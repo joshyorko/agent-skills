@@ -1,0 +1,4 @@
+interface:
+  display_name: "RCC Automation"
+  short_description: "RCC robots, environments, and holotree ops"
+  default_prompt: "Use $rcc to create and manage RCC robots, environments, and holotree workflows."
