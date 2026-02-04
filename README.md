@@ -14,6 +14,12 @@ agent-skills/
 │   ├── scripts/         # Validation utilities
 │   └── templates/       # Reference conda.yaml configs
 │
+├── copilot/rcc/         # RCC skill for GitHub Copilot agents
+│   ├── SKILL.md         # Skill definition
+│   ├── assets/          # Templates and starter files
+│   ├── references/      # Documentation
+│   └── scripts/         # Utilities
+│
 └── codex/rcc-skill/     # RCC skill for OpenAI Codex
     ├── SKILL.md         # Skill definition
     ├── agents/          # Agent configurations
@@ -44,6 +50,12 @@ agent-skills/
 1. Copy the `claude/rcc/` directory to your project's `.claude/skills/` folder
 2. The skill will auto-initialize on session start via hooks
 3. Use natural language to create and manage RCC robots
+
+### GitHub Copilot
+
+1. Copy `copilot/rcc/` to your project's `.github/skills/rcc/` folder
+2. Commit the skill so Copilot agents can load it from the repository
+3. Use natural language to plan and execute RCC workflows
 
 ### Codex
 
