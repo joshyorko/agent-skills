@@ -75,3 +75,4 @@ htmlcov/
 *.local
 .env.local
 devdata/work-items-out/
+benchmarks/

@@ -60,6 +60,7 @@ Use explicit add-on dependencies for any package not covered by `robocorp` metap
 ## Typical imports by capability
 
 - Entry points: `from robocorp.tasks import task`
+- Task runtime helpers: `from robocorp.tasks import get_output_dir, get_current_task`
 - Logging: `from robocorp import log`
 - Queues: `from robocorp import workitems`
 - Secrets: `from robocorp import vault`
@@ -68,13 +69,35 @@ Use explicit add-on dependencies for any package not covered by `robocorp` metap
 - Windows desktop: `from robocorp import windows`
 - Excel files: `from robocorp import excel`
 
+## Task runtime helpers (`robocorp.tasks` >= 4.0.0)
+
+```python
+import os
+from pathlib import Path
+
+from robocorp.tasks import get_current_task, get_output_dir
+
+def resolve_output_dir() -> Path:
+    output = get_output_dir()
+    if output is not None:
+        return output.resolve()
+    # Fallback for execution outside robocorp.tasks.
+    return Path(os.environ.get("ROBOT_ARTIFACTS", "output")).resolve()
+
+def current_task_name() -> str:
+    current = get_current_task()
+    return current.name if current is not None else "<outside-task>"
+```
+
 ## Practical guidance
 
 1. Prefer `robocorp.tasks` for Python-first task entry points.
-2. Use `workitems.inputs`/`workitems.outputs` for queue-based producer-consumer flow.
-3. Pull credentials from Vault, not environment literals in code.
-4. Add non-metapackage dependencies explicitly.
-5. Keep `robocorp.*` and `RPA.*` dependencies separate and intentional.
+2. Prefer `get_output_dir()` for artifact paths and `get_current_task()` for task-aware logging.
+3. Keep `ROBOT_ARTIFACTS`/`ROBOT_ROOT` fallback logic only for outside-task contexts.
+4. Use `workitems.inputs`/`workitems.outputs` for queue-based producer-consumer flow.
+5. Pull credentials from Vault, not environment literals in code.
+6. Add non-metapackage dependencies explicitly.
+7. Keep `robocorp.*` and `RPA.*` dependencies separate and intentional.
 
 ## Community fork note (`actions-work-items`)
 

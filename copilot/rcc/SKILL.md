@@ -28,6 +28,7 @@ https://pypi.org/project/uv/
 - Use `environmentConfigs` with freeze files before `conda.yaml` for reproducibility.
 - Treat `output/environment_*_freeze.yaml` as runtime artifacts; only copy to the project root when intentionally freezing.
 - Use `ROBOT_ROOT` and `ROBOT_ARTIFACTS` for path resolution; RCC resolves relative paths from `ROBOT_ROOT`.
+- In `robocorp.tasks` runtime, prefer `get_output_dir()` and `get_current_task()` over direct env-var reads; keep `ROBOT_ARTIFACTS`/`ROBOT_ROOT` as fallback for non-task contexts.
 
 ## Holotree
 - List environments: `rcc holotree list`.
