@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fizzy API CLI"
+  short_description: "Run Fizzy API calls with Bash wrappers."
+  default_prompt: "Use $fizzy-api-cli to call Fizzy endpoints with the bundled Bash script and summarize request/response details."
