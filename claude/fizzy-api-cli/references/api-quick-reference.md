@@ -61,8 +61,47 @@ scripts/fizzy.sh call GET /123456/cards/42 --etag '"abc123"'
 
 A `304 Not Modified` means no new payload.
 
+### Markdown comment create/update
+
+```bash
+COMMENT_MD="$(cat <<'MD'
+## Progress Update
+
+### Changes
+- Item one
+- Item two
+
+### Validation
+- Added/ran relevant checks
+MD
+)"
+jq -n --arg body "$COMMENT_MD" '{comment:{body:$body}}' >/tmp/comment.json
+scripts/fizzy.sh call POST /123456/cards/42/comments --json-file /tmp/comment.json
+scripts/fizzy.sh call PUT /123456/cards/42/comments/987 --json-file /tmp/comment.json
+```
+
+### Markdown card description update
+
+```bash
+CARD_MD="$(cat <<'MD'
+## Summary
+
+### Fix Applied
+- Change details
+
+### Verification
+- Validation details
+MD
+)"
+jq -n --arg description "$CARD_MD" '{card:{description:$description}}' >/tmp/card-update.json
+scripts/fizzy.sh call PUT /123456/cards/42 --json-file /tmp/card-update.json
+```
+
+`jq --arg` safely escapes newlines and quotes so Fizzy receives valid JSON while preserving markdown formatting.
+
 ## Notes
 
 - List parameters repeat the same key and end with `[]`, e.g. `tag_ids[]=a&tag_ids[]=b`.
+- Prefer markdown sections and bullet lists for human-facing card/comment content; avoid single-line paragraph dumps.
 - Validation errors often return `422`; malformed or unexpected data can return `500`.
 - Some rich text/file features use ActiveStorage direct upload flows.

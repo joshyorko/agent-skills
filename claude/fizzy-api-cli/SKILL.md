@@ -1,6 +1,6 @@
 ---
 name: fizzy-api-cli
-description: Automate Fizzy API operations with a bundled Bash CLI and focused endpoint references. Use when Codex needs to authenticate with Fizzy (personal token or magic link), call or script Fizzy REST endpoints, handle pagination or ETag caching, upload files via multipart requests, or replace ad-hoc curl snippets with repeatable commands.
+description: Automate Fizzy API operations with a bundled Bash CLI and focused endpoint references. Use when Codex needs to authenticate with Fizzy (personal token or magic link), call or script Fizzy REST endpoints, compose markdown-formatted card/comment updates, handle pagination or ETag caching, upload files via multipart requests, or replace ad-hoc curl snippets with repeatable commands.
 ---
 
 # Fizzy API CLI
@@ -42,7 +42,10 @@ Use `identity`, `boards`, `cards`, and `comments` subcommands when they fit.
 3. Use generic commands for uncovered endpoints.
 Use `call` for JSON endpoints, `form` for multipart, and `paginate` for `Link: rel="next"` traversal.
 
-4. Keep outputs machine-friendly.
+4. Format write payloads for cards/comments as markdown.
+When writing comment bodies or card descriptions, compose structured markdown first (headings + bullets + blank lines), then encode it with `jq --arg` and send with `--json-file`. Do not send long single-line prose blobs.
+
+5. Keep outputs machine-friendly.
 Pipe to `jq` when you need transforms. Use `--raw` when you need unformatted response bodies.
 
 ## Command Surface
@@ -57,6 +60,42 @@ Pipe to `jq` when you need transforms. Use `--raw` when you need unformatted res
 - `call METHOD PATH [--json ...|--json-file ...] [--header ...] [--etag ...]`
 - `form METHOD PATH field=value field=@/path/file [--header ...]`
 - `paginate PATH [--header ...] [--etag ...] [--max-pages N]`
+
+## Markdown Writes (Cards and Comments)
+
+Use this pattern for `POST/PUT` comment and card updates so markdown rendering is preserved:
+
+```bash
+COMMENT_MD="$(cat <<'MD'
+## Status Update
+
+### Changes
+- Updated token resolution for AWS credential selection.
+- Added regression coverage for local endpoint mode.
+
+### Validation
+- Ran `DownloadTranscriptsJob`.
+- Confirmed transcript sync completed.
+MD
+)"
+jq -n --arg body "$COMMENT_MD" '{comment:{body:$body}}' >/tmp/comment.json
+scripts/fizzy.sh call POST /123456/cards/42/comments --json-file /tmp/comment.json
+```
+
+For card description edits:
+
+```bash
+CARD_MD="$(cat <<'MD'
+## Implementation Notes
+
+### What Changed
+- Item one
+- Item two
+MD
+)"
+jq -n --arg description "$CARD_MD" '{card:{description:$description}}' >/tmp/card-update.json
+scripts/fizzy.sh call PUT /123456/cards/42 --json-file /tmp/card-update.json
+```
 
 ## Resource Use
 
