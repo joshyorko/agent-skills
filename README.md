@@ -1,6 +1,6 @@
 # Agent Skills
 
-A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and the [Fizzy CLI](https://github.com/basecamp/fizzy-cli) for managing boards, cards, and more on a self-hosted Fizzy instance at `fizzy.joshyorko.com`.
+A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and Fizzy project management support for the hosted instance at `https://fizzy.joshyorko.com`. Fizzy operations use the direct HTTP API as the primary path; the optional [Fizzy CLI](https://github.com/basecamp/fizzy-cli) is a convenience layer when the binary is confirmed installed.
 
 ## Structure
 
@@ -39,21 +39,30 @@ agent-skills/
 
 ## Skills
 
-### Fizzy CLI
+### Fizzy
 
-Manage Fizzy boards, cards, columns, comments, steps, and more via the [Basecamp fizzy CLI](https://github.com/basecamp/fizzy-cli). Configured for the self-hosted instance at `https://fizzy.joshyorko.com`.
+Manage Fizzy boards, cards, columns, comments, and steps on the hosted instance at `https://fizzy.joshyorko.com`.
 
-Install the CLI:
+**Primary path — direct HTTP API (validated):**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/basecamp/fizzy-cli/master/scripts/install.sh | bash
-fizzy setup
+export FIZZY_TOKEN="your_token"
+export FIZZY_BASE="https://fizzy.joshyorko.com"
+# Identity
+curl -s -H "Authorization: Bearer $FIZZY_TOKEN" "$FIZZY_BASE/my/identity" | jq .
+# List boards
+curl -s -H "Authorization: Bearer $FIZZY_TOKEN" "$FIZZY_BASE/boards.json" | jq '[.[] | {id, name}]'
 ```
 
-Or use the bundled install script:
+**Optional CLI (use only when binary is confirmed installed):**
 ```bash
 bash claude/fizzy/scripts/install.sh   # Claude Code
 bash codex/fizzy/scripts/install.sh   # Codex
+fizzy setup                            # Interactive token setup
+fizzy board list
+fizzy card list --board BOARD_ID
 ```
+
+See the [Fizzy skill](codex/fizzy/SKILL.md) for the full validation matrix and API reference.
 
 ### RCC
 
@@ -105,7 +114,8 @@ brew install --cask joshyorko/tools/rcc
 - [RCC Examples & Recipes](codex/rcc-skill/references/examples.md)
 - [RCC Work Items](codex/rcc-skill/references/workitems.md)
 - [RCC Deployment Patterns](codex/rcc-skill/references/deployment.md)
-- [Fizzy CLI Repository](https://github.com/basecamp/fizzy-cli)
+- [Fizzy Skill & Validation Matrix](codex/fizzy/SKILL.md)
+- [Fizzy CLI Repository](https://github.com/basecamp/fizzy-cli) (optional binary)
 
 ## License
 
