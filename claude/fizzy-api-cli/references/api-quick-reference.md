@@ -12,7 +12,7 @@
 
 ## Script Environment Variables
 
-- `FIZZY_BASE_URL` (default: `https://app.fizzy.do`)
+- `FIZZY_BASE_URL` (default: `https://fizzy.joshyorko.com`)
 - `FIZZY_TOKEN`
 - `FIZZY_SESSION_TOKEN`
 - `FIZZY_PENDING_AUTH_TOKEN`

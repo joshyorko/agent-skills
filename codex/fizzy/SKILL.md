@@ -48,6 +48,7 @@ triggers:
   # URLs
   - fizzy.do
   - app.fizzy.do
+  - fizzy.joshyorko.com
 invocable: true
 argument-hint: "[action] [args...]"
 ---
@@ -122,7 +123,7 @@ All commands support:
 |------|-------------|
 | `--token TOKEN` | API access token |
 | `--profile NAME` | Named profile (for multi-account users) |
-| `--api-url URL` | API base URL (default: https://app.fizzy.do) |
+| `--api-url URL` | API base URL (default: https://fizzy.joshyorko.com) |
 | `--json` | JSON envelope output |
 | `--quiet` | Raw JSON data without envelope |
 | `--styled` | Human-readable styled output (tables, colors) |

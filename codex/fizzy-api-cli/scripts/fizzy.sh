@@ -3,7 +3,7 @@ set -euo pipefail
 
 PROGRAM="$(basename "$0")"
 
-BASE_URL="${FIZZY_BASE_URL:-https://app.fizzy.do}"
+BASE_URL="${FIZZY_BASE_URL:-https://fizzy.joshyorko.com}"
 TOKEN="${FIZZY_TOKEN:-}"
 SESSION_TOKEN="${FIZZY_SESSION_TOKEN:-}"
 PENDING_AUTH_TOKEN="${FIZZY_PENDING_AUTH_TOKEN:-}"
@@ -35,7 +35,7 @@ Usage:
   fizzy.sh [global options] <command> [args]
 
 Global options:
-  --base-url URL         Override Fizzy API base URL (default: https://app.fizzy.do)
+  --base-url URL         Override Fizzy API base URL (default: https://fizzy.joshyorko.com)
   --token TOKEN          Override FIZZY_TOKEN
   --session-token TOKEN  Override FIZZY_SESSION_TOKEN
   --pending-token TOKEN  Override FIZZY_PENDING_AUTH_TOKEN
