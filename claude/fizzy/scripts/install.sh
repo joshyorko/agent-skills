@@ -1,122 +1,65 @@
 #!/usr/bin/env bash
+# Fizzy hosted-instance setup for https://fizzy.joshyorko.com
+#
+# There is no stable self-hosted CLI binary for this instance.
+# The supported and validated approach is direct HTTP API calls with a Bearer token.
+# This script configures the environment and verifies connectivity.
 set -euo pipefail
 
-REPO="basecamp/fizzy-cli"
-INSTALL_DIR="${FIZZY_BIN_DIR:-$HOME/.local/bin}"
+FIZZY_API_URL="${FIZZY_API_URL:-https://fizzy.joshyorko.com}"
 
-# Detect OS and architecture
-OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-ARCH=$(uname -m)
-
-case "$ARCH" in
-  x86_64|amd64) ARCH="amd64" ;;
-  aarch64|arm64) ARCH="arm64" ;;
-  *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
-esac
-
-case "$OS" in
-  linux|darwin) ;;
-  mingw*|msys*|cygwin*) OS="windows" ;;
-  *) echo "Unsupported OS: $OS"; exit 1 ;;
-esac
-
-# Fetch latest version
-echo "Fetching latest version..."
-VERSION=$(curl -sI "https://github.com/$REPO/releases/latest" | grep -i '^location:' | sed 's/.*tag\///' | tr -d '\r\n' || true)
-if [ -z "$VERSION" ]; then
-  echo "Failed to determine latest version"
-  exit 1
-fi
-echo "Latest version: $VERSION"
-
-# Download archive
-EXT="tar.gz"
-if [ "$OS" = "windows" ]; then
-  EXT="zip"
-fi
-
-ARCHIVE="fizzy_${VERSION#v}_${OS}_${ARCH}.${EXT}"
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/${VERSION}/${ARCHIVE}"
-CHECKSUMS_URL="https://github.com/$REPO/releases/download/${VERSION}/checksums.txt"
-
-TMPDIR=$(mktemp -d)
-trap 'rm -rf "$TMPDIR"' EXIT
-
-echo "Downloading $ARCHIVE..."
-curl -fsSL "$DOWNLOAD_URL" -o "$TMPDIR/$ARCHIVE"
-curl -fsSL "$CHECKSUMS_URL" -o "$TMPDIR/checksums.txt"
-
-# Verify SHA256
-echo "Verifying checksum..."
-cd "$TMPDIR"
-EXPECTED=$(awk -v f="$ARCHIVE" '$2 == f {print $1}' checksums.txt)
-if [ -z "$EXPECTED" ]; then
-  echo "ERROR: Archive not found in checksums file"
-  exit 1
-fi
-ACTUAL=$(sha256sum "$ARCHIVE" 2>/dev/null || shasum -a 256 "$ARCHIVE" | awk '{print $1}')
-ACTUAL=$(echo "$ACTUAL" | awk '{print $1}')
-if [ "$EXPECTED" != "$ACTUAL" ]; then
-  echo "ERROR: Checksum mismatch!"
-  echo "  Expected: $EXPECTED"
-  echo "  Actual:   $ACTUAL"
-  exit 1
-fi
-echo "Checksum verified."
-
-# Verify cosign signature (if cosign available)
-if command -v cosign >/dev/null 2>&1; then
-  SIG_URL="https://github.com/$REPO/releases/download/${VERSION}/checksums.txt.sig"
-  CERT_URL="https://github.com/$REPO/releases/download/${VERSION}/checksums.txt.pem"
-  if curl -fsSL "$SIG_URL" -o checksums.txt.sig 2>/dev/null && \
-     curl -fsSL "$CERT_URL" -o checksums.txt.pem 2>/dev/null; then
-    echo "Verifying cosign signature..."
-    if cosign verify-blob \
-      --certificate checksums.txt.pem \
-      --signature checksums.txt.sig \
-      --certificate-identity-regexp="https://github.com/$REPO/.github/workflows/release.yml@refs/tags/" \
-      --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-      checksums.txt 2>/dev/null; then
-      echo "Signature verified."
-    else
-      echo "ERROR: Signature verification failed"
-      exit 1
-    fi
-  fi
-fi
-
-# Extract
-echo "Extracting..."
-if [ "$EXT" = "zip" ]; then
-  unzip -q "$ARCHIVE" -d extract
-else
-  mkdir -p extract
-  tar -xzf "$ARCHIVE" -C extract
-fi
-
-# Install
-mkdir -p "$INSTALL_DIR"
-BINARY="fizzy"
-if [ "$OS" = "windows" ]; then
-  BINARY="fizzy.exe"
-fi
-cp "extract/${BINARY}" "$INSTALL_DIR/${BINARY}"
-chmod +x "$INSTALL_DIR/${BINARY}"
-
+echo "=== Fizzy hosted-instance setup ==="
+echo "API URL: $FIZZY_API_URL"
 echo ""
-echo "fizzy ${VERSION} installed to $INSTALL_DIR/${BINARY}"
 
-# Check if install dir is in PATH
-if ! echo "$PATH" | tr ':' '\n' | grep -qx "$INSTALL_DIR"; then
+# Require a token
+if [ -z "${FIZZY_TOKEN:-}" ]; then
+  echo "ERROR: FIZZY_TOKEN is not set."
   echo ""
-  echo "Add $INSTALL_DIR to your PATH:"
-  SHELL_NAME=$(basename "${SHELL:-bash}")
-  case "$SHELL_NAME" in
-    zsh)  echo "  echo 'export PATH=\"$INSTALL_DIR:\$PATH\"' >> ~/.zshrc && source ~/.zshrc" ;;
-    fish) echo "  fish_add_path $INSTALL_DIR" ;;
-    *)    echo "  echo 'export PATH=\"$INSTALL_DIR:\$PATH\"' >> ~/.bashrc && source ~/.bashrc" ;;
-  esac
+  echo "Set your API token before running this script:"
+  echo "  export FIZZY_TOKEN=fizzy_your_token_here"
+  echo ""
+  echo "Then re-run:"
+  echo "  bash claude/fizzy/scripts/install.sh"
+  exit 1
 fi
 
+echo "Verifying token against $FIZZY_API_URL/my/identity ..."
+HTTP_STATUS=$(curl -s -o /tmp/fizzy_identity.json -w "%{http_code}" \
+  -H "Authorization: Bearer $FIZZY_TOKEN" \
+  "$FIZZY_API_URL/my/identity")
+
+if [ "$HTTP_STATUS" != "200" ]; then
+  echo "ERROR: Authentication failed (HTTP $HTTP_STATUS)."
+  echo "Check that FIZZY_TOKEN is correct and that the instance is reachable."
+  rm -f /tmp/fizzy_identity.json
+  exit 1
+fi
+
+echo "Authentication successful."
+if command -v jq >/dev/null 2>&1; then
+  jq -r '"Logged in as: \(.name // .email // "unknown")"' /tmp/fizzy_identity.json 2>/dev/null || true
+fi
+rm -f /tmp/fizzy_identity.json
+
 echo ""
-"$INSTALL_DIR/${BINARY}" setup || echo "Run '$INSTALL_DIR/${BINARY} setup' to get started."
+echo "=== Setup complete ==="
+echo ""
+echo "Environment variables for this session:"
+echo "  export FIZZY_TOKEN=<your-token>"
+echo "  export FIZZY_API_URL=$FIZZY_API_URL"
+echo ""
+echo "Quick API reference:"
+echo "  # Identity"
+echo "  curl -s -H \"Authorization: Bearer \$FIZZY_TOKEN\" \$FIZZY_API_URL/my/identity | jq ."
+echo ""
+echo "  # List boards"
+echo "  curl -s -H \"Authorization: Bearer \$FIZZY_TOKEN\" \$FIZZY_API_URL/1/boards | jq ."
+echo ""
+echo "  # Create a board"
+echo "  curl -s -X POST -H \"Authorization: Bearer \$FIZZY_TOKEN\" \\"
+echo "    -H \"Content-Type: application/json\" \\"
+echo "    -d '{\"name\": \"My Board\"}' \\"
+echo "    \$FIZZY_API_URL/1/boards | jq ."
+echo ""
+echo "See claude/fizzy/SKILL.md for the full HTTP API reference."

@@ -54,7 +54,60 @@ argument-hint: "[action] [args...]"
 
 # /fizzy - Fizzy Workflow Command
 
-Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration.
+> **Hosted-instance notice:** There is no stable CLI binary for `https://fizzy.joshyorko.com`. The `basecamp/fizzy-cli` binary hardcodes `https://app.fizzy.do` and will not work here. **Use direct HTTP API calls** with `Authorization: Bearer $FIZZY_TOKEN`. The CLI documentation below remains as a reference for the API surface, but every example can also be performed via `curl` against the hosted instance.
+
+## Hosted Instance — Direct HTTP API
+
+**Environment:**
+```bash
+export FIZZY_TOKEN=fizzy_your_token_here
+export FIZZY_API_URL=https://fizzy.joshyorko.com
+```
+
+**Validated endpoints (self-hosted `https://fizzy.joshyorko.com`):**
+
+```bash
+# Identity / auth check
+curl -s -H "Authorization: Bearer $FIZZY_TOKEN" \
+  $FIZZY_API_URL/my/identity | jq .
+
+# List boards
+curl -s -H "Authorization: Bearer $FIZZY_TOKEN" \
+  $FIZZY_API_URL/1/boards | jq .
+
+# Create a board
+curl -s -X POST \
+  -H "Authorization: Bearer $FIZZY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "My Board"}' \
+  $FIZZY_API_URL/1/boards | jq .
+
+# Create a column on a board
+curl -s -X POST \
+  -H "Authorization: Bearer $FIZZY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "In Progress"}' \
+  $FIZZY_API_URL/1/boards/<board_id>/columns | jq .
+
+# Create a card on a board
+curl -s -X POST \
+  -H "Authorization: Bearer $FIZZY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "My Card"}' \
+  $FIZZY_API_URL/1/boards/<board_id>/cards | jq .
+
+# Move a card to triage
+curl -s -X POST \
+  -H "Authorization: Bearer $FIZZY_TOKEN" \
+  $FIZZY_API_URL/1/cards/<card_number>/triage | jq .
+```
+
+**Run setup/verify script:**
+```bash
+bash codex/fizzy/scripts/install.sh   # Verifies token and connectivity
+```
+
+---
 
 ## Agent Invariants
 
@@ -1113,5 +1166,7 @@ fizzy auth status                        # Shows configured profile and API URL
 
 ## Learn More
 
-- API documentation: https://github.com/basecamp/fizzy/blob/main/docs/API.md
-- CLI repository: https://github.com/basecamp/fizzy-cli
+- Hosted instance: https://fizzy.joshyorko.com
+- HTTP API skill reference: this file (codex/fizzy/SKILL.md)
+
+> **Self-hosted note:** The `basecamp/fizzy-cli` binary hardcodes `https://app.fizzy.do` and does not work with this hosted instance. Use the HTTP API directly with `Authorization: Bearer $FIZZY_TOKEN` and `FIZZY_API_URL=https://fizzy.joshyorko.com`.
