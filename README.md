@@ -1,15 +1,15 @@
 # Agent Skills
 
-A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and Fizzy project management support for the hosted instance at `https://fizzy.joshyorko.com`. Fizzy operations use the direct HTTP API as the primary path; the optional [Fizzy CLI](https://github.com/basecamp/fizzy-cli) is a convenience layer when the binary is confirmed installed.
+A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and a Fizzy HTTP API skill for managing boards, cards, and more on the self-hosted Fizzy instance at `https://fizzy.joshyorko.com`.
 
 ## Structure
 
 ```
 agent-skills/
 ├── claude/
-│   ├── fizzy/           # Fizzy CLI skill for Claude Code
-│   │   ├── SKILL.md     # Skill definition (Basecamp fizzy CLI)
-│   │   └── scripts/     # install.sh
+│   ├── fizzy/           # Fizzy HTTP API skill for Claude Code
+│   │   ├── SKILL.md     # Skill definition (direct HTTP API)
+│   │   └── scripts/     # install.sh (token setup + connectivity check)
 │   └── rcc/             # RCC skill for Claude Code
 │       ├── SKILL.md     # Skill definition with hooks
 │       ├── robot.yaml   # RCC task configuration
@@ -25,10 +25,10 @@ agent-skills/
 │   └── scripts/         # Utilities
 │
 └── codex/
-    ├── fizzy/           # Fizzy CLI skill for OpenAI Codex
-    │   ├── SKILL.md     # Skill definition (Basecamp fizzy CLI)
+    ├── fizzy/           # Fizzy HTTP API skill for OpenAI Codex
+    │   ├── SKILL.md     # Skill definition (direct HTTP API)
     │   ├── agents/      # Agent configuration
-    │   └── scripts/     # install.sh
+    │   └── scripts/     # install.sh (token setup + connectivity check)
     └── rcc-skill/       # RCC skill for OpenAI Codex
         ├── SKILL.md     # Skill definition
         ├── agents/      # Agent configurations
@@ -39,30 +39,40 @@ agent-skills/
 
 ## Skills
 
-### Fizzy
+### Fizzy HTTP API
 
-Manage Fizzy boards, cards, columns, comments, and steps on the hosted instance at `https://fizzy.joshyorko.com`.
+Manage Fizzy boards, cards, columns, comments, steps, and more via the [Fizzy HTTP API](https://fizzy.joshyorko.com). The supported method for this self-hosted instance is direct HTTP calls with a Bearer token — no CLI binary is required or validated for self-hosted use.
 
-**Primary path — direct HTTP API (validated):**
+> **Note:** The `basecamp/fizzy-cli` binary hardcodes `https://app.fizzy.do` and does not work with `https://fizzy.joshyorko.com`. The `@raw-works/fizzy-cli` npm package requires `bun` and is not validated here. **Use the HTTP API directly.**
+
+Configure your token:
 ```bash
-export FIZZY_TOKEN="your_token"
-export FIZZY_BASE="https://fizzy.joshyorko.com"
-# Identity
-curl -s -H "Authorization: Bearer $FIZZY_TOKEN" "$FIZZY_BASE/my/identity" | jq .
-# List boards
-curl -s -H "Authorization: Bearer $FIZZY_TOKEN" "$FIZZY_BASE/boards.json" | jq '[.[] | {id, name}]'
+export FIZZY_TOKEN=fizzy_your_token_here
+export FIZZY_API_URL=https://fizzy.joshyorko.com
 ```
 
-**Optional CLI (use only when binary is confirmed installed):**
+Verify authentication:
 ```bash
+curl -s -H "Authorization: Bearer $FIZZY_TOKEN" $FIZZY_API_URL/my/identity | jq .
+```
+
+Or use the bundled setup script (verifies connectivity):
+```bash
+export FIZZY_TOKEN=fizzy_your_token_here
 bash claude/fizzy/scripts/install.sh   # Claude Code
 bash codex/fizzy/scripts/install.sh   # Codex
-fizzy setup                            # Interactive token setup
-fizzy board list
-fizzy card list --board BOARD_ID
 ```
 
-See the [Fizzy skill](codex/fizzy/SKILL.md) for the full validation matrix and API reference.
+**Validated endpoints:**
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET`  | `/my/identity` | Authenticate / identity discovery |
+| `GET`  | `/1/boards` | List boards |
+| `POST` | `/1/boards` | Create a board |
+| `POST` | `/1/boards/:board_id/columns` | Create a column |
+| `POST` | `/1/boards/:board_id/cards` | Create a card |
+| `POST` | `/1/cards/:card_number/triage` | Move card to triage |
 
 ### RCC
 
@@ -114,8 +124,8 @@ brew install --cask joshyorko/tools/rcc
 - [RCC Examples & Recipes](codex/rcc-skill/references/examples.md)
 - [RCC Work Items](codex/rcc-skill/references/workitems.md)
 - [RCC Deployment Patterns](codex/rcc-skill/references/deployment.md)
-- [Fizzy Skill & Validation Matrix](codex/fizzy/SKILL.md)
-- [Fizzy CLI Repository](https://github.com/basecamp/fizzy-cli) (optional binary)
+- [Fizzy HTTP API Skill (Codex)](codex/fizzy/SKILL.md)
+- [Fizzy HTTP API Skill (Claude)](claude/fizzy/SKILL.md)
 
 ## License
 

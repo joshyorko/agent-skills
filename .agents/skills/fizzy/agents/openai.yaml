@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fizzy"
+  short_description: "Manage Fizzy boards, cards, columns, comments, steps, and more via the fizzy CLI."
+  default_prompt: "Use $fizzy to manage Fizzy boards, cards, comments, and more from the command line."
