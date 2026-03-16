@@ -1,65 +1,126 @@
 #!/usr/bin/env bash
-# Fizzy hosted-instance setup for https://fizzy.joshyorko.com
-#
-# There is no stable self-hosted CLI binary for this instance.
-# The supported and validated approach is direct HTTP API calls with a Bearer token.
-# This script configures the environment and verifies connectivity.
+# Fizzy CLI setup for the hosted instance at https://fizzy.joshyorko.com
 set -euo pipefail
 
+REPO="basecamp/fizzy-cli"
 FIZZY_API_URL="${FIZZY_API_URL:-https://fizzy.joshyorko.com}"
+INSTALL_DIR="${FIZZY_BIN_DIR:-$HOME/.local/bin}"
+INSTALL_TMPDIR=""
 
-echo "=== Fizzy hosted-instance setup ==="
+cleanup() {
+  if [ -n "$INSTALL_TMPDIR" ] && [ -d "$INSTALL_TMPDIR" ]; then
+    rm -rf "$INSTALL_TMPDIR"
+  fi
+}
+
+trap cleanup EXIT
+
+detect_os() {
+  local os
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  case "$os" in
+    linux|darwin) printf '%s\n' "$os" ;;
+    *)
+      echo "ERROR: Unsupported OS: $os"
+      exit 1
+      ;;
+  esac
+}
+
+detect_arch() {
+  local arch
+  arch=$(uname -m)
+  case "$arch" in
+    x86_64|amd64) printf 'amd64\n' ;;
+    aarch64|arm64) printf 'arm64\n' ;;
+    *)
+      echo "ERROR: Unsupported architecture: $arch"
+      exit 1
+      ;;
+  esac
+}
+
+latest_version() {
+  curl -fsSI "https://github.com/$REPO/releases/latest" \
+    | awk 'BEGIN {IGNORECASE=1} /^location:/ {print $2}' \
+    | tr -d '\r\n' \
+    | sed 's#.*/tag/##'
+}
+
+install_fizzy() {
+  local os arch version asset url
+  os=$(detect_os)
+  arch=$(detect_arch)
+  version=$(latest_version)
+
+  if [ -z "$version" ]; then
+    echo "ERROR: Failed to determine the latest fizzy release version."
+    exit 1
+  fi
+
+  asset="fizzy-${os}-${arch}"
+  url="https://github.com/$REPO/releases/download/${version}/${asset}"
+  INSTALL_TMPDIR=$(mktemp -d)
+
+  echo "Installing upstream Fizzy CLI ${version}..."
+  echo "Downloading ${asset}..."
+  curl -fsSL "$url" -o "$INSTALL_TMPDIR/fizzy"
+
+  mkdir -p "$INSTALL_DIR"
+  install -m 0755 "$INSTALL_TMPDIR/fizzy" "$INSTALL_DIR/fizzy"
+
+  export PATH="$INSTALL_DIR:$PATH"
+}
+
+echo "=== Fizzy CLI setup ==="
 echo "API URL: $FIZZY_API_URL"
+echo "Install dir: $INSTALL_DIR"
 echo ""
 
-# Require a token
-if [ -z "${FIZZY_TOKEN:-}" ]; then
-  echo "ERROR: FIZZY_TOKEN is not set."
-  echo ""
-  echo "Set your API token before running this script:"
-  echo "  export FIZZY_TOKEN=fizzy_your_token_here"
-  echo ""
-  echo "Then re-run:"
-  echo "  bash codex/fizzy/scripts/install.sh"
-  exit 1
+if ! command -v fizzy >/dev/null 2>&1; then
+  install_fizzy
 fi
 
-echo "Verifying token against $FIZZY_API_URL/my/identity ..."
-HTTP_STATUS=$(curl -s -o /tmp/fizzy_identity.json -w "%{http_code}" \
-  -H "Authorization: Bearer $FIZZY_TOKEN" \
-  "$FIZZY_API_URL/my/identity")
+echo "Using fizzy at: $(command -v fizzy)"
+echo "Version: $(fizzy version 2>/dev/null || echo unknown)"
 
-if [ "$HTTP_STATUS" != "200" ]; then
-  echo "ERROR: Authentication failed (HTTP $HTTP_STATUS)."
-  echo "Check that FIZZY_TOKEN is correct and that the instance is reachable."
+if [ -n "${FIZZY_TOKEN:-}" ]; then
+  echo ""
+  echo "Verifying CLI auth against $FIZZY_API_URL ..."
+  if fizzy identity show --api-url "$FIZZY_API_URL" --json > /tmp/fizzy_identity.json; then
+    echo "Authentication successful."
+    if command -v jq >/dev/null 2>&1; then
+      jq -r '"Logged in as: \(.data.name // .data.email_address // .data.email // \"unknown\")"' /tmp/fizzy_identity.json 2>/dev/null || true
+    fi
+    fizzy board list --api-url "$FIZZY_API_URL" --count >/dev/null
+  else
+    echo "ERROR: Fizzy CLI could not authenticate with the provided token."
+    echo "Check FIZZY_TOKEN or run the interactive setup below."
+    rm -f /tmp/fizzy_identity.json
+    exit 1
+  fi
   rm -f /tmp/fizzy_identity.json
-  exit 1
 fi
-
-echo "Authentication successful."
-if command -v jq >/dev/null 2>&1; then
-  jq -r '"Logged in as: \(.name // .email // "unknown")"' /tmp/fizzy_identity.json 2>/dev/null || true
-fi
-rm -f /tmp/fizzy_identity.json
 
 echo ""
 echo "=== Setup complete ==="
 echo ""
 echo "Environment variables for this session:"
-echo "  export FIZZY_TOKEN=<your-token>"
 echo "  export FIZZY_API_URL=$FIZZY_API_URL"
+echo "  export FIZZY_TOKEN=<your-token>"
 echo ""
-echo "Quick API reference:"
-echo "  # Identity"
-echo "  curl -s -H \"Authorization: Bearer \$FIZZY_TOKEN\" \$FIZZY_API_URL/my/identity | jq ."
+echo "Recommended next steps:"
+echo "  1) Add the install dir to your PATH if needed:"
+echo "     export PATH=\"$INSTALL_DIR:\$PATH\""
 echo ""
-echo "  # List boards"
-echo "  curl -s -H \"Authorization: Bearer \$FIZZY_TOKEN\" \$FIZZY_API_URL/1/boards | jq ."
+echo "  2) Run interactive setup for the hosted instance:"
+echo "     fizzy setup --api-url \"$FIZZY_API_URL\""
 echo ""
-echo "  # Create a board"
-echo "  curl -s -X POST -H \"Authorization: Bearer \$FIZZY_TOKEN\" \\"
-echo "    -H \"Content-Type: application/json\" \\"
-echo "    -d '{\"name\": \"My Board\"}' \\"
-echo "    \$FIZZY_API_URL/1/boards | jq ."
+echo "  3) Or save a token non-interactively:"
+echo "     fizzy auth login \"\$FIZZY_TOKEN\" --api-url \"$FIZZY_API_URL\""
 echo ""
-echo "See codex/fizzy/SKILL.md for the full HTTP API reference."
+echo "  4) Verify CLI access:"
+echo "     fizzy identity show --api-url \"$FIZZY_API_URL\" --json | jq ."
+echo "     fizzy board list --api-url \"$FIZZY_API_URL\" --limit 5"
+echo ""
+echo "See .agents/skills/fizzy/SKILL.md for the full CLI workflow reference."

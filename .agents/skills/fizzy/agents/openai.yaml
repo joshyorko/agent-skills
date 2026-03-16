@@ -1,4 +1,4 @@
 interface:
   display_name: "Fizzy"
-  short_description: "Manage Fizzy boards, cards, columns, comments, steps, and more via the fizzy CLI."
-  default_prompt: "Use $fizzy to manage Fizzy boards, cards, comments, and more from the command line."
+  short_description: "Manage Fizzy boards, cards, columns, comments, steps, and more with the upstream fizzy CLI only. Never use curl or direct HTTP requests."
+  default_prompt: "Use $fizzy to manage Fizzy boards, cards, comments, and more from the command line. For self-hosted work, point the CLI at the hosted instance with --api-url or FIZZY_API_URL, and never fall back to curl, raw HTTP requests, endpoint probing, or HTML scraping."

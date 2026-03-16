@@ -1,15 +1,15 @@
 # Agent Skills
 
-A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and a Fizzy HTTP API skill for managing boards, cards, and more on the self-hosted Fizzy instance at `https://fizzy.joshyorko.com`.
+A collection of skills for AI coding agents. Includes RCC (Repeatable, Contained Code) automation skills and a Fizzy CLI skill for managing boards, cards, and more on the self-hosted Fizzy instance at `https://fizzy.joshyorko.com`.
 
 ## Structure
 
 ```
 agent-skills/
 ├── claude/
-│   ├── fizzy/           # Fizzy HTTP API skill for Claude Code
-│   │   ├── SKILL.md     # Skill definition (direct HTTP API)
-│   │   └── scripts/     # install.sh (token setup + connectivity check)
+│   ├── fizzy/           # Fizzy CLI skill for Claude Code
+│   │   ├── SKILL.md     # Skill definition (CLI-only workflow)
+│   │   └── scripts/     # install.sh (CLI install + setup verification)
 │   └── rcc/             # RCC skill for Claude Code
 │       ├── SKILL.md     # Skill definition with hooks
 │       ├── robot.yaml   # RCC task configuration
@@ -25,10 +25,10 @@ agent-skills/
 │   └── scripts/         # Utilities
 │
 └── codex/
-    ├── fizzy/           # Fizzy HTTP API skill for OpenAI Codex
-    │   ├── SKILL.md     # Skill definition (direct HTTP API)
+    ├── fizzy/           # Fizzy CLI skill for OpenAI Codex
+    │   ├── SKILL.md     # Skill definition (CLI-only workflow)
     │   ├── agents/      # Agent configuration
-    │   └── scripts/     # install.sh (token setup + connectivity check)
+    │   └── scripts/     # install.sh (CLI install + setup verification)
     └── rcc-skill/       # RCC skill for OpenAI Codex
         ├── SKILL.md     # Skill definition
         ├── agents/      # Agent configurations
@@ -39,40 +39,36 @@ agent-skills/
 
 ## Skills
 
-### Fizzy HTTP API
+### Fizzy CLI
 
-Manage Fizzy boards, cards, columns, comments, steps, and more via the [Fizzy HTTP API](https://fizzy.joshyorko.com). The supported method for this self-hosted instance is direct HTTP calls with a Bearer token — no CLI binary is required or validated for self-hosted use.
+Manage Fizzy boards, cards, columns, comments, steps, and more via the upstream [`fizzy` CLI](https://github.com/basecamp/fizzy-cli). This repo standardizes on a **CLI-only** workflow for the self-hosted instance at `https://fizzy.joshyorko.com`.
 
-> **Note:** The `basecamp/fizzy-cli` binary hardcodes `https://app.fizzy.do` and does not work with `https://fizzy.joshyorko.com`. The `@raw-works/fizzy-cli` npm package requires `bun` and is not validated here. **Use the HTTP API directly.**
+> **Rule:** Agents must use the `fizzy` CLI only. Do **not** call the HTTP API directly, inspect raw endpoints, or scrape the app HTML as a fallback.
 
-Configure your token:
+The bundled setup scripts install the official upstream binary from GitHub releases using the current asset names (`fizzy-linux-amd64`, `fizzy-darwin-arm64`, and so on), then walk you through self-hosted CLI setup.
+
+Bootstrap the CLI:
+
 ```bash
-export FIZZY_TOKEN=fizzy_your_token_here
 export FIZZY_API_URL=https://fizzy.joshyorko.com
+bash claude/fizzy/scripts/install.sh   # Claude Code
+bash codex/fizzy/scripts/install.sh    # Codex / global agents
 ```
 
-Verify authentication:
-```bash
-curl -s -H "Authorization: Bearer $FIZZY_TOKEN" $FIZZY_API_URL/my/identity | jq .
-```
+Authenticate and verify access:
 
-Or use the bundled setup script (verifies connectivity):
 ```bash
 export FIZZY_TOKEN=fizzy_your_token_here
-bash claude/fizzy/scripts/install.sh   # Claude Code
-bash codex/fizzy/scripts/install.sh   # Codex
+fizzy auth login "$FIZZY_TOKEN" --api-url "$FIZZY_API_URL"
+fizzy identity show --api-url "$FIZZY_API_URL" --json | jq .
+fizzy board list --api-url "$FIZZY_API_URL" --limit 5
 ```
 
-**Validated endpoints:**
+Or use the interactive wizard:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET`  | `/my/identity` | Authenticate / identity discovery |
-| `GET`  | `/1/boards` | List boards |
-| `POST` | `/1/boards` | Create a board |
-| `POST` | `/1/boards/:board_id/columns` | Create a column |
-| `POST` | `/1/boards/:board_id/cards` | Create a card |
-| `POST` | `/1/cards/:card_number/triage` | Move card to triage |
+```bash
+fizzy setup --api-url "$FIZZY_API_URL"
+```
 
 ### RCC
 
@@ -85,6 +81,7 @@ Create and run self-contained Python automation robots with isolated environment
 - **Hook Integration**: Pre/post task hooks for validation and setup
 
 Prerequisites — [RCC CLI](https://github.com/joshyorko/rcc):
+
 ```bash
 brew install --cask joshyorko/tools/rcc
 ```
@@ -109,13 +106,13 @@ brew install --cask joshyorko/tools/rcc
 
 ## RCC Common Commands
 
-| Command | Purpose |
-|---------|---------|
-| `rcc robot init -t <template> -d <dir>` | Create new robot |
-| `rcc ht vars -r robot.yaml` | Build/verify environment |
-| `rcc run --task "Task Name" --silent` | Run specific task |
-| `rcc task shell` | Interactive shell in environment |
-| `rcc configure diagnostics` | System diagnostics |
+| Command                                 | Purpose                          |
+| --------------------------------------- | -------------------------------- |
+| `rcc robot init -t <template> -d <dir>` | Create new robot                 |
+| `rcc ht vars -r robot.yaml`             | Build/verify environment         |
+| `rcc run --task "Task Name" --silent`   | Run specific task                |
+| `rcc task shell`                        | Interactive shell in environment |
+| `rcc configure diagnostics`             | System diagnostics               |
 
 ## Documentation
 
@@ -124,8 +121,8 @@ brew install --cask joshyorko/tools/rcc
 - [RCC Examples & Recipes](codex/rcc-skill/references/examples.md)
 - [RCC Work Items](codex/rcc-skill/references/workitems.md)
 - [RCC Deployment Patterns](codex/rcc-skill/references/deployment.md)
-- [Fizzy HTTP API Skill (Codex)](codex/fizzy/SKILL.md)
-- [Fizzy HTTP API Skill (Claude)](claude/fizzy/SKILL.md)
+- [Fizzy CLI Skill (Codex)](codex/fizzy/SKILL.md)
+- [Fizzy CLI Skill (Claude)](claude/fizzy/SKILL.md)
 
 ## License
 
