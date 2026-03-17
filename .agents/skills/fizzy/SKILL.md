@@ -1,63 +1,72 @@
 ---
 name: fizzy
 description: |
-  Use the upstream Fizzy CLI only to manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, and account settings.
-user-invocable: true
+  Interact with Fizzy via the Fizzy CLI. Manage boards, cards, columns, comments,
+  steps, reactions, tags, users, notifications, pins, webhooks, and account settings. Use for ANY Fizzy question or action.
+triggers:
+  # Direct invocations
+  - fizzy
+  - /fizzy
+  # Resource actions
+  - fizzy board
+  - fizzy card
+  - fizzy column
+  - fizzy comment
+  - fizzy step
+  - fizzy reaction
+  - fizzy tag
+  - fizzy notification
+  - fizzy webhook
+  - fizzy account
+  # Common actions
+  - link to fizzy
+  - track in fizzy
+  - create card
+  - close card
+  - move card
+  - assign card
+  - add comment
+  - add step
+  - search cards
+  # Search and discovery
+  - search fizzy
+  - find in fizzy
+  - check fizzy
+  - list fizzy
+  - show fizzy
+  - get from fizzy
+  # Questions
+  - what's in fizzy
+  - what fizzy
+  - how do I fizzy
+  # My work
+  - my cards
+  - my tasks
+  - my board
+  - assigned to me
+  - pinned cards
+  # URLs
+  - fizzy.do
+  - app.fizzy.do
+invocable: true
 argument-hint: "[action] [args...]"
 ---
 
 # /fizzy - Fizzy Workflow Command
 
-> **CLI-only rule:** Use the upstream `fizzy` CLI for every Fizzy task. Do **not** use `curl`, raw HTTP requests, endpoint probing, or HTML scraping. For `https://fizzy.joshyorko.com`, point the CLI at the hosted instance with `--api-url`, `FIZZY_API_URL`, or `.fizzy.yaml`.
-
-## Hosted Instance — CLI Only
-
-**Bootstrap the CLI:**
-
-```bash
-bash .agents/skills/fizzy/scripts/install.sh
-```
-
-**Configure the hosted instance:**
-
-```bash
-export FIZZY_API_URL=https://fizzy.joshyorko.com
-
-# Interactive setup
-fizzy setup --api-url "$FIZZY_API_URL"
-
-# Save a token for future sessions
-fizzy auth login "$FIZZY_TOKEN" --api-url "$FIZZY_API_URL"
-
-# Verify auth and connectivity
-fizzy identity show --api-url "$FIZZY_API_URL" --json | jq .
-fizzy board list --api-url "$FIZZY_API_URL" --limit 5 | jq '.data[] | {id, name}'
-```
-
-**Per-repo config (`.fizzy.yaml`):**
-
-```yaml
-api_url: https://fizzy.joshyorko.com
-board: 03foq1hqmyy91tuyz3ghugg6c
-```
-
-**Agent rule:** If a Fizzy request cannot be completed with the `fizzy` CLI, stop and report the CLI limitation. Do not fall back to direct API calls.
-
----
+Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration.
 
 ## Agent Invariants
 
 **MUST follow these rules:**
 
-1. **Use the upstream `fizzy` CLI only** — no direct HTTP, `curl`, endpoint probing, or HTML scraping.
-2. **Cards use NUMBER, not ID** — `fizzy card show 42` uses the card number. Other resources use their `id` field.
-3. **Parse JSON with jq** to reduce token output — `fizzy card list | jq '[.data[] | {number, title}]'`
-4. **Check breadcrumbs** in responses for available next actions with pre-filled values
-5. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards
-6. **Rich text fields accept HTML** — use `<p>` tags for paragraphs, `<action-text-attachment>` for inline images
-7. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`
-8. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
+1. **Cards use NUMBER, not ID** — `fizzy card show 42` uses the card number. Other resources use their `id` field.
+2. **Parse JSON with jq** to reduce token output — `fizzy card list | jq '[.data[] | {number, title}]'`
+3. **Check breadcrumbs** in responses for available next actions with pre-filled values
+4. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards
+5. **Rich text fields accept HTML** — use `<p>` tags for paragraphs, `<action-text-attachment>` for inline images
+6. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`
+7. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
 
 ## Decision Trees
 
@@ -113,7 +122,7 @@ All commands support:
 | ---------------- | ----------------------------------------------------------------- |
 | `--token TOKEN`  | API access token                                                  |
 | `--profile NAME` | Named profile (for multi-account users)                           |
-| `--api-url URL`  | API base URL (default: https://fizzy.joshyorko.com)               |
+| `--api-url URL`  | API base URL (default: https://app.fizzy.do)                      |
 | `--json`         | JSON envelope output                                              |
 | `--quiet`        | Raw JSON data without envelope                                    |
 | `--styled`       | Human-readable styled output (tables, colors)                     |
@@ -143,7 +152,7 @@ fizzy card list --all
 
 Note: `--limit` and `--all` cannot be used together.
 
-**IMPORTANT:** The `--all` flag controls pagination only - it fetches all pages of results for your current filter. It does NOT change which cards are included. By default, `card list` returns only open cards. See the `Card Statuses` section below for how to fetch closed or postponed cards.
+**IMPORTANT:** The `--all` flag controls pagination only - it fetches all pages of results for your current filter. It does NOT change which cards are included. By default, `card list` returns only open cards. See [Card Statuses](#card-statuses) for how to fetch closed or postponed cards.
 
 Commands supporting `--all` and `--page`:
 
@@ -173,10 +182,11 @@ Commands supporting `--all` and `--page`:
 **Per-repo config:** `.fizzy.yaml`
 
 ```yaml
-api_url: https://fizzy.joshyorko.com
 account: 123456789
 board: 03foq1hqmyy91tuyz3ghugg6c
 ```
+
+Add `api_url: https://...` when the project should target a hosted or self-hosted Fizzy instance instead of the upstream default.
 
 **Priority (highest to lowest):**
 
@@ -204,6 +214,8 @@ fizzy auth logout                        # Log out current profile
 fizzy auth logout --all                  # Log out all profiles
 fizzy identity show                      # Show profiles
 ```
+
+**Local bootstrap note:** If `fizzy` is not installed or not on `PATH`, first have the user run `bash codex/fizzy/scripts/install.sh`. After that, prefer the user's own `fizzy setup --api-url "$FIZZY_API_URL"` flow for first-run auth on hosted or self-hosted instances. If `fizzy identity show --api-url "$FIZZY_API_URL"` already works, continue without redoing setup.
 
 ### Signup (New User or Token Generation)
 
@@ -1138,7 +1150,5 @@ fizzy auth status                        # Shows configured profile and API URL
 
 ## Learn More
 
-- Hosted instance: https://fizzy.joshyorko.com
-- CLI skill reference: this file (.agents/skills/fizzy/SKILL.md)
-
-> **Self-hosted note:** Use the upstream `fizzy` CLI with `--api-url https://fizzy.joshyorko.com`, `FIZZY_API_URL=https://fizzy.joshyorko.com`, or `api_url` in `.fizzy.yaml`. Do not bypass the CLI with direct HTTP calls.
+- API documentation: https://github.com/basecamp/fizzy/blob/main/docs/API.md
+- CLI repository: https://github.com/basecamp/fizzy-cli
