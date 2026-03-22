@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" fill="none">
+  <defs>
+    <linearGradient id="night" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b132b"/>
+      <stop offset="100%" stop-color="#17233f"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff7f4d"/>
+      <stop offset="50%" stop-color="#ffb347"/>
+      <stop offset="100%" stop-color="#ffe29f"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" rx="18" fill="url(#night)"/>
+  <circle cx="120" cy="70" r="3" fill="#f6d99e"/>
+  <circle cx="180" cy="90" r="4" fill="#f6d99e"/>
+  <circle cx="520" cy="70" r="3" fill="#f6d99e"/>
+  <circle cx="430" cy="110" r="4" fill="#f6d99e"/>
+  <circle cx="350" cy="60" r="2" fill="#f6d99e"/>
+  <rect x="120" y="250" width="400" height="50" rx="25" fill="#10192e"/>
+  <rect x="180" y="265" width="280" height="18" rx="9" fill="#23314f"/>
+  <path d="M320 130 C360 200 330 240 320 260 C310 240 280 200 320 130 Z" fill="url(#flame)" stroke="#ff7f4d" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M300 190 C310 200 305 215 300 225" stroke="#f75c03" stroke-width="6" stroke-linecap="round"/>
+  <path d="M340 190 C330 205 335 218 340 228" stroke="#f75c03" stroke-width="6" stroke-linecap="round"/>
+  <line x1="270" y1="260" x2="370" y2="300" stroke="#8d5524" stroke-width="16" stroke-linecap="round"/>
+  <line x1="370" y1="260" x2="270" y2="300" stroke="#b07b33" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="250" cy="210" r="4" fill="#ffe29f" opacity="0.9"/>
+  <circle cx="390" cy="210" r="3" fill="#ffe29f" opacity="0.9"/>
+  <circle cx="320" cy="95" r="6" fill="#ffe29f" opacity="0.8"/>
+</svg>
