@@ -127,6 +127,7 @@ brew install --cask joshyorko/tools/rcc
 - [RCC Deployment Patterns](codex/rcc-skill/references/deployment.md)
 - [Fizzy CLI Skill (Codex)](codex/fizzy/SKILL.md)
 - [Frontend Skill (Codex)](codex/frontend-skill/SKILL.md)
+- [Frontend Skill Mood Assets](codex/frontend-skill/assets/) — Basecamp/HEY/Campfire reference SVGs
 - [Fizzy CLI Skill (Claude)](claude/fizzy/SKILL.md)
 
 ## License

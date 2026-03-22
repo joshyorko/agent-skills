@@ -11,6 +11,8 @@ triggers:
   - web redesign
   - marketing page
   - product UI
+  - rails ui
+  - hotwire
 invocable: true
 argument-hint: "[task]"
 ---
@@ -18,6 +20,12 @@ argument-hint: "[task]"
 # Codex Frontend Skill (37signals-influenced)
 
 Use this when art direction, hierarchy, restraint, imagery, and motion determine success more than component count. Default toward clear brand voice, calm surfaces, and Jason Fried/DHH simplicity: one idea per screen, ruthless deletion of chrome, and copy that speaks plainly.
+
+## Rails-native defaults
+- Default to Rails + Hotwire/Turbo/Stimulus + importmaps or jsbundling for light assets; keep views server-rendered first.
+- Favor ERB/HTML with Turbo Streams for interactivity; keep React only when mandated.
+- Use Tailwind only when the project already has it; otherwise rely on lean utility classes or SCSS tokens defined locally.
+- Treat background jobs/emails as Rails land; frontends should respect Basecamp/HEY performance discipline (small payloads, cache-friendly, minimal JS).
 
 ## Working Model
 - **Visual thesis**: one sentence on mood, material, energy (e.g., “sunlit paper, confident serif, cedar accents”).
@@ -55,6 +63,8 @@ Litmus: if removing the image leaves the hero unchanged, the image is too weak. 
 - Use uploaded/pre-generated images first; otherwise, call the image generation tool for real-looking, in-situ photos. Do not link random web images unless the user asks.
 - Pick/crop images with stable tonal areas for text; no embedded signage or UI frames.
 - The first viewport needs a real visual anchor; decorative texture alone is not enough.
+- When mood is unspecified, start with a 37signals-inspired trio and pick one: calm Basecamp alpine morning, playful HEY letterpress, or Campfire night warmth.
+- Keep generated assets reusable—store handles and reuse across sections for consistency.
 
 ## Motion
 - Ship 2-3 intentional motions: hero entrance, scroll-linked depth or parallax, and one hover/reveal or layout transition that sharpens affordance.
@@ -75,6 +85,14 @@ Litmus: if removing the image leaves the hero unchanged, the image is too weak. 
 - Use Playwright or equivalent tooling to inspect rendered layouts, multiple viewports, and motion; verify contrast, spacing, and CTA prominence.
 - Keep fixed/floating UI from overlapping primary content; for `100vh`/`100svh` heroes, account for header height (`calc(100svh - header)`).
 - When reasoning stalls, regenerate mood board options, pick one, and iterate.
+- For Rails stacks, validate Turbo flows, form submissions, and CSRF safety; prefer system tests with Capybara when adding interactions.
+
+## 37signals reference mini-moodboard
+- Basecamp alpine calm: ![Basecamp mood](assets/basecamp-mood.svg)
+- HEY letterpress color pop: ![HEY envelope](assets/hey-letter.svg)
+- Campfire warmth at night: ![Campfire sparks](assets/campfire-sparks.svg)
+
+Use these as visual anchors when generating assets; they model full-bleed heroes, calm palettes, and minimal chrome.
 
 ## Preflight Checks
 - Brand unmistakable in first screen? One strong visual anchor? Each section with one job?
