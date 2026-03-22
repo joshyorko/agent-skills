@@ -29,6 +29,9 @@ agent-skills/
     │   ├── SKILL.md     # Skill definition (CLI-only workflow)
     │   ├── agents/      # Agent configuration
     │   └── scripts/     # install.sh (CLI install + setup verification)
+    ├── frontend-skill/  # Frontend design skill for Codex
+    │   ├── SKILL.md     # Design guidance and guardrails
+    │   └── agents/      # Agent configuration
     └── rcc-skill/       # RCC skill for OpenAI Codex
         ├── SKILL.md     # Skill definition
         ├── agents/      # Agent configurations
@@ -101,8 +104,9 @@ brew install --cask joshyorko/tools/rcc
 
 ### Codex
 
-1. Reference `codex/fizzy/` or `codex/rcc-skill/` in your Codex agent configuration
-2. RCC templates are available in `codex/rcc-skill/assets/templates/`
+1. Reference `codex/fizzy/`, `codex/frontend-skill/`, or `codex/rcc-skill/` in your Codex agent configuration
+2. Use `codex/frontend-skill/` for 37signals-inspired frontend guidance, `codex/fizzy/` for Fizzy CLI workflows, and `codex/rcc-skill/` for RCC automation.
+3. RCC templates are available in `codex/rcc-skill/assets/templates/`
 
 ## RCC Common Commands
 
@@ -122,6 +126,7 @@ brew install --cask joshyorko/tools/rcc
 - [RCC Work Items](codex/rcc-skill/references/workitems.md)
 - [RCC Deployment Patterns](codex/rcc-skill/references/deployment.md)
 - [Fizzy CLI Skill (Codex)](codex/fizzy/SKILL.md)
+- [Frontend Skill (Codex)](codex/frontend-skill/SKILL.md)
 - [Fizzy CLI Skill (Claude)](claude/fizzy/SKILL.md)
 
 ## License
