@@ -1,4 +1,0 @@
-interface:
-  display_name: "Frontend Design"
-  short_description: "37signals-inspired, brand-first UI composition with strong imagery and restrained chrome."
-  default_prompt: "Use $frontend-skill for visually led landing pages, marketing sites, and app surfaces. Lead with full-bleed hero composition, strong branding, cardless layouts, purposeful motion, and concise copy."
