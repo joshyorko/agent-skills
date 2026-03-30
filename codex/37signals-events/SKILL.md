@@ -112,12 +112,12 @@ end
 - account_id on every table
 - All events scoped to account
 
-**Related Agents:**
-- @model-agent - Rich event models with business logic
-- @state-records-agent - Events as state records, not booleans
-- @jobs-agent - Webhook delivery jobs, event processing
-- @turbo-agent - Real-time activity feed updates
-- @migration-agent - Event table schemas with UUIDs
+**Related Skills:**
+- `$37signals-model` - Rich event models with business logic
+- `$37signals-state-records` - Events as state records, not booleans
+- `$37signals-jobs` - Webhook delivery jobs and event processing
+- `$37signals-turbo` - Real-time activity feed updates
+- `$37signals-migration` - Event table schemas with UUIDs
 
 ## Commands
 

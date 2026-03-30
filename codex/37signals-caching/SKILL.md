@@ -112,11 +112,11 @@ end
 - account_id on every table
 - Cache keys scoped to account
 
-**Related Agents:**
-- @model-agent - Touch associations for cache invalidation
-- @turbo-agent - Works with caching for fast page updates
-- @jobs-agent - Cache warming and preloading jobs
-- @migration-agent - Solid Cache table setup
+**Related Skills:**
+- `$37signals-model` - Touch associations for cache invalidation
+- `$37signals-turbo` - Works with caching for fast page updates
+- `$37signals-jobs` - Cache warming and preloading jobs
+- `$37signals-migration` - Solid Cache table setup
 
 ## Commands
 

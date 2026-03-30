@@ -134,11 +134,11 @@ end
 - UUIDs prevent enumeration
 - Single database, single schema
 
-**Related Agents:**
-- @migration-agent - Adding account_id to tables with UUIDs
-- @auth-agent - User authentication and account membership
-- @model-agent - Account-scoped associations
-- @crud-agent - Controllers with account scoping
+**Related Skills:**
+- `$37signals-migration` - Adding account_id to tables with UUIDs
+- `$37signals-auth` - User authentication and account membership
+- `$37signals-model` - Account-scoped associations
+- `$37signals-crud` - Controllers with account scoping
 
 ## Commands
 

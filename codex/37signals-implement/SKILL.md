@@ -18,7 +18,32 @@ metadata:
 
 # Implement Agent
 
-You are an expert Rails development orchestrator who coordinates specialized agents to implement complete features following modern patterns. You analyze requirements, break down tasks, delegate to appropriate specialized agents, and ensure cohesive implementation across the entire Rails stack.
+You are an expert Rails development orchestrator who coordinates specialist skills and focused sub-agents to implement complete features following modern patterns. You analyze requirements, break down tasks, hand work to the appropriate specialist guidance, and ensure cohesive implementation across the entire Rails stack.
+
+## Codex Port Note
+
+This upstream skill used generic `@...-agent` names. In this Codex install, read them as the locally installed `37signals-*` skills:
+
+- `@api-agent` -> `$37signals-api`
+- `@auth-agent` -> `$37signals-auth`
+- `@caching-agent` -> `$37signals-caching`
+- `@concerns-agent` -> `$37signals-concerns`
+- `@crud-agent` -> `$37signals-crud`
+- `@events-agent` -> `$37signals-events`
+- `@implement-agent` -> `$37signals-implement`
+- `@jobs-agent` -> `$37signals-jobs`
+- `@mailer-agent` -> `$37signals-mailer`
+- `@migration-agent` -> `$37signals-migration`
+- `@model-agent` -> `$37signals-model`
+- `@multi-tenant-agent` -> `$37signals-multi-tenant`
+- `@refactoring-agent` -> `$37signals-refactoring`
+- `@review-agent` -> `$37signals-review`
+- `@state-records-agent` -> `$37signals-state-records`
+- `@stimulus-agent` -> `$37signals-stimulus`
+- `@test-agent` -> `$37signals-test`
+- `@turbo-agent` -> `$37signals-turbo`
+
+When the examples below say `runSubagent(...)`, interpret that as "use the matching `$37signals-*` skill and only spawn a focused sub-agent if execution would benefit from it."
 
 ## Philosophy: Orchestrated Implementation, Not Monolithic Code Generation
 
@@ -59,15 +84,15 @@ def implement_feature(description)
   # No delegation, no specialization
 end
 
-# ✅ GOOD: Orchestrate specialized agents
+# ✅ GOOD: Orchestrate specialist skills
 def implement_feature(description)
   # 1. Analyze requirements
   components = analyze_requirements(description)
 
-  # 2. Delegate to specialized agents
+  # 2. Hand each component to the matching skill
   components.each do |component|
-    agent = select_agent_for(component)
-    runSubagent(agent: agent, prompt: component.requirements)
+    skill = select_skill_for(component)
+    implement_component_with(skill, component.requirements)
   end
 
   # 3. Coordinate integration
@@ -435,15 +460,12 @@ Document the sequence:
 6. Tests: Add tests for X, Y, Z
 ```
 
-### Step 3: Delegate to Agents
+### Step 3: Hand Off to the Matching Skill
 
 For each step:
 ```
-runSubagent(
-  agentName: "@appropriate-agent",
-  description: "Brief task description",
-  prompt: "Detailed requirements for this specific component"
-)
+skill = select_skill_for(component)
+implement_component_with(skill, component.requirements)
 ```
 
 ### Step 4: Validate Integration
@@ -458,7 +480,7 @@ After delegation, verify:
 
 Give user:
 - What was implemented
-- Which agents were used
+- Which skills or focused sub-agents were used
 - Files created/modified
 - Next steps or suggestions
 
@@ -673,7 +695,7 @@ Next steps:
 - Coordinate testing across all layers
 - Follow modern patterns consistently
 - Provide implementation summary to user
-- Use runSubagent for each specialized task
+- Use the matching `37signals-*` skill for each specialized task; only spawn a focused sub-agent when execution benefits from it
 
 ### Ask First:
 - Whether to create new resource vs. extend existing

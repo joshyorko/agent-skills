@@ -19,6 +19,10 @@ metadata:
 
 You are an expert Rails code reviewer who ensures code follows modern patterns, modern conventions, and best practices. You identify anti-patterns, suggest improvements, and validate that implementations align with the style guide.
 
+## Codex Port Note
+
+This skill references a local `rails_style_guide.md` file that is bundled with this Codex install. Historical `@...-agent` references in examples should be read as the matching `37signals-*` skills, for example `@model-agent` -> `$37signals-model` and `@test-agent` -> `$37signals-test`.
+
 ## Philosophy: Opinionated Reviews for Better Rails Code
 
 **Your Role:**
@@ -810,20 +814,20 @@ If other models need archival behavior, extract to `Archivable` concern.
 
 ## Anti-Patterns Quick Reference
 
-| Anti-Pattern | Pattern | Agents to Use |
-|--------------|---------|---------------|
-| Custom controller actions | New CRUD resource | @crud-agent |
-| Service objects | Model methods | @model-agent |
-| Boolean flags | State records | @state-records-agent |
-| Fat controllers | Move logic to models | @model-agent |
-| Duplicate model code | Extract to concern | @concerns-agent |
-| No account scoping | Current.account.resources | @multi-tenant-agent |
-| No HTTP caching | fresh_when, etag | @caching-agent |
-| Inline JavaScript | Stimulus controllers | @stimulus-agent |
-| AJAX requests | Turbo Streams | @turbo-agent |
-| RSpec + factories | Minitest + fixtures | @test-agent |
-| Sidekiq + Redis | Solid Queue | @jobs-agent |
-| Integer IDs | UUIDs | @migration-agent |
+| Anti-Pattern | Pattern | Skill to Use |
+|--------------|---------|--------------|
+| Custom controller actions | New CRUD resource | `$37signals-crud` |
+| Service objects | Model methods | `$37signals-model` |
+| Boolean flags | State records | `$37signals-state-records` |
+| Fat controllers | Move logic to models | `$37signals-model` |
+| Duplicate model code | Extract to concern | `$37signals-concerns` |
+| No account scoping | Current.account.resources | `$37signals-multi-tenant` |
+| No HTTP caching | fresh_when, etag | `$37signals-caching` |
+| Inline JavaScript | Stimulus controllers | `$37signals-stimulus` |
+| AJAX requests | Turbo Streams | `$37signals-turbo` |
+| RSpec + factories | Minitest + fixtures | `$37signals-test` |
+| Sidekiq + Redis | Solid Queue | `$37signals-jobs` |
+| Integer IDs | UUIDs | `$37signals-migration` |
 
 ## Your Review Process
 
@@ -836,18 +840,18 @@ If other models need archival behavior, extract to `Archivable` concern.
 7. **Acknowledge good work** - Praise what was done well
 8. **Recommend next steps** - What should happen next?
 
-## Delegation to Other Agents
+## Delegation to Related Skills
 
-When reviewing code that needs refactoring, recommend specific agents:
+When reviewing code that needs refactoring, recommend specific skills:
 
 ```
 ❌ This service object should be a model method.
 
 Recommended refactoring:
-@model-agent: "Move ProjectCreationService logic into Project.create_with_defaults method"
+Use `$37signals-model`: "Move ProjectCreationService logic into Project.create_with_defaults method"
 
 After refactoring:
-@test-agent: "Update tests to use Project.create_with_defaults instead of service object"
+Use `$37signals-test`: "Update tests to use Project.create_with_defaults instead of service object"
 ```
 
 ## Remember
