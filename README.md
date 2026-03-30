@@ -1,6 +1,7 @@
 # Agent Skills
 
 A focused set of Codex skills for four jobs:
+
 - `codex/37signals-*` for focused 37signals-style Rails specialists
 - `codex/rails-37signals-*` for workflow-level Rails implementation, refactoring, and review
 - `codex/fizzy/` for self-hosted Fizzy workflows via the upstream CLI
@@ -61,11 +62,13 @@ agent-skills/
 The `codex/37signals-*` skills cover focused Rails patterns and conventions inspired by 37signals-style applications. Across the set, the defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, explicit `Current.account` scoping, UUID-backed schemas, and Minitest with fixtures.
 
 **Architecture and workflow**
+
 - [`37signals-implement`](codex/37signals-implement/SKILL.md) — orchestrates complete Rails feature work across the specialist skills.
 - [`37signals-refactoring`](codex/37signals-refactoring/SKILL.md) — orchestrates incremental refactors toward 37signals Rails patterns.
 - [`37signals-review`](codex/37signals-review/SKILL.md) — reviews Rails code for convention alignment, CRUD shape, model design, and Hotwire fit.
 
 **Domain, data, and tenancy**
+
 - [`37signals-auth`](codex/37signals-auth/SKILL.md) — custom passwordless authentication without Devise.
 - [`37signals-concerns`](codex/37signals-concerns/SKILL.md) — shared model and controller behavior via focused concerns.
 - [`37signals-migration`](codex/37signals-migration/SKILL.md) — UUID-first, account-scoped migrations without foreign key constraints.
@@ -74,6 +77,7 @@ The `codex/37signals-*` skills cover focused Rails patterns and conventions insp
 - [`37signals-state-records`](codex/37signals-state-records/SKILL.md) — models business state as records instead of booleans.
 
 **Delivery, UI, and operations**
+
 - [`37signals-api`](codex/37signals-api/SKILL.md) — REST APIs using `respond_to` blocks with Jbuilder templates.
 - [`37signals-caching`](codex/37signals-caching/SKILL.md) — HTTP caching, ETags, `fresh_when`, `stale?`, and fragment caching.
 - [`37signals-crud`](codex/37signals-crud/SKILL.md) — RESTful controllers built around the “everything is CRUD” philosophy.
@@ -126,6 +130,7 @@ fizzy board list --api-url "$FIZZY_API_URL" --limit 5
 ```
 
 Primary docs:
+
 - [Fizzy skill](codex/fizzy/SKILL.md)
 - [Fizzy install wrapper](codex/fizzy/scripts/install.sh)
 
@@ -134,6 +139,7 @@ Primary docs:
 The RCC skill focuses on repeatable, isolated Python automation environments and robot scaffolding.
 
 Use it for:
+
 - new robot setup
 - holotree-backed environment validation
 - work item flows
@@ -141,6 +147,7 @@ Use it for:
 - hook-based setup and verification
 
 Primary docs:
+
 - [RCC skill](codex/rcc-skill/SKILL.md)
 - [RCC installation guide](codex/rcc-skill/references/installation.md)
 - [RCC reference](codex/rcc-skill/references/reference.md)
@@ -152,6 +159,7 @@ Primary docs:
 ### Codex
 
 Point Codex at the folder that matches the job:
+
 - any `codex/37signals-*/` folder for a focused Rails pattern
 - `codex/rails-37signals-implement/` for end-to-end Rails feature work
 - `codex/rails-37signals-refactor/` for incremental Rails refactors
