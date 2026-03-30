@@ -1,0 +1,7 @@
+interface:
+  display_name: "Rails 37signals Implement"
+  short_description: "Build Rails features the 37signals way"
+  default_prompt: "Use $rails-37signals-implement to implement this Rails feature with 37signals-style conventions."
+
+policy:
+  allow_implicit_invocation: true
