@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Test"
+  short_description: "Writes Minitest tests with integration tests and fixtures following 37signals conventions. Uses Minitest (not RSpec) and fixtures (not factories)."
+  default_prompt: "Use $37signals-test when writing tests, adding test coverage, or when user mentions testing, Minitest, fixtures, or integration tests."
+
+policy:
+  allow_implicit_invocation: true

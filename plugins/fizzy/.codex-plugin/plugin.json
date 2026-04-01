@@ -1,0 +1,41 @@
+{
+  "name": "fizzy",
+  "version": "0.1.0",
+  "description": "CLI-first Fizzy workflows for boards, cards, comments, account setup, and self-hosted management using the upstream fizzy CLI only.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "fizzy",
+    "cli",
+    "project-management",
+    "self-hosted",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Fizzy",
+    "shortDescription": "Manage Fizzy from the command line with the upstream CLI only.",
+    "longDescription": "CLI-first Fizzy automation for boards, cards, comments, setup, and self-hosted workflows. Never falls back to curl or raw HTTP requests.",
+    "developerName": "Josh Yorko",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/joshyorko/agent-skills",
+    "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
+    "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
+    "defaultPrompt": [
+      "Set up the Fizzy CLI for the hosted instance.",
+      "List boards and summarize active work in Fizzy.",
+      "Manage Fizzy cards and comments from the CLI."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

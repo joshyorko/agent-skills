@@ -1,0 +1,20 @@
+{
+  "name": "fizzy",
+  "version": "0.1.0",
+  "description": "CLI-first Fizzy workflows for boards, cards, comments, account setup, and self-hosted management using the upstream fizzy CLI only.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "fizzy",
+    "cli",
+    "project-management",
+    "self-hosted",
+    "workflow"
+  ]
+}

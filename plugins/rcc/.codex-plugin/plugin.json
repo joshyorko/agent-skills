@@ -1,0 +1,41 @@
+{
+  "name": "rcc",
+  "version": "0.1.0",
+  "description": "RCC automation workflows for robot scaffolding, isolated environments, holotree operations, and repeatable Python automation.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "rcc",
+    "robocorp",
+    "robot-framework",
+    "automation",
+    "holotree"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "RCC Automation",
+    "shortDescription": "RCC robots, environments, and holotree operations.",
+    "longDescription": "RCC workflows for creating robots, validating robot and conda configuration, managing holotree environments, and packaging repeatable automation.",
+    "developerName": "Josh Yorko",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/joshyorko/agent-skills",
+    "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
+    "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
+    "defaultPrompt": [
+      "Create a new RCC robot with the right templates.",
+      "Debug this robot.yaml or conda.yaml setup.",
+      "Check RCC environment and holotree health."
+    ],
+    "brandColor": "#1D4ED8"
+  }
+}

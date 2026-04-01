@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Events"
+  short_description: "Builds event tracking and activity systems with webhooks following 37signals patterns."
+  default_prompt: "Use $37signals-events when implementing audit trails, activity feeds, event sourcing, or when user mentions events, tracking, webhooks, or activity logs."
+
+policy:
+  allow_implicit_invocation: true
