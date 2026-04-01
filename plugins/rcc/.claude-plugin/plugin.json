@@ -1,0 +1,20 @@
+{
+  "name": "rcc",
+  "version": "0.1.0",
+  "description": "RCC automation workflows for robot scaffolding, isolated environments, holotree operations, and repeatable Python automation.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "rcc",
+    "robocorp",
+    "robot-framework",
+    "automation",
+    "holotree"
+  ]
+}

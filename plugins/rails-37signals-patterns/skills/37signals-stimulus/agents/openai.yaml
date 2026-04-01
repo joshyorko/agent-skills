@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Stimulus"
+  short_description: "Builds focused, single-purpose Stimulus controllers for progressive enhancement following 37signals patterns."
+  default_prompt: "Use $37signals-stimulus when adding JavaScript behavior, UI interactions, form enhancements, or when user mentions Stimulus, JavaScript controllers, or sprinkles."
+
+policy:
+  allow_implicit_invocation: true

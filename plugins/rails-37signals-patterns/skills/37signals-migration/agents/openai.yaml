@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Migration"
+  short_description: "Creates database migrations with UUIDs, account scoping, and no foreign key constraints following 37signals patterns."
+  default_prompt: "Use $37signals-migration when creating tables, adding columns, modifying schema, or when user mentions migrations, database structure, or schema changes."
+
+policy:
+  allow_implicit_invocation: true

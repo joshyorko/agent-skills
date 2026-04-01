@@ -1,0 +1,56 @@
+{
+  "name": "agent-skills",
+  "interface": {
+    "displayName": "Agent Skills"
+  },
+  "plugins": [
+    {
+      "name": "rails-37signals-patterns",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rails-37signals-patterns"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "rails-37signals-workflows",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rails-37signals-workflows"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "fizzy",
+      "source": {
+        "source": "local",
+        "path": "./plugins/fizzy"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "rcc",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rcc"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

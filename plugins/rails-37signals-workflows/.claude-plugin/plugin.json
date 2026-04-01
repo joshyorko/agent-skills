@@ -1,0 +1,20 @@
+{
+  "name": "rails-37signals-workflows",
+  "version": "0.1.0",
+  "description": "Workflow-level Rails skills for implementing, refactoring, and reviewing features with 37signals-style conventions.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "rails",
+    "37signals",
+    "workflow",
+    "implementation",
+    "review"
+  ]
+}

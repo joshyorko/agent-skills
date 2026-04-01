@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Implement"
+  short_description: "Orchestrates implementation of complete Rails features across models, controllers, views, and tests following 37signals conventions."
+  default_prompt: "Use $37signals-implement when implementing a full feature end-to-end or when user mentions feature implementation, full-stack, or orchestration."
+
+policy:
+  allow_implicit_invocation: true

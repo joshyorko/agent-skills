@@ -1,0 +1,20 @@
+{
+  "name": "rails-37signals-patterns",
+  "version": "0.1.0",
+  "description": "Focused 37signals-style Rails skills for models, controllers, Hotwire, jobs, testing, and related architecture patterns.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "rails",
+    "37signals",
+    "hotwire",
+    "patterns",
+    "skills"
+  ]
+}

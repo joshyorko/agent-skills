@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals API"
+  short_description: "Builds REST APIs using respond_to blocks with Jbuilder templates following the 37signals same-controllers-different-formats philosophy."
+  default_prompt: "Use $37signals-api when adding API endpoints, JSON responses, token authentication, or when user mentions API, JSON, REST, or Jbuilder."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,73 @@
+{
+  "name": "agent-skills",
+  "owner": {
+    "name": "Josh Yorko"
+  },
+  "interface": {
+    "displayName": "Agent Skills"
+  },
+  "metadata": {
+    "description": "Plugin-first skill marketplace for Rails, Fizzy, and RCC workflows."
+  },
+  "plugins": [
+    {
+      "name": "rails-37signals-patterns",
+      "category": "Developer Tools",
+      "claude_category": "development",
+      "description": "Focused 37signals-style Rails specialists for models, controllers, Hotwire, jobs, testing, and related application patterns.",
+      "tags": [
+        "rails",
+        "37signals",
+        "hotwire",
+        "patterns",
+        "developer-tools"
+      ]
+    },
+    {
+      "name": "rails-37signals-workflows",
+      "category": "Developer Tools",
+      "claude_category": "development",
+      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-style conventions.",
+      "tags": [
+        "rails",
+        "37signals",
+        "workflow",
+        "implementation",
+        "review"
+      ]
+    },
+    {
+      "name": "fizzy",
+      "category": "Productivity",
+      "claude_category": "productivity",
+      "description": "CLI-first Fizzy workflows for boards, cards, comments, setup, and self-hosted management.",
+      "tags": [
+        "fizzy",
+        "project-management",
+        "cli",
+        "productivity"
+      ]
+    },
+    {
+      "name": "rcc",
+      "category": "Developer Tools",
+      "claude_category": "development",
+      "description": "RCC automation workflows for robots, holotree environments, work items, and repeatable Python automation.",
+      "tags": [
+        "rcc",
+        "robocorp",
+        "automation",
+        "holotree",
+        "developer-tools"
+      ],
+      "aliases": {
+        "codex": [
+          {
+            "name": "rcc-skill",
+            "skill": "rcc"
+          }
+        ]
+      }
+    }
+  ]
+}

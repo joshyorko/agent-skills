@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Caching"
+  short_description: "Implements HTTP caching with ETags, fresh_when, stale?, and fragment caching."
+  default_prompt: "Use $37signals-caching when optimizing performance, adding caching layers, or when user mentions ETags, HTTP caching, fresh_when, stale?, cache keys, or Russian doll caching."
+
+policy:
+  allow_implicit_invocation: true

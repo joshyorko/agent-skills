@@ -1,0 +1,41 @@
+{
+  "name": "rails-37signals-patterns",
+  "version": "0.1.0",
+  "description": "Focused 37signals-style Rails skills for models, controllers, Hotwire, jobs, testing, and related architecture patterns.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "rails",
+    "37signals",
+    "hotwire",
+    "patterns",
+    "skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Rails 37signals Patterns",
+    "shortDescription": "Focused Rails pattern skills inspired by 37signals.",
+    "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, caching, jobs, multi-tenancy, and related 37signals-style application design.",
+    "developerName": "Josh Yorko",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/joshyorko/agent-skills",
+    "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
+    "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
+    "defaultPrompt": [
+      "Implement this Rails model using 37signals patterns.",
+      "Refactor this controller toward RESTful Rails conventions.",
+      "Review this Hotwire feature for 37signals-style tradeoffs."
+    ],
+    "brandColor": "#9A3412"
+  }
+}

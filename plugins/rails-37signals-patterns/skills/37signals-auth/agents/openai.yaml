@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Auth"
+  short_description: "Implements custom passwordless authentication without Devise."
+  default_prompt: "Use $37signals-auth when setting up authentication, login flows, session management, password resets, or when user mentions auth, login, passwordless, or sessions."
+
+policy:
+  allow_implicit_invocation: true

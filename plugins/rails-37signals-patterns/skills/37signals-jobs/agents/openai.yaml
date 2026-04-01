@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Jobs"
+  short_description: "Implements shallow background jobs with _later/_now conventions using Solid Queue."
+  default_prompt: "Use $37signals-jobs when adding background processing, async operations, scheduled tasks, or when user mentions jobs, queues, Solid Queue, or background workers."
+
+policy:
+  allow_implicit_invocation: true
