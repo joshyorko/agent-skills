@@ -41,21 +41,15 @@ def rel_symlink(target: Path, link_path: Path, check: bool) -> bool:
 
 def collect_skills(catalog: dict) -> tuple[dict[str, Path], dict[str, Path]]:
     canonical = {}
-    codex_entries = {}
+    standalone_entries = {}
     for plugin in catalog["plugins"]:
         skills_root = ROOT / "plugins" / plugin["name"] / "skills"
         for skill_dir in sorted(p for p in skills_root.iterdir() if p.is_dir()):
             if skill_dir.name in canonical:
                 raise SystemExit(f"duplicate skill name: {skill_dir.name}")
             canonical[skill_dir.name] = skill_dir
-            codex_entries[skill_dir.name] = skill_dir
-        for alias in plugin.get("aliases", {}).get("codex", []):
-            alias_name = alias["name"]
-            skill_name = alias["skill"]
-            if skill_name not in canonical:
-                raise SystemExit(f"codex alias {alias_name} points to missing skill {skill_name}")
-            codex_entries[alias_name] = canonical[skill_name]
-    return canonical, codex_entries
+            standalone_entries[skill_dir.name] = skill_dir
+    return canonical, standalone_entries
 
 
 def sync_dir(target_dir: Path, entries: dict[str, Path], check: bool) -> bool:
@@ -86,16 +80,26 @@ def sync_dir(target_dir: Path, entries: dict[str, Path], check: bool) -> bool:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Build generated Codex runtime views.")
+    parser = argparse.ArgumentParser(description="Build generated skill runtime views.")
     parser.add_argument("--check", action="store_true", help="Fail if generated views are out of date.")
     args = parser.parse_args()
 
     catalog = load_catalog()
-    canonical, codex_entries = collect_skills(catalog)
+    canonical, standalone_entries = collect_skills(catalog)
 
     changed = False
     changed |= sync_dir(ROOT / ".agents" / "skills", canonical, args.check)
-    changed |= sync_dir(ROOT / "codex", codex_entries, args.check)
+    changed |= sync_dir(ROOT / "skills", standalone_entries, args.check)
+
+    codex_dir = ROOT / "codex"
+    if codex_dir.exists() or codex_dir.is_symlink():
+        if args.check:
+            print("stale: codex")
+            changed = True
+        else:
+            remove_path(codex_dir)
+            print("removed codex")
+            changed = True
 
     if args.check and changed:
         return 1

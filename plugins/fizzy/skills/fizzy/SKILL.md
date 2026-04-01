@@ -215,7 +215,7 @@ fizzy auth logout --all                  # Log out all profiles
 fizzy identity show                      # Show profiles
 ```
 
-**Local bootstrap note:** If `fizzy` is not installed or not on `PATH`, first have the user run `bash codex/fizzy/scripts/install.sh`. That script follows the upstream release binary/checksum flow, keeps the hosted default `FIZZY_API_URL`, and prints the exact `PATH` fix if the binary lands outside the current shell path. After the CLI is installed, the user can run `fizzy skill` to install the upstream skill if they want it. For first-run auth on hosted or self-hosted instances, prefer `fizzy setup --api-url "$FIZZY_API_URL"`. If `fizzy identity show --api-url "$FIZZY_API_URL"` already works, continue without redoing setup.
+**Local bootstrap note:** If `fizzy` is not installed or not on `PATH`, first have the user run `bash skills/fizzy/scripts/install.sh`. That script follows the upstream release binary/checksum flow, keeps the hosted default `FIZZY_API_URL`, and prints the exact `PATH` fix if the binary lands outside the current shell path. After the CLI is installed, the user can run `fizzy skill` to install the upstream skill if they want it. For first-run auth on hosted or self-hosted instances, prefer `fizzy setup --api-url "$FIZZY_API_URL"`. If `fizzy identity show --api-url "$FIZZY_API_URL"` already works, continue without redoing setup.
 
 ### Signup (New User or Token Generation)
 

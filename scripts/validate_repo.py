@@ -22,7 +22,7 @@ def main() -> int:
     catalog = load_json(CATALOG_PATH)
     plugins = catalog["plugins"]
     seen_skills: dict[str, str] = {}
-    expected_codex_entries: dict[str, Path] = {}
+    expected_standalone_entries: dict[str, Path] = {}
     expected_agent_entries: dict[str, Path] = {}
 
     for plugin in plugins:
@@ -47,15 +47,9 @@ def main() -> int:
                 fail(f"duplicate skill name {skill_dir.name} in {plugin['name']} and {seen_skills[skill_dir.name]}")
             seen_skills[skill_dir.name] = plugin["name"]
             expected_agent_entries[skill_dir.name] = skill_dir
-            expected_codex_entries[skill_dir.name] = skill_dir
+            expected_standalone_entries[skill_dir.name] = skill_dir
             if not (skill_dir / "SKILL.md").exists():
                 fail(f"missing SKILL.md in {skill_dir}")
-
-        for alias in plugin.get("aliases", {}).get("codex", []):
-            skill_name = alias["skill"]
-            if skill_name not in expected_agent_entries:
-                fail(f"codex alias {alias['name']} points to unknown skill {skill_name}")
-            expected_codex_entries[alias["name"]] = expected_agent_entries[skill_name]
 
     for name, target in expected_agent_entries.items():
         link_path = ROOT / ".agents" / "skills" / name
@@ -67,15 +61,18 @@ def main() -> int:
     if actual_agent_entries != set(expected_agent_entries):
         fail("unexpected entries found in .agents/skills")
 
-    for name, target in expected_codex_entries.items():
-        link_path = ROOT / "codex" / name
+    for name, target in expected_standalone_entries.items():
+        link_path = ROOT / "skills" / name
         if not link_path.is_symlink():
-            fail(f"missing codex compatibility symlink: {link_path}")
+            fail(f"missing standalone skill symlink: {link_path}")
         if link_path.resolve() != target.resolve():
-            fail(f"incorrect codex compatibility symlink: {link_path}")
-    actual_codex_entries = {path.name for path in (ROOT / "codex").iterdir()}
-    if actual_codex_entries != set(expected_codex_entries):
-        fail("unexpected entries found in codex compatibility view")
+            fail(f"incorrect standalone skill symlink: {link_path}")
+    actual_standalone_entries = {path.name for path in (ROOT / "skills").iterdir()}
+    if actual_standalone_entries != set(expected_standalone_entries):
+        fail("unexpected entries found in top-level skills view")
+
+    if (ROOT / "codex").exists() or (ROOT / "codex").is_symlink():
+        fail("legacy codex compatibility view should not exist")
 
     codex_marketplace = load_json(ROOT / ".agents" / "plugins" / "marketplace.json")
     claude_marketplace = load_json(ROOT / ".claude-plugin" / "marketplace.json")

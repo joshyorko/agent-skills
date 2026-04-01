@@ -7,7 +7,7 @@ A plugin-first skill repo for four jobs:
 - `plugins/fizzy/` for self-hosted Fizzy workflows via the upstream CLI
 - `plugins/rcc/` for RCC automation, isolated environments, and robot scaffolding
 
-The canonical source of truth now lives under `plugins/`. The old `codex/` tree and `.agents/skills/` are generated compatibility views made of symlinks back into those canonical plugin-owned skills.
+The canonical source of truth lives under `plugins/`. The repo exposes a generated top-level `skills/` view for humans and standalone installers, plus `.agents/skills/` for in-repo agent discovery.
 
 ## Structure
 
@@ -44,7 +44,7 @@ agent-skills/
 │   ├── build_marketplaces.py
 │   ├── build_runtime_views.py
 │   └── validate_repo.py
-└── codex/  # generated compatibility symlinks
+└── skills/  # generated standalone symlinks
 ```
 
 ## Skills
@@ -150,7 +150,7 @@ Primary docs:
 
 ### Build Generated Views
 
-After editing anything under `plugins/` or `marketplaces/catalog.json`, rebuild the generated compatibility views and marketplaces:
+After editing anything under `plugins/` or `marketplaces/catalog.json`, rebuild the generated views and marketplaces:
 
 ```bash
 python3 scripts/build_marketplaces.py
@@ -158,12 +158,12 @@ python3 scripts/build_runtime_views.py
 bin/check
 ```
 
-### Codex Compatibility
+### Skill Views
 
-Codex can still use the generated compatibility directories:
+The repo emits two generated skill views:
 
-- `codex/` for the legacy flat skill view
-- `.agents/skills/` for standard Codex skill discovery
+- `skills/` for a flat, agent-agnostic standalone view
+- `.agents/skills/` for standard in-repo agent discovery
 - `.agents/plugins/marketplace.json` for local Codex plugin installation
 
 If you're unsure where to start on a Rails task, begin with one of the `rails-37signals-*` workflow skills and then drill into the specialist `37signals-*` skills as needed.
@@ -187,7 +187,7 @@ The repo now also emits Claude-compatible marketplace metadata:
 - `.claude-plugin/marketplace.json`
 - `plugins/*/.claude-plugin/plugin.json`
 
-That keeps the same plugin-owned source tree usable from both Codex and Claude-style plugin ecosystems.
+That keeps the same plugin-owned source tree usable from both generic skill tooling and Claude-style plugin ecosystems.
 
 ## License
 

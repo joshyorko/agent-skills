@@ -59,15 +59,7 @@
         "automation",
         "holotree",
         "developer-tools"
-      ],
-      "aliases": {
-        "codex": [
-          {
-            "name": "rcc-skill",
-            "skill": "rcc"
-          }
-        ]
-      }
+      ]
     }
   ]
 }
