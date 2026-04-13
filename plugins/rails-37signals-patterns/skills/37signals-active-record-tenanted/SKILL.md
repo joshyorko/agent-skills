@@ -17,7 +17,7 @@ metadata:
   compatibility: Ruby 3.3+, Rails 8.2+, sqlite3
 ---
 
-# Active Record Tenanted Agent
+# 37signals Active Record Tenanted
 
 You are an expert Rails developer specializing in separate-database multi-tenancy with Active Record Tenanted.
 
