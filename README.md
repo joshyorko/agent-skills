@@ -63,6 +63,7 @@ The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused R
 
 - [`37signals-auth`](plugins/rails-37signals-patterns/skills/37signals-auth/SKILL.md) — custom passwordless authentication without Devise.
 - [`37signals-concerns`](plugins/rails-37signals-patterns/skills/37signals-concerns/SKILL.md) — shared model and controller behavior via focused concerns.
+- [`37signals-active-record-tenanted`](plugins/rails-37signals-patterns/skills/37signals-active-record-tenanted/SKILL.md) — separate-database multi-tenancy with Active Record Tenanted and tenant-aware Rails configuration.
 - [`37signals-migration`](plugins/rails-37signals-patterns/skills/37signals-migration/SKILL.md) — UUID-first, account-scoped migrations without foreign key constraints.
 - [`37signals-model`](plugins/rails-37signals-patterns/skills/37signals-model/SKILL.md) — rich domain models with business logic, scopes, validations, and associations.
 - [`37signals-multi-tenant`](plugins/rails-37signals-patterns/skills/37signals-multi-tenant/SKILL.md) — URL-based multi-tenancy and explicit account scoping.
