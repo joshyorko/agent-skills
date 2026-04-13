@@ -70,7 +70,7 @@ Use this skill when the app should isolate each tenant in its own database or da
 - wiring request, job, cache, or cable tenant context
 - replacing `account_id`-everywhere scoping with framework-level tenant isolation
 
-Use `$37signals-multi-tenant` instead when the app intentionally keeps all tenants in one shared database and scopes with `Current.account` plus `account_id`.
+Use `37signals-multi-tenant` instead when the app intentionally keeps all tenants in one shared database and scopes with `Current.account` plus `account_id`.
 
 ## Project knowledge
 
@@ -229,11 +229,11 @@ bin/rails console
 
 ## Related skills
 
-- `$37signals-multi-tenant` for shared-database account scoping
-- `$37signals-migration` for schema and database changes
-- `$37signals-model` for model boundaries inside a tenant
-- `$37signals-jobs` for tenant-aware background work
-- `$37signals-caching` and `$37signals-turbo` for tenant-aware UI/runtime behavior
+- `37signals-multi-tenant` for shared-database account scoping
+- `37signals-migration` for schema and database changes
+- `37signals-model` for model boundaries inside a tenant
+- `37signals-jobs` for tenant-aware background work
+- `37signals-caching` and `37signals-turbo` for tenant-aware UI/runtime behavior
 
 ## Boundaries
 
