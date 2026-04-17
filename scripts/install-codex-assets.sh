@@ -176,11 +176,12 @@ if marketplace_file.exists():
         style = "list"
     elif isinstance(data, dict) and "plugins" in data:
         if data.get("name") != marketplace_name:
+            existing_name = data.get("name", "unknown")
             raise SystemExit(
                 f"{marketplace_file} already uses a single-marketplace format for "
-                f'"{data.get("name", "unknown")}". Refusing to convert it automatically; '
-                "update or remove the existing file first, or re-run with its current "
-                "--marketplace-name."
+                f'"{existing_name}". Refusing to convert it automatically; '
+                "update or remove the existing file first, or re-run with "
+                f"--marketplace-name {existing_name}."
             )
         existing = [data]
         style = "single"

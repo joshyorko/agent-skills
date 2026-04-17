@@ -86,6 +86,19 @@ MARKETPLACE_NAME="${MARKETPLACE_NAME:-$MARKETPLACE_NAME_DEFAULT}"
 
 SKILLS_ROOT="${CODEX_HOME}/skills"
 
+resolve_link_target() {
+  python3 - "$1" <<'PY'
+import os
+import sys
+
+target = os.path.abspath(sys.argv[1])
+link = os.readlink(target)
+if not os.path.isabs(link):
+    link = os.path.join(os.path.dirname(target), link)
+print(os.path.realpath(link))
+PY
+}
+
 remove_marketplace() {
   local marketplace_file="${AGENTS_HOME}/plugins/marketplace.json"
   [[ -f "$marketplace_file" ]] || { log "Marketplace file not found, skipping removal."; return; }
@@ -130,18 +143,7 @@ remove_skill_target() {
 
   if [[ -L "$target" ]]; then
     local current
-    current="$(
-      python3 - "$target" <<'PY'
-import os
-import sys
-
-target = os.path.abspath(sys.argv[1])
-link = os.readlink(target)
-if not os.path.isabs(link):
-    link = os.path.join(os.path.dirname(target), link)
-print(os.path.realpath(link))
-PY
-    )"
+    current="$(resolve_link_target "$target")"
     case "$current" in
       "${REPO_PATH}"/plugins/*/skills/*)
         rm -f "$target"
