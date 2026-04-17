@@ -37,11 +37,11 @@ Environment overrides:
   REPO_URL   Default clone URL
 
 Examples:
-  # Install with defaults
-  bash scripts/install-codex-assets.sh
+  # Fresh environment: clone once, then install from the stable checkout
+  if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
 
   # Install into a custom location with copies instead of symlinks
-  bash scripts/install-codex-assets.sh --repo-path ~/code/agent-skills --copy --force
+  bash ~/code/agent-skills/scripts/install-codex-assets.sh --repo-path ~/code/agent-skills --copy --force
 EOF
 }
 
@@ -175,6 +175,12 @@ if marketplace_file.exists():
         existing = data["marketplaces"]
         style = "list"
     elif isinstance(data, dict) and "plugins" in data:
+        if data.get("name") != marketplace_name:
+            raise SystemExit(
+                f"{marketplace_file} already uses a single-marketplace format for "
+                f'"{data.get("name", "unknown")}". Refusing to convert it automatically; '
+                "update the file manually or choose a different --marketplace-name."
+            )
         existing = [data]
         style = "single"
     else:
@@ -253,15 +259,15 @@ install_skills() {
 
     if [[ "$SKILL_MODE" == "copy" ]]; then
       if copy_skill "$skill_dir" "$target"; then
-        ((copied++))
+        copied=$((copied + 1))
       else
-        ((skipped++))
+        skipped=$((skipped + 1))
       fi
     else
       if link_skill "$skill_dir" "$target"; then
-        ((linked++))
+        linked=$((linked + 1))
       else
-        ((skipped++))
+        skipped=$((skipped + 1))
       fi
     fi
   done

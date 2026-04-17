@@ -85,7 +85,6 @@ AGENTS_HOME="$(normalize_path "$AGENTS_HOME")"
 MARKETPLACE_NAME="${MARKETPLACE_NAME:-$MARKETPLACE_NAME_DEFAULT}"
 
 SKILLS_ROOT="${CODEX_HOME}/skills"
-CATALOG_PATH="${REPO_PATH}/marketplaces/catalog.json"
 
 remove_marketplace() {
   local marketplace_file="${AGENTS_HOME}/plugins/marketplace.json"
@@ -127,13 +126,12 @@ PY
 }
 
 remove_skill_target() {
-  local source="$1"
-  local target="$2"
+  local target="$1"
 
   if [[ -L "$target" ]]; then
     local current
-    current="$(readlink -f "$target")"
-    if [[ "$current" == "$source" ]]; then
+    current="$(readlink "$target")"
+    if [[ "$current" == "${REPO_PATH}"/plugins/*/skills/* ]]; then
       rm -f "$target"
       return 0
     fi
@@ -142,10 +140,15 @@ remove_skill_target() {
   fi
 
   if [[ -d "$target" && "$FORCE" -eq 1 ]]; then
-    if diff -qr "$source" "$target" >/dev/null 2>&1; then
-      rm -rf "$target"
-      return 0
-    fi
+    local name source
+    name="$(basename "$target")"
+    for source in "${REPO_PATH}"/plugins/*/skills/"${name}"; do
+      [[ -d "$source" ]] || continue
+      if diff -qr "$source" "$target" >/dev/null 2>&1; then
+        rm -rf "$target"
+        return 0
+      fi
+    done
   fi
 
   return 1
@@ -153,21 +156,17 @@ remove_skill_target() {
 
 remove_skills() {
   [[ -d "$SKILLS_ROOT" ]] || { log "Skills directory not found, skipping skill removal."; return; }
-  [[ -f "$CATALOG_PATH" ]] || { log "Catalog not found at ${CATALOG_PATH}, skipping skill removal."; return; }
 
   local removed=0
   local skipped=0
 
-  for skill_dir in "${REPO_PATH}"/plugins/*/skills/*; do
-    [[ -d "$skill_dir" ]] || continue
-    local name target
-    name="$(basename "$skill_dir")"
-    target="${SKILLS_ROOT}/${name}"
+  for target in "${SKILLS_ROOT}"/*; do
+    [[ -e "$target" || -L "$target" ]] || continue
 
-    if remove_skill_target "$skill_dir" "$target"; then
-      ((removed++))
+    if remove_skill_target "$target"; then
+      removed=$((removed + 1))
     else
-      ((skipped++))
+      skipped=$((skipped + 1))
     fi
   done
 

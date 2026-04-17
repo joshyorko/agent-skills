@@ -10,10 +10,16 @@ This repository can be installed once per machine and reused across projects wit
 
 ## Install
 
-Run from anywhere (idempotent; safe to re-run):
+Run from anywhere. On a fresh machine, clone into the stable path first and then run the installer from that checkout:
 
 ```bash
-bash scripts/install-codex-assets.sh
+if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
+```
+
+After the repo exists at `~/src/agent-skills`, the installer is idempotent and safe to re-run:
+
+```bash
+bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
 ```
 
 What it does:
@@ -36,7 +42,7 @@ After install, restart Codex and run `/plugins` to confirm the marketplace is vi
 Remove marketplace entries and any symlinks (and matching copy-mode installs when `--force` is provided):
 
 ```bash
-bash scripts/uninstall-codex-assets.sh
+bash ~/src/agent-skills/scripts/uninstall-codex-assets.sh --repo-path ~/src/agent-skills
 ```
 
 ## Devcontainer example
@@ -45,7 +51,7 @@ To bootstrap automatically inside a devcontainer, add a `postCreateCommand`:
 
 ```jsonc
 {
-  "postCreateCommand": "bash scripts/install-codex-assets.sh --repo-path ~/src/agent-skills"
+  "postCreateCommand": "if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills"
 }
 ```
 
