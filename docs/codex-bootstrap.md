@@ -37,6 +37,7 @@ What it does:
 - Clones or updates `agent-skills` to `~/src/agent-skills` (override with `--repo-path`).
 - Registers this repo as a local Codex marketplace via `codex marketplace add "$REPO_PATH"`, keeping plugin paths relative to the repo root.
 - Symlinks all skills into `~/.codex/skills` (use `--copy` if you prefer copies). Conflicting entries are left untouched unless you pass `--force`.
+- Prints whether marketplace registration actually succeeded, was skipped, or failed, along with the manual `codex marketplace add` command when needed.
 
 Common options:
 

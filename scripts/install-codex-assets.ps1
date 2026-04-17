@@ -51,6 +51,7 @@ function Normalize-Path {
 $RepoPath = Normalize-Path $RepoPath
 $CodexHome = Normalize-Path $CodexHome
 $MarketplaceName = $MarketplaceName
+$MarketplaceStatus = "not attempted"
 
 $SkillsRoot = Join-Path $CodexHome "skills"
 $CatalogPath = Join-Path $RepoPath "marketplaces/catalog.json"
@@ -82,6 +83,7 @@ function Clone-Or-UpdateRepo {
 function Register-Marketplace {
   $codexCmd = Get-Command codex -ErrorAction SilentlyContinue
   if (-not $codexCmd) {
+    $script:MarketplaceStatus = "not registered automatically (codex CLI not found)"
     Warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add `"$RepoPath`""
     return
   }
@@ -91,6 +93,7 @@ function Register-Marketplace {
   try {
     & codex marketplace add $RepoPath | Out-Null
     if ($LASTEXITCODE -eq 0) {
+      $script:MarketplaceStatus = "registered via ``codex marketplace add `"$RepoPath`"``"
       Log "Registered marketplace `"$MarketplaceName`" via codex marketplace add $RepoPath"
     }
     else {
@@ -98,6 +101,7 @@ function Register-Marketplace {
     }
   }
   catch {
+    $script:MarketplaceStatus = "not registered automatically (codex marketplace add failed)"
     Warn "failed to register marketplace via codex; run manually: CODEX_HOME=`"$CodexHome`" codex marketplace add `"$RepoPath`" ($($_.Exception.Message))"
   }
   finally {
@@ -255,11 +259,11 @@ function Main {
 
 Codex assets installed.
 - Repository path: $RepoPath
-- Marketplace: registered via `codex marketplace add "$RepoPath"`
+- Marketplace: $MarketplaceStatus
 - Skills directory: $SkillsRoot
 
 Next steps:
-- Restart Codex to pick up the marketplace change.
+- Restart Codex if marketplace registration succeeded.
 - Run "/plugins" or inspect available skills in your client.
 - If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="$CodexHome" codex marketplace add "$RepoPath"
 "@ | Write-Host

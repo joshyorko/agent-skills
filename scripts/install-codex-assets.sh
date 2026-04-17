@@ -14,6 +14,7 @@ CODEX_HOME="$CODEX_HOME_DEFAULT"
 MARKETPLACE_NAME="$MARKETPLACE_NAME_DEFAULT"
 SKILL_MODE="$SKILL_MODE_DEFAULT"
 FORCE=0
+MARKETPLACE_STATUS="not attempted"
 
 usage() {
   cat <<'EOF'
@@ -126,7 +127,7 @@ clone_or_update_repo() {
 
 cleanup_legacy_marketplace() {
   local marketplace_file="${LEGACY_AGENTS_HOME}/plugins/marketplace.json"
-  [[ -f "$marketplace_file" ]] || return
+  [[ -f "$marketplace_file" ]] || return 0
 
   python3 - "$marketplace_file" "$MARKETPLACE_NAME" <<'PY'
 import json
@@ -168,13 +169,16 @@ PY
 
 register_marketplace() {
   if ! command -v codex >/dev/null 2>&1; then
+    MARKETPLACE_STATUS="not registered automatically (codex CLI not found)"
     warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add \"${REPO_PATH}\""
     return
   fi
 
   if CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"; then
+    MARKETPLACE_STATUS="registered via \`codex marketplace add \"${REPO_PATH}\"\`"
     log "Registered marketplace \"${MARKETPLACE_NAME}\" via codex marketplace add ${REPO_PATH}"
   else
+    MARKETPLACE_STATUS="not registered automatically (codex marketplace add failed)"
     warn "failed to register marketplace via codex; run manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace add \"${REPO_PATH}\""
   fi
 }
@@ -268,11 +272,11 @@ main() {
 
 Codex assets installed.
 - Repository path: ${REPO_PATH}
-- Marketplace: registered via \`codex marketplace add "${REPO_PATH}"\`
+- Marketplace: ${MARKETPLACE_STATUS}
 - Skills directory: ${SKILLS_ROOT}
 
 Next steps:
-- Restart Codex to pick up the marketplace change.
+- Restart Codex if marketplace registration succeeded.
 - Run "/plugins" or inspect available skills in your client.
 - If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"
 EOF
