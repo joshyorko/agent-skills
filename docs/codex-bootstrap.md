@@ -10,7 +10,9 @@ This repository can be installed once per machine and reused across projects wit
 
 ## Install
 
-Run from anywhere. On a fresh machine, clone into the stable path first and then run the installer from that checkout:
+Run from anywhere. On a fresh machine, clone into the stable path first and then run the installer from that checkout.
+
+**macOS/Linux (bash):**
 
 ```bash
 if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
@@ -21,6 +23,14 @@ After the repo exists at `~/src/agent-skills`, the installer is idempotent and s
 ```bash
 bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
+```
+
+If Windows symlinks are blocked, use copy mode instead: add `-SkillMode copy -Force`.
 
 What it does:
 
