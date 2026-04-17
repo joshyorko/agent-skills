@@ -35,7 +35,7 @@ If Windows symlinks are blocked, use copy mode instead: add `-SkillMode copy -Fo
 What it does:
 
 - Clones or updates `agent-skills` to `~/src/agent-skills` (override with `--repo-path`).
-- Registers a user-level marketplace entry in `~/.agents/plugins/marketplace.json` that points at this repo’s plugins.
+- Registers this repo as a local Codex marketplace via `codex marketplace add "$REPO_PATH"`, keeping plugin paths relative to the repo root.
 - Symlinks all skills into `~/.codex/skills` (use `--copy` if you prefer copies). Conflicting entries are left untouched unless you pass `--force`.
 
 Common options:
@@ -49,7 +49,7 @@ After install, restart Codex and run `/plugins` to confirm the marketplace is vi
 
 ## Uninstall
 
-Remove marketplace entries and any symlinks (and matching copy-mode installs when `--force` is provided):
+Remove the Codex marketplace registration plus any symlinks (and matching copy-mode installs when `--force` is provided). Legacy `~/.agents/plugins/marketplace.json` entries are also cleaned up:
 
 ```bash
 bash ~/src/agent-skills/scripts/uninstall-codex-assets.sh --repo-path ~/src/agent-skills

@@ -4,14 +4,13 @@ set -euo pipefail
 REPO_URL_DEFAULT="https://github.com/joshyorko/agent-skills.git"
 REPO_PATH_DEFAULT="${HOME}/src/agent-skills"
 CODEX_HOME_DEFAULT="${HOME}/.codex"
-AGENTS_HOME_DEFAULT="${HOME}/.agents"
 MARKETPLACE_NAME_DEFAULT="agent-skills"
 SKILL_MODE_DEFAULT="link"
+LEGACY_AGENTS_HOME="${HOME}/.agents"
 
 REPO_URL="${REPO_URL:-$REPO_URL_DEFAULT}"
 REPO_PATH="$REPO_PATH_DEFAULT"
 CODEX_HOME="$CODEX_HOME_DEFAULT"
-AGENTS_HOME="$AGENTS_HOME_DEFAULT"
 MARKETPLACE_NAME="$MARKETPLACE_NAME_DEFAULT"
 SKILL_MODE="$SKILL_MODE_DEFAULT"
 FORCE=0
@@ -26,7 +25,6 @@ Options:
   --repo-path PATH        Destination for the agent-skills clone (default: ~/src/agent-skills)
   --repo-url URL          Git clone URL to use (default: https://github.com/joshyorko/agent-skills.git)
   --codex-home PATH       Codex user directory (default: ~/.codex)
-  --agents-home PATH      Agents user directory for marketplace metadata (default: ~/.agents)
   --marketplace-name NAME Marketplace name to register (default: agent-skills)
   --link                  Symlink skills into Codex (default)
   --copy                  Copy skills into Codex instead of symlinking
@@ -76,10 +74,6 @@ while [[ $# -gt 0 ]]; do
       CODEX_HOME="$2"
       shift 2
       ;;
-    --agents-home)
-      AGENTS_HOME="$2"
-      shift 2
-      ;;
     --marketplace-name)
       MARKETPLACE_NAME="$2"
       shift 2
@@ -110,7 +104,6 @@ done
 
 REPO_PATH="$(normalize_path "$REPO_PATH")"
 CODEX_HOME="$(normalize_path "$CODEX_HOME")"
-AGENTS_HOME="$(normalize_path "$AGENTS_HOME")"
 MARKETPLACE_NAME="${MARKETPLACE_NAME:-$MARKETPLACE_NAME_DEFAULT}"
 
 SKILLS_ROOT="${CODEX_HOME}/skills"
@@ -131,86 +124,59 @@ clone_or_update_repo() {
   fi
 }
 
-merge_marketplace() {
-  local marketplace_file="${AGENTS_HOME}/plugins/marketplace.json"
-  mkdir -p "$(dirname "${marketplace_file}")"
+cleanup_legacy_marketplace() {
+  local marketplace_file="${LEGACY_AGENTS_HOME}/plugins/marketplace.json"
+  [[ -f "$marketplace_file" ]] || return
 
-  python3 - "$CATALOG_PATH" "$marketplace_file" "$MARKETPLACE_NAME" "$REPO_PATH" <<'PY'
+  python3 - "$marketplace_file" "$MARKETPLACE_NAME" <<'PY'
 import json
 import sys
 from pathlib import Path
 
-catalog_path = Path(sys.argv[1])
-marketplace_file = Path(sys.argv[2])
-marketplace_name = sys.argv[3]
-repo_path = Path(sys.argv[4])
+marketplace_file = Path(sys.argv[1])
+marketplace_name = sys.argv[2]
 
-catalog = json.loads(catalog_path.read_text())
-
-entry = {
-    "name": marketplace_name,
-    "interface": catalog.get("interface", {}),
-    "plugins": [],
-}
-
-for plugin in catalog["plugins"]:
-    entry["plugins"].append(
-        {
-            "name": plugin["name"],
-            "source": {
-                "source": "local",
-                "path": str(repo_path / "plugins" / plugin["name"]),
-            },
-            "policy": {
-                "installation": plugin.get("installation", "AVAILABLE"),
-                "authentication": plugin.get("authentication", "ON_INSTALL"),
-            },
-            "category": plugin["category"],
-        }
-    )
-
-if marketplace_file.exists():
+try:
     data = json.loads(marketplace_file.read_text())
     if isinstance(data, dict) and "marketplaces" in data and isinstance(data["marketplaces"], list):
-        existing = data["marketplaces"]
+        entries = data["marketplaces"]
         style = "list"
     elif isinstance(data, dict) and "plugins" in data:
-        if data.get("name") != marketplace_name:
-            existing_name = data.get("name", "unknown")
-            raise SystemExit(
-                f"{marketplace_file} already uses a single-marketplace format for "
-                f'"{existing_name}". Refusing to convert it automatically; '
-                "update or remove the existing file first, or re-run with "
-                f"--marketplace-name {existing_name}."
-            )
-        existing = [data]
+        entries = [data]
         style = "single"
     else:
-        raise SystemExit(f"Unexpected marketplace format in {marketplace_file}")
-else:
-    existing = []
-    style = "single"
+        raise ValueError("Unexpected marketplace format")
 
-if style == "list":
-    existing = [m for m in existing if m.get("name") != marketplace_name]
-    existing.append(entry)
-    output = {"marketplaces": existing}
-elif existing:
-    current = existing[0]
-    if current.get("name") not in (None, marketplace_name):
-        raise SystemExit(
-            f"{marketplace_file} contains single-marketplace entry "
-            f"{current.get('name')!r}; refusing to auto-convert to multi-marketplace format. "
-            f"Either replace the file intentionally for {marketplace_name!r} or convert it "
-            f"manually to {{\"marketplaces\": [...]}} before rerunning."
-        )
-    output = entry
-else:
-    output = entry
+    filtered = [m for m in entries if m.get("name") != marketplace_name]
+    if len(filtered) == len(entries):
+        sys.exit(0)
 
-marketplace_file.write_text(json.dumps(output, indent=2) + "\n")
-print(f"wrote marketplace entry to {marketplace_file}")
+    if not filtered:
+        marketplace_file.unlink()
+        print(f"removed legacy marketplace file {marketplace_file}")
+    elif style == "list" or len(filtered) > 1:
+        marketplace_file.write_text(json.dumps({"marketplaces": filtered}, indent=2) + "\n")
+        print(f"removed legacy marketplace entry \"{marketplace_name}\" from {marketplace_file}")
+    else:
+        marketplace_file.write_text(json.dumps(filtered[0], indent=2) + "\n")
+        print(f"removed legacy marketplace entry \"{marketplace_name}\" from {marketplace_file}")
+except Exception as exc:  # pragma: no cover
+    print(f"skipping legacy marketplace cleanup: {exc}", file=sys.stderr)
+    sys.exit(0)
 PY
+}
+
+register_marketplace() {
+  if ! command -v codex >/dev/null 2>&1; then
+    warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add \"${REPO_PATH}\""
+    return
+  fi
+
+  if CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"; then
+    log "Registered marketplace \"${MARKETPLACE_NAME}\" via codex marketplace add ${REPO_PATH}"
+  else
+    warn "failed to register marketplace via codex; run manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace add \"${REPO_PATH}\""
+  fi
 }
 
 link_skill() {
@@ -294,19 +260,21 @@ main() {
     exit 1
   fi
 
-  merge_marketplace
+  cleanup_legacy_marketplace
+  register_marketplace
   install_skills
 
   cat <<EOF
 
 Codex assets installed.
 - Repository path: ${REPO_PATH}
-- Marketplace: ${AGENTS_HOME}/plugins/marketplace.json (entry "${MARKETPLACE_NAME}")
+- Marketplace: registered via \`codex marketplace add "${REPO_PATH}"\`
 - Skills directory: ${SKILLS_ROOT}
 
 Next steps:
 - Restart Codex to pick up the marketplace change.
 - Run "/plugins" or inspect available skills in your client.
+- If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"
 EOF
 }
 
