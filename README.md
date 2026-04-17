@@ -149,6 +149,16 @@ Primary docs:
 
 ## Quick Start
 
+### Codex Bootstrap
+
+Install this repo once per machine and expose its plugins/skills globally:
+
+```bash
+bash scripts/install-codex-assets.sh
+```
+
+See `docs/codex-bootstrap.md` for options, uninstall flow, and devcontainer usage.
+
 ### Build Generated Views
 
 After editing anything under `plugins/` or `marketplaces/catalog.json`, rebuild the generated views and marketplaces:
