@@ -191,13 +191,22 @@ else:
     existing = []
     style = "single"
 
-existing = [m for m in existing if m.get("name") != marketplace_name]
-existing.append(entry)
-
-if style == "list" or len(existing) > 1:
+if style == "list":
+    existing = [m for m in existing if m.get("name") != marketplace_name]
+    existing.append(entry)
     output = {"marketplaces": existing}
+elif existing:
+    current = existing[0]
+    if current.get("name") not in (None, marketplace_name):
+        raise SystemExit(
+            f"{marketplace_file} contains single-marketplace entry "
+            f"{current.get('name')!r}; refusing to auto-convert to multi-marketplace format. "
+            f"Either replace the file intentionally for {marketplace_name!r} or convert it "
+            f"manually to {{\"marketplaces\": [...]}} before rerunning."
+        )
+    output = entry
 else:
-    output = existing[0]
+    output = entry
 
 marketplace_file.write_text(json.dumps(output, indent=2) + "\n")
 print(f"wrote marketplace entry to {marketplace_file}")
