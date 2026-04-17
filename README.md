@@ -149,6 +149,22 @@ Primary docs:
 
 ## Quick Start
 
+### Codex Bootstrap
+
+Install this repo once per machine and expose its plugins/skills globally:
+
+```bash
+if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
+```
+
+Windows (PowerShell):
+
+```powershell
+if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
+```
+
+See `docs/codex-bootstrap.md` for options, uninstall flow, and devcontainer usage.
+
 ### Build Generated Views
 
 After editing anything under `plugins/` or `marketplaces/catalog.json`, rebuild the generated views and marketplaces:
