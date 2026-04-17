@@ -21,7 +21,7 @@ Remove Codex skill symlinks and marketplace entries created by install-codex-ass
 Options:
   --repo-path PATH        Location of the agent-skills clone (default: ~/src/agent-skills)
   --codex-home PATH       Codex user directory (default: ~/.codex)
-  --agents-home PATH      Agents user directory for marketplace metadata (default: ~/.agents)
+  --agents-home PATH      Agents user directory for legacy marketplace metadata (default: ~/.agents)
   --marketplace-name NAME Marketplace name to remove (default: agent-skills)
   --force                 Remove copy-mode skill directories that exactly match the repo source
   -h, --help              Show this help message
@@ -100,8 +100,29 @@ PY
 }
 
 remove_marketplace() {
+  local removed_cli=0
+  if command -v codex >/dev/null 2>&1; then
+    if CODEX_HOME="${CODEX_HOME}" codex marketplace remove "${MARKETPLACE_NAME}" >/dev/null 2>&1; then
+      log "Removed marketplace \"${MARKETPLACE_NAME}\" via codex marketplace remove"
+      removed_cli=1
+    elif CODEX_HOME="${CODEX_HOME}" codex marketplace remove "${REPO_PATH}" >/dev/null 2>&1; then
+      log "Removed marketplace registered at ${REPO_PATH} via codex marketplace remove"
+      removed_cli=1
+    else
+      warn "codex marketplace remove failed; remove manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace remove \"${MARKETPLACE_NAME}\""
+    fi
+  else
+    warn "codex CLI not found; skipping Codex marketplace removal. Remove manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace remove \"${MARKETPLACE_NAME}\""
+  fi
+
+  remove_legacy_marketplace
+
+  return $removed_cli
+}
+
+remove_legacy_marketplace() {
   local marketplace_file="${AGENTS_HOME}/plugins/marketplace.json"
-  [[ -f "$marketplace_file" ]] || { log "Marketplace file not found, skipping removal."; return; }
+  [[ -f "$marketplace_file" ]] || { log "Legacy marketplace file not found, skipping removal."; return; }
 
   python3 - "$marketplace_file" "$MARKETPLACE_NAME" <<'PY'
 import json

@@ -5,7 +5,6 @@ param(
   [string]$RepoPath = "$HOME/src/agent-skills",
   [string]$RepoUrl = $(if ($env:REPO_URL) { $env:REPO_URL } else { "https://github.com/joshyorko/agent-skills.git" }),
   [string]$CodexHome = "$HOME/.codex",
-  [string]$AgentsHome = "$HOME/.agents",
   [string]$MarketplaceName = "agent-skills",
   [ValidateSet("link", "copy")] [string]$SkillMode = "link",
   [switch]$Force,
@@ -14,7 +13,7 @@ param(
 
 function Show-Usage {
   @"
-Usage: pwsh -File scripts/install-codex-assets.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-AgentsHome PATH] [-MarketplaceName NAME] [-SkillMode link|copy] [-Force]
+Usage: pwsh -File scripts/install-codex-assets.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-MarketplaceName NAME] [-SkillMode link|copy] [-Force]
 
 Bootstrap Codex plugins and skills from this repository into a user-level installation.
 
@@ -22,7 +21,6 @@ Parameters:
   -RepoPath          Destination for the agent-skills clone (default: $HOME/src/agent-skills)
   -RepoUrl           Git clone URL to use (default: https://github.com/joshyorko/agent-skills.git)
   -CodexHome         Codex user directory (default: $HOME/.codex)
-  -AgentsHome        Agents user directory for marketplace metadata (default: $HOME/.agents)
   -MarketplaceName   Marketplace name to register (default: agent-skills)
   -SkillMode         link (default) or copy
   -Force             Replace conflicting skill entries
@@ -52,11 +50,11 @@ function Normalize-Path {
 
 $RepoPath = Normalize-Path $RepoPath
 $CodexHome = Normalize-Path $CodexHome
-$AgentsHome = Normalize-Path $AgentsHome
 $MarketplaceName = $MarketplaceName
 
 $SkillsRoot = Join-Path $CodexHome "skills"
 $CatalogPath = Join-Path $RepoPath "marketplaces/catalog.json"
+$LegacyAgentsHome = Normalize-Path "$HOME/.agents"
 
 function Ensure-Directory {
   param([string]$Path)
@@ -81,65 +79,79 @@ function Clone-Or-UpdateRepo {
   }
 }
 
-function Merge-Marketplace {
-  $marketplaceFile = Join-Path $AgentsHome "plugins/marketplace.json"
-  Ensure-Directory (Split-Path -Parent $marketplaceFile)
-
-  $catalog = Get-Content -Raw -LiteralPath $CatalogPath | ConvertFrom-Json
-  $entry = [ordered]@{
-    name = $MarketplaceName
-    interface = $catalog.interface
-    plugins = @()
+function Register-Marketplace {
+  $codexCmd = Get-Command codex -ErrorAction SilentlyContinue
+  if (-not $codexCmd) {
+    Warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add `"$RepoPath`""
+    return
   }
 
-  foreach ($plugin in $catalog.plugins) {
-    $entry.plugins += [ordered]@{
-      name = $plugin.name
-      source = @{
-        source = "local"
-        path = (Join-Path $RepoPath "plugins/$($plugin.name)")
-      }
-      policy = @{
-        installation = if ($plugin.installation) { $plugin.installation } else { "AVAILABLE" }
-        authentication = if ($plugin.authentication) { $plugin.authentication } else { "ON_INSTALL" }
-      }
-      category = $plugin.category
+  $originalCodexHome = $env:CODEX_HOME
+  $env:CODEX_HOME = $CodexHome
+  try {
+    & codex marketplace add $RepoPath | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      Log "Registered marketplace `"$MarketplaceName`" via codex marketplace add $RepoPath"
+    }
+    else {
+      throw "codex marketplace add returned exit code $LASTEXITCODE"
     }
   }
+  catch {
+    Warn "failed to register marketplace via codex; run manually: CODEX_HOME=`"$CodexHome`" codex marketplace add `"$RepoPath`" ($($_.Exception.Message))"
+  }
+  finally {
+    $env:CODEX_HOME = $originalCodexHome
+  }
+}
 
-  $entries = @()
-  $style = "single"
+function Remove-LegacyMarketplace {
+  $marketplaceFile = Join-Path $LegacyAgentsHome "plugins/marketplace.json"
+  if (-not (Test-Path -LiteralPath $marketplaceFile)) {
+    return
+  }
 
-  if (Test-Path -LiteralPath $marketplaceFile) {
+  try {
     $data = Get-Content -Raw -LiteralPath $marketplaceFile | ConvertFrom-Json
+    $entries = @()
+    $style = "single"
+
     if ($data.PSObject.Properties.Name -contains "marketplaces" -and $data.marketplaces -is [System.Collections.IEnumerable]) {
       $entries = @($data.marketplaces)
       $style = "list"
     }
     elseif ($data.PSObject.Properties.Name -contains "plugins") {
-      if ($data.name -and ($data.name -ne $MarketplaceName)) {
-        throw "$marketplaceFile already uses a single-marketplace format for `"$($data.name)`". Remove or update it, or re-run with -MarketplaceName `"$($data.name)`"."
-      }
       $entries = @($data)
     }
     else {
-      throw "Unexpected marketplace format in $marketplaceFile"
+      throw "Unexpected marketplace format"
     }
-  }
 
-  $entries = $entries | Where-Object { $_.name -ne $MarketplaceName }
-  $entries += $entry
+    $filtered = $entries | Where-Object { $_.name -ne $MarketplaceName }
+    if ($filtered.Count -eq $entries.Count) {
+      return
+    }
 
-  if ($style -eq "list" -or $entries.Count -gt 1) {
-    $output = @{ marketplaces = $entries }
-  }
-  else {
-    $output = $entries[0]
-  }
+    if ($filtered.Count -eq 0) {
+      Remove-Item -LiteralPath $marketplaceFile -Force
+      Log "Removed legacy marketplace file $marketplaceFile"
+      return
+    }
 
-  $json = ($output | ConvertTo-Json -Depth 6)
-  Set-Content -LiteralPath $marketplaceFile -Value ($json + "`n")
-  Log "wrote marketplace entry to $marketplaceFile"
+    if ($style -eq "list" -or $filtered.Count -gt 1) {
+      $output = @{ marketplaces = $filtered }
+    }
+    else {
+      $output = $filtered[0]
+    }
+
+    $json = ($output | ConvertTo-Json -Depth 6)
+    Set-Content -LiteralPath $marketplaceFile -Value ($json + "`n")
+    Log "Removed legacy marketplace entry `"$MarketplaceName`" from $marketplaceFile"
+  }
+  catch {
+    Warn "skipping legacy marketplace cleanup: $($_.Exception.Message)"
+  }
 }
 
 function Test-IsSymlink {
@@ -235,19 +247,21 @@ function Main {
     throw "Catalog not found at $CatalogPath"
   }
 
-  Merge-Marketplace
+  Remove-LegacyMarketplace
+  Register-Marketplace
   Install-Skills
 
   @"
 
 Codex assets installed.
 - Repository path: $RepoPath
-- Marketplace: $(Join-Path $AgentsHome "plugins/marketplace.json") (entry "$MarketplaceName")
+- Marketplace: registered via `codex marketplace add "$RepoPath"`
 - Skills directory: $SkillsRoot
 
 Next steps:
 - Restart Codex to pick up the marketplace change.
 - Run "/plugins" or inspect available skills in your client.
+- If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="$CodexHome" codex marketplace add "$RepoPath"
 "@ | Write-Host
 }
 
