@@ -131,10 +131,12 @@ remove_skill_target() {
   if [[ -L "$target" ]]; then
     local current
     current="$(readlink "$target")"
-    if [[ "$current" == "${REPO_PATH}"/plugins/*/skills/* ]]; then
-      rm -f "$target"
-      return 0
-    fi
+    case "$current" in
+      "${REPO_PATH}"/plugins/*/skills/*)
+        rm -f "$target"
+        return 0
+        ;;
+    esac
     warn "skipping ${target}; symlink points to ${current}"
     return 1
   fi
@@ -164,9 +166,9 @@ remove_skills() {
     [[ -e "$target" || -L "$target" ]] || continue
 
     if remove_skill_target "$target"; then
-      removed=$((removed + 1))
+      ((++removed))
     else
-      skipped=$((skipped + 1))
+      ((++skipped))
     fi
   done
 

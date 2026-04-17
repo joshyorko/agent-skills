@@ -259,15 +259,15 @@ install_skills() {
 
     if [[ "$SKILL_MODE" == "copy" ]]; then
       if copy_skill "$skill_dir" "$target"; then
-        copied=$((copied + 1))
+        ((++copied))
       else
-        skipped=$((skipped + 1))
+        ((++skipped))
       fi
     else
       if link_skill "$skill_dir" "$target"; then
-        linked=$((linked + 1))
+        ((++linked))
       else
-        skipped=$((skipped + 1))
+        ((++skipped))
       fi
     fi
   done
