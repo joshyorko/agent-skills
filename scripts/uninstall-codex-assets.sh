@@ -130,7 +130,18 @@ remove_skill_target() {
 
   if [[ -L "$target" ]]; then
     local current
-    current="$(readlink "$target")"
+    current="$(
+      python3 - "$target" <<'PY'
+import os
+import sys
+
+target = os.path.abspath(sys.argv[1])
+link = os.readlink(target)
+if not os.path.isabs(link):
+    link = os.path.join(os.path.dirname(target), link)
+print(os.path.realpath(link))
+PY
+    )"
     case "$current" in
       "${REPO_PATH}"/plugins/*/skills/*)
         rm -f "$target"

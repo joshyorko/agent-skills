@@ -179,7 +179,8 @@ if marketplace_file.exists():
             raise SystemExit(
                 f"{marketplace_file} already uses a single-marketplace format for "
                 f'"{data.get("name", "unknown")}". Refusing to convert it automatically; '
-                "update the file manually or choose a different --marketplace-name."
+                "update or remove the existing file first, or re-run with its current "
+                "--marketplace-name."
             )
         existing = [data]
         style = "single"
