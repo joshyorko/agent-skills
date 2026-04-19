@@ -124,7 +124,8 @@ function Install-FromGit {
 
   $resolvedRef = $Ref
   if (-not $resolvedRef) {
-    $tag = (& git -C $RepoPath describe --tags --exact-match 2>$null)
+    $tagsAtHead = @(& git -C $RepoPath tag --points-at HEAD 2>$null)
+    $tag = $tagsAtHead | Select-Object -First 1
     if ($LASTEXITCODE -eq 0 -and $tag) {
       $resolvedRef = $tag.Trim()
     }
