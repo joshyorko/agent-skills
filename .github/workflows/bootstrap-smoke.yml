@@ -66,3 +66,17 @@ jobs:
         shell: pwsh
         run: |
           pwsh -File install.ps1 -Help | Out-Null
+
+      - name: Remote entrypoint install from existing checkout
+        shell: pwsh
+        run: |
+          $tmpCodex = Join-Path $env:RUNNER_TEMP "codex-remote"
+          pwsh -File install.ps1 `
+            -RepoPath $PWD `
+            -CodexHome $tmpCodex `
+            -InstallMethod git `
+            -SkillMode copy `
+            -Force
+          if (-not (Test-Path (Join-Path $tmpCodex "state/agent-skills.json"))) {
+            throw "state file missing after remote entrypoint install"
+          }
