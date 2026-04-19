@@ -13,88 +13,75 @@ metadata:
   source: activerecord-tenanted
   source_repo: basecamp/activerecord-tenanted
   source_ref: main
-  source_path: GUIDE.md
+  source_path: README.md, GUIDE.md
   compatibility: Ruby 3.3+, Rails 8.2+, sqlite3
 ---
 
 # 37signals Active Record Tenanted
 
-You are an expert Rails developer specializing in separate-database multi-tenancy with Active Record Tenanted.
+Use this skill when the app should isolate tenant data in separate databases and let Rails carry the tenant context for you.
 
-## Your role
-- You set up and extend `activerecord-tenanted` with the smallest safe Rails changes.
-- You keep tenant isolation in the framework layer instead of scattering `account_id` filters through the app.
-- You preserve normal Rails conventions so feature code feels single-tenant inside a tenant context.
-- Your output: tenant-safe Rails code, configuration, migrations, and tests.
+This is the database-per-tenant path. Use `37signals-multi-tenant` instead when the app intentionally keeps all tenants in one shared database and scopes through `Current.account` plus `account_id`.
 
-## Core philosophy
+## Core approach
 
-**One tenant context. One isolated database. Rails should do the switching for you.**
+- Tenanting lives in the framework layer, not in ad hoc query scopes.
+- A tenant key resolves to a tenant-specific database name or path.
+- Tenanted code should feel single-tenant inside the current tenant context.
+- Shared/global data should stay explicitly outside the tenanted connection.
 
-### Prefer this
+Prefer this:
+
 ```ruby
-# app/models/application_record.rb
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
   tenanted
 end
 
-# config/initializers/active_record_tenanted.rb
 Rails.application.configure do
-  config.active_record_tenanted.tenant_resolver = ->(request) { request.path_parameters[:account_id] }
-end
-
-ApplicationRecord.with_tenant("acme") do
-  Project.create!(name: "Roadmap")
+  config.active_record_tenanted.connection_class = "ApplicationRecord"
+  config.active_record_tenanted.tenant_resolver = ->(request) { request.subdomain }
 end
 ```
 
-### Not this
+Not this:
+
 ```ruby
-# ❌ Don't rely on remembering account scoping in every query
 class Project < ApplicationRecord
   scope :for_account, ->(account_id) { where(account_id: account_id) }
 end
-
-def create
-  Project.create!(project_params.merge(account_id: params[:account_id]))
-end
 ```
 
-## When to use this skill
+## Repo decision rule
 
-Use this skill when the app should isolate each tenant in its own database or database file, especially when:
-- adopting `activerecord-tenanted`
-- converting a commingled Rails app to per-tenant databases
-- configuring tenant-aware `database.yml`
-- wiring request, job, cache, or cable tenant context
-- replacing `account_id`-everywhere scoping with framework-level tenant isolation
+Choose one tenancy model per feature area and stay consistent:
 
-Use `37signals-multi-tenant` instead when the app intentionally keeps all tenants in one shared database and scopes with `Current.account` plus `account_id`.
+- Shared DB: `Current.account`, `account_id`, explicit account scoping, normal shared tables.
+- Separate DB: `tenanted`, `with_tenant`, separate tenant databases, explicit shared/global models outside the tenanted connection.
 
-## Project knowledge
+Hybrid apps are possible, but the boundary must be explicit:
 
-**Default gem posture**
-- built on Rails horizontal sharding APIs
-- `sqlite3` is the fully supported adapter today
-- tenant context is required for database access
-- Rails integrations carry tenant context into jobs, caches, cable, and related subsystems
+- shared models inherit from a non-tenanted abstract class
+- tenant-owned models inherit from the tenanted connection class
+- jobs, caches, broadcasts, and scripts must know which side they are operating on
 
-**Important concepts**
-- a tenant ID identifies the tenant-specific database
-- `ApplicationRecord.current_tenant` is the current execution context
-- `ApplicationRecord.with_tenant("acme") { ... }` scopes all Active Record work inside the block
-- querying a tenanted model without a tenant context should raise instead of leaking data
+## Current upstream posture
 
-## Installation and baseline setup
+- `sqlite3` is the only fully supported adapter today.
+- The gem is built on Rails horizontal sharding APIs.
+- Access without a tenant context should raise `ActiveRecord::Tenanted::NoTenantError`.
+- The upstream GUIDE is still a work in progress, so some framework integrations should be treated as provisional and verified against the gem version in use.
 
-### 1. Add the gem
+## Baseline setup
+
+1. Add the gem.
+
 ```ruby
-# Gemfile
 gem "activerecord-tenanted"
 ```
 
-### 2. Tenant the abstract base class
+2. Tenant the abstract base class.
+
 ```ruby
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
@@ -102,7 +89,8 @@ class ApplicationRecord < ActiveRecord::Base
 end
 ```
 
-### 3. Mark the database config as tenanted
+3. Mark the tenant database configuration as tenanted.
+
 ```yaml
 production:
   primary:
@@ -112,7 +100,8 @@ production:
     max_connection_pools: 20
 ```
 
-### 4. Configure tenant resolution
+4. Configure the connection class and resolver.
+
 ```ruby
 Rails.application.configure do
   config.active_record_tenanted.connection_class = "ApplicationRecord"
@@ -120,17 +109,30 @@ Rails.application.configure do
 end
 ```
 
-If the app uses URL-based account routing instead of subdomains, prefer an explicit resolver:
+5. If only part of the app is tenant-isolated, use a separate abstract class.
 
 ```ruby
-Rails.application.configure do
-  config.active_record_tenanted.tenant_resolver = ->(request) { request.path_parameters[:account_id] }
+class TenantedApplicationRecord < ActiveRecord::Base
+  self.abstract_class = true
+  tenanted "tenant_db"
 end
 ```
 
-## Implementation patterns
+## Tenant key guidance
 
-### Pattern 1: Request-scoped tenant context
+Pick one canonical tenant key and use it consistently in the resolver, lifecycle code, and provisioning flow. In practice this is usually a slug or subdomain, not an internal numeric ID.
+
+- Normalize case and whitespace once.
+- Validate characters based on the backing database naming/path rules.
+- Do not let arbitrary user input become a database name without normalization and validation.
+- If routes expose `account_id`, make sure it resolves to the canonical tenant key instead of using raw path data blindly.
+
+## Runtime patterns
+
+### Requests
+
+Inside a resolved request, controllers should read like ordinary Rails controllers:
+
 ```ruby
 class ProjectsController < ApplicationController
   def index
@@ -139,60 +141,51 @@ class ProjectsController < ApplicationController
 end
 ```
 
-Inside a resolved tenant request, the controller should be able to act like a normal single-tenant Rails controller. Avoid manually repeating tenant filters unless the design truly requires mixed shared and tenanted data.
+### Scripts, console, and one-off work
 
-### Pattern 2: Explicit tenant context outside requests
+Outside a request, always set the tenant explicitly:
+
 ```ruby
 ApplicationRecord.with_tenant(account.slug) do
   ProjectImporter.new.call
 end
 ```
 
-Use explicit tenant blocks in:
-- console tasks
-- scripts
-- data backfills
-- one-off maintenance
-- tests that exercise tenant switching directly
+Use explicit tenant blocks in console tasks, data backfills, repair scripts, and maintenance commands.
 
-### Pattern 3: Alternate tenanted connection class
-```ruby
-class TenantedApplicationRecord < ActiveRecord::Base
-  self.abstract_class = true
-  tenanted "tenant_db"
-end
+### Jobs, caches, and broadcasts
 
-Rails.application.configure do
-  config.active_record_tenanted.connection_class = "TenantedApplicationRecord"
-end
+Do not copy shared-database `Current.account` examples into a database-per-tenant app.
+
+- Jobs should restore the tenant context before touching tenanted models.
+- Cache keys, stream names, and broadcast channels should include tenant identity when they escape the database boundary.
+- Be cautious with direct `Rails.cache` access and global cache namespaces; verify how the installed gem version integrates with fragment caching and cache key derivation.
+- Treat Action Cable, Turbo streams, and Active Job integration as something to verify against the gem version in use, not as magic you can assume blindly.
+
+## Tenant lifecycle
+
+Separate-database tenancy is not just query scoping. You need a lifecycle plan:
+
+- tenant creation: provision the tenant database before routing traffic there
+- tenant migration: know whether you are migrating one tenant or all tenants
+- tenant archival or deletion: remove access first, then archive or drop the tenant database intentionally
+- tenant bootstrap: seed required tenant-owned records after provisioning
+
+Be explicit about database tasks in scripts and docs:
+
+```bash
+bundle add activerecord-tenanted
+bin/rails db:migrate
+ARTENANT=acme bin/rails db:migrate:primary
+bin/rails test
+bin/rails console
 ```
 
-Use this when only part of the app is tenant-isolated and other models stay on an untenanted primary database.
-
-## Safety rules
-
-### Always
-- require a tenant context before touching tenanted models
-- keep tenant resolution in one place
-- let Rails integrations carry tenant context through jobs, caching, cable, and rendering
-- validate tenant identifiers if they come from user-controlled input
-- keep shared/global data explicitly separate from tenant data
-
-### Ask first
-- using MySQL or PostgreSQL as the tenanted adapter
-- mixing commingled shared tables with tenant databases
-- custom cross-tenant admin/reporting features
-- path-based routing that needs non-trivial tenant lookup
-
-### Never
-- query tenanted models with no tenant set
-- silently fall back to a default tenant for normal requests
-- rebuild tenant isolation with ad hoc `where(account_id: ...)` filters everywhere
-- assume record IDs are globally unique across tenants
+If a tenant database is missing required migrations, treat that as an operational problem to fix, not something to paper over with a fallback tenant.
 
 ## Testing guidance
 
-Test the tenant boundary, not just happy-path CRUD.
+Test the tenant boundary directly:
 
 ```ruby
 test "requires a tenant context" do
@@ -212,31 +205,38 @@ end
 ```
 
 Also cover:
-- tenant resolver behavior
-- background jobs restoring tenant context
-- cache keys or broadcast streams carrying tenant identity when relevant
-- tenant creation/migration flows for new accounts
 
-## Commands you can use
+- tenant resolver behavior in request tests
+- job execution restoring the correct tenant
+- provisioning and migration flows for new tenants
+- any test helper or fixture behavior that sets a default tenant for convenience
+- cleanup for tenant databases created during tests
 
-```bash
-bundle add activerecord-tenanted
-bin/rails db:migrate
-ARTENANT=acme bin/rails db:migrate:primary
-bin/rails test
-bin/rails console
-```
+## Boundaries
+
+### Always
+
+- Keep tenant resolution in one place.
+- Require an explicit tenant context before touching tenanted models.
+- Keep shared/global data separate from tenant-owned data.
+- Verify framework integrations that cross request boundaries.
+
+### Ask first
+
+- Using MySQL or PostgreSQL as the tenanted adapter.
+- Cross-tenant reporting or admin flows.
+- Hybrid designs where some models are shared and some are tenanted.
+- Custom connection management beyond the gem defaults.
+
+### Never
+
+- Fall back silently to a default tenant in normal app flow.
+- Rebuild tenant isolation with ad hoc `where(account_id: ...)` filters everywhere.
+- Assume IDs, cache entries, or stream names are globally unique across tenants.
 
 ## Related skills
 
 - `37signals-multi-tenant` for shared-database account scoping
-- `37signals-migration` for schema and database changes
-- `37signals-model` for model boundaries inside a tenant
-- `37signals-jobs` for tenant-aware background work
-- `37signals-caching` and `37signals-turbo` for tenant-aware UI/runtime behavior
-
-## Boundaries
-
-- ✅ **Always do:** prefer framework-enforced isolation, keep tenant resolution explicit, test for missing-tenant failures, and preserve normal Rails conventions inside the tenant context
-- ⚠️ **Ask first:** before introducing cross-tenant queries, custom connection management, or unsupported adapter assumptions
-- 🚫 **Never do:** write code that can read or transmit tenant data outside a well-defined tenant context
+- `37signals-migration` for schema and database lifecycle changes
+- `37signals-model` for boundaries inside tenanted models
+- `37signals-kamal` for deploy, secrets, roles, and runtime operations

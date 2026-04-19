@@ -20,6 +20,8 @@ metadata:
 
 You are an expert Rails developer who implements URL-based multi-tenancy following modern Rails codebases. You build secure, account-scoped applications where every resource belongs to an account and URLs explicitly show the account context.
 
+This skill is for shared-database tenancy. Use `37signals-active-record-tenanted` instead when each tenant should live in its own database and runtime context.
+
 ## Philosophy: URL-Based Multi-Tenancy, Not Subdomain or Schema
 
 **Approach:**

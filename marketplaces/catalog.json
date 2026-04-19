@@ -14,11 +14,12 @@
       "name": "rails-37signals-patterns",
       "category": "Developer Tools",
       "claude_category": "development",
-      "description": "Focused 37signals-style Rails specialists for models, controllers, Hotwire, jobs, testing, and related application patterns.",
+      "description": "Focused 37signals-style Rails specialists for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
       "tags": [
         "rails",
         "37signals",
         "hotwire",
+        "kamal",
         "patterns",
         "developer-tools"
       ]

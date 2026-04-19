@@ -51,7 +51,7 @@ agent-skills/
 
 ### Rails 37signals Patterns
 
-The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused Rails patterns and conventions inspired by 37signals-style applications. Across the set, the defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, explicit `Current.account` scoping, UUID-backed schemas, and Minitest with fixtures.
+The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused Rails patterns and conventions inspired by 37signals-style applications. Across the set, the defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, Kamal-based deployment, explicit tenancy choices, UUID-backed schemas, and Minitest with fixtures.
 
 **Architecture and workflow**
 
@@ -75,6 +75,7 @@ The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused R
 - [`37signals-caching`](plugins/rails-37signals-patterns/skills/37signals-caching/SKILL.md) — HTTP caching, ETags, `fresh_when`, `stale?`, and fragment caching.
 - [`37signals-crud`](plugins/rails-37signals-patterns/skills/37signals-crud/SKILL.md) — RESTful controllers built around the “everything is CRUD” philosophy.
 - [`37signals-events`](plugins/rails-37signals-patterns/skills/37signals-events/SKILL.md) — event tracking, activity feeds, and webhook-friendly event models.
+- [`37signals-kamal`](plugins/rails-37signals-patterns/skills/37signals-kamal/SKILL.md) — Kamal deployment, roles, hooks, secrets, accessories, and deploy-safe Rails runtime operations.
 - [`37signals-jobs`](plugins/rails-37signals-patterns/skills/37signals-jobs/SKILL.md) — shallow background jobs and async workflows using Solid Queue.
 - [`37signals-mailer`](plugins/rails-37signals-patterns/skills/37signals-mailer/SKILL.md) — minimal Action Mailer patterns and bundled notifications.
 - [`37signals-stimulus`](plugins/rails-37signals-patterns/skills/37signals-stimulus/SKILL.md) — focused Stimulus controllers for progressive enhancement.
@@ -87,8 +88,8 @@ These specialist skills preserve source metadata in their frontmatter and were a
 
 The `plugins/rails-37signals-workflows/skills/rails-37signals-*` folders are standalone workflow skills for common Rails jobs, not just aliases. Each one includes an `agents/openai.yaml` file plus a focused `references/` set.
 
-- [`rails-37signals-implement`](plugins/rails-37signals-workflows/skills/rails-37signals-implement/SKILL.md) — end-to-end feature implementation in dependency order. See `references/conventions.md` and `references/implementation-workflow.md`.
-- [`rails-37signals-refactor`](plugins/rails-37signals-workflows/skills/rails-37signals-refactor/SKILL.md) — incremental, behavior-preserving refactors toward 37signals conventions. See `references/conventions.md` and `references/refactoring-guide.md`.
+- [`rails-37signals-implement`](plugins/rails-37signals-workflows/skills/rails-37signals-implement/SKILL.md) — end-to-end feature implementation in dependency order, including tenancy and deploy/runtime checks. See `references/conventions.md` and `references/implementation-workflow.md`.
+- [`rails-37signals-refactor`](plugins/rails-37signals-workflows/skills/rails-37signals-refactor/SKILL.md) — incremental, behavior-preserving refactors toward 37signals conventions, including tenancy cleanup and runtime alignment. See `references/conventions.md` and `references/refactoring-guide.md`.
 - [`rails-37signals-review`](plugins/rails-37signals-workflows/skills/rails-37signals-review/SKILL.md) — code review and architecture auditing for 37signals-style Rails codebases. See `references/conventions.md` and `references/review-checklist.md`.
 
 ### Fizzy

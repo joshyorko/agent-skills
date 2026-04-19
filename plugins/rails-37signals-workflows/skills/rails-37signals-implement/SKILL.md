@@ -22,15 +22,16 @@ Use this skill for end-to-end feature work in a Rails app that follows 37signals
 - Prefer rich models over `app/services/`.
 - Prefer CRUD resources over custom controller actions.
 - Model business state as records, not booleans, when the state has lifecycle or audit value.
-- Scope reads and writes through `Current.account` in multi-tenant apps.
+- Choose the tenancy model explicitly: shared database with `Current.account`, or separate databases with `with_tenant`.
 - Prefer Hotwire and server-rendered Rails over client-side stateful frontends.
 - Prefer Minitest with fixtures when the codebase follows that stack.
+- Include deploy/runtime work when the feature changes startup, workers, dependencies, or secrets.
 
 ## Implementation Workflow
 
 ### 1. Frame the change
 
-- List the schema changes, domain objects, controller endpoints, views, async work, and tests that will move.
+- List the schema changes, tenancy model, domain objects, controller endpoints, views, async work, deploy/runtime changes, and tests that will move.
 - If the request suggests a state transition like archive, publish, close, or approve, consider a separate resource first.
 
 ### 2. Build from the bottom up
@@ -50,7 +51,7 @@ Use this skill for end-to-end feature work in a Rails app that follows 37signals
 ### 4. Verify
 
 - Run targeted tests first, then broader verification only if needed.
-- Check naming, account scoping, fixture references, and Turbo response behavior.
+- Check naming, tenancy consistency, fixture references, Turbo response behavior, and deploy/runtime impact.
 
 ## Load These References When Needed
 

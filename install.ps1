@@ -1,5 +1,4 @@
 #!/usr/bin/env pwsh
-$ErrorActionPreference = "Stop"
 
 param(
   [string]$RepoPath = $(if ($env:AGENT_SKILLS_REPO_PATH) { $env:AGENT_SKILLS_REPO_PATH } else { "$HOME/src/agent-skills" }),
@@ -12,6 +11,8 @@ param(
   [switch]$Force,
   [switch]$Help
 )
+
+$ErrorActionPreference = "Stop"
 
 $RepoOwner = "joshyorko"
 $RepoName = "agent-skills"

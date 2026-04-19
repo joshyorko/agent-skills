@@ -1,7 +1,7 @@
 {
   "name": "rails-37signals-patterns",
   "version": "0.1.0",
-  "description": "Focused 37signals-style Rails skills for models, controllers, Hotwire, jobs, testing, and related architecture patterns.",
+  "description": "Focused 37signals-style Rails skills for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related architecture patterns.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -14,6 +14,7 @@
     "rails",
     "37signals",
     "hotwire",
+    "kamal",
     "patterns",
     "skills"
   ],
@@ -21,7 +22,7 @@
   "interface": {
     "displayName": "Rails 37signals Patterns",
     "shortDescription": "Focused Rails pattern skills inspired by 37signals.",
-    "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, caching, jobs, multi-tenancy, and related 37signals-style application design.",
+    "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-style application design.",
     "developerName": "Josh Yorko",
     "category": "Developer Tools",
     "capabilities": [
@@ -34,7 +35,8 @@
     "defaultPrompt": [
       "Implement this Rails model using 37signals patterns.",
       "Refactor this controller toward RESTful Rails conventions.",
-      "Review this Hotwire feature for 37signals-style tradeoffs."
+      "Review this Hotwire feature for 37signals-style tradeoffs.",
+      "Set up or fix Kamal deployment for this Rails app."
     ],
     "brandColor": "#9A3412"
   }
