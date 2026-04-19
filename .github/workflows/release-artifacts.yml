@@ -1,0 +1,44 @@
+name: Release Artifacts
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate repo
+        run: bin/check
+
+      - name: Build release archives
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="agent-skills-${tag}/" -o "dist/agent-skills-${tag}.tar.gz" "${GITHUB_SHA}"
+          git archive --format=zip --prefix="agent-skills-${tag}/" -o "dist/agent-skills-${tag}.zip" "${GITHUB_SHA}"
+          (
+            cd dist
+            sha256sum "agent-skills-${tag}.tar.gz" "agent-skills-${tag}.zip" > SHA256SUMS
+          )
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/SHA256SUMS

@@ -5,16 +5,27 @@ REPO_URL_DEFAULT="https://github.com/joshyorko/agent-skills.git"
 REPO_PATH_DEFAULT="${HOME}/src/agent-skills"
 CODEX_HOME_DEFAULT="${HOME}/.codex"
 MARKETPLACE_NAME_DEFAULT="agent-skills"
-SKILL_MODE_DEFAULT="link"
+SKILL_MODE_DEFAULT="auto"
+INSTALL_METHOD_DEFAULT="git"
 LEGACY_AGENTS_HOME="${HOME}/.agents"
 
 REPO_URL="${REPO_URL:-$REPO_URL_DEFAULT}"
 REPO_PATH="$REPO_PATH_DEFAULT"
 CODEX_HOME="$CODEX_HOME_DEFAULT"
 MARKETPLACE_NAME="$MARKETPLACE_NAME_DEFAULT"
-SKILL_MODE="$SKILL_MODE_DEFAULT"
+SKILL_MODE="${SKILL_MODE:-$SKILL_MODE_DEFAULT}"
+INSTALL_METHOD="${INSTALL_METHOD:-$INSTALL_METHOD_DEFAULT}"
+REF_SPEC="${REF_SPEC:-}"
+RESOLVED_REF_OVERRIDE="${RESOLVED_REF:-}"
 FORCE=0
+SKIP_REPO_SYNC=0
 MARKETPLACE_STATUS="not attempted"
+
+MANAGED_SKILLS=()
+LINKED_COUNT=0
+COPIED_COUNT=0
+SKIPPED_COUNT=0
+ACTUAL_SKILL_MODE=""
 
 usage() {
   cat <<'EOF'
@@ -23,24 +34,29 @@ Usage: scripts/install-codex-assets.sh [options]
 Bootstrap Codex plugins and skills from this repository into a user-level installation.
 
 Options:
-  --repo-path PATH        Destination for the agent-skills clone (default: ~/src/agent-skills)
-  --repo-url URL          Git clone URL to use (default: https://github.com/joshyorko/agent-skills.git)
-  --codex-home PATH       Codex user directory (default: ~/.codex)
-  --marketplace-name NAME Marketplace name to register (default: agent-skills)
-  --link                  Symlink skills into Codex (default)
-  --copy                  Copy skills into Codex instead of symlinking
-  --force                 Replace conflicting skill entries
-  -h, --help              Show this help message
+  --repo-path PATH          Destination for the agent-skills checkout (default: ~/src/agent-skills)
+  --repo-url URL           Git clone URL to use when syncing the repo (default: https://github.com/joshyorko/agent-skills.git)
+  --codex-home PATH        Codex user directory (default: ~/.codex)
+  --marketplace-name NAME  Marketplace name to register (default: agent-skills)
+  --skill-mode MODE        auto (default), link, or copy
+  --link                   Symlink skills into Codex
+  --copy                   Copy skills into Codex
+  --install-method MODE    git or archive metadata for the managed install (default: git)
+  --ref REF                Ref to sync when managing the repo checkout directly
+  --resolved-ref REF       Resolved ref metadata to record in install state
+  --skip-repo-sync         Skip clone/update logic and install from an existing checkout
+  --force                  Replace conflicting skill entries
+  -h, --help               Show this help message
 
 Environment overrides:
-  REPO_URL   Default clone URL
+  REPO_URL      Default clone URL
+  REF_SPEC      Default ref
+  RESOLVED_REF  Resolved ref metadata
 
 Examples:
-  # Fresh environment: clone once, then install from the stable checkout
-  if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
-
-  # Install into a custom location with copies instead of symlinks
-  bash ~/code/agent-skills/scripts/install-codex-assets.sh --repo-path ~/code/agent-skills --copy --force
+  bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
+  bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills --skill-mode copy --force
+  bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills --skip-repo-sync --install-method archive --resolved-ref v1.2.3
 EOF
 }
 
@@ -61,6 +77,58 @@ print(Path(sys.argv[1]).expanduser().resolve())
 PY
 }
 
+current_ref() {
+  local repo="$1"
+
+  if [[ -n "$RESOLVED_REF_OVERRIDE" ]]; then
+    printf '%s\n' "$RESOLVED_REF_OVERRIDE"
+    return 0
+  fi
+
+  if [[ ! -d "${repo}/.git" ]]; then
+    if [[ -n "$REF_SPEC" ]]; then
+      printf '%s\n' "$REF_SPEC"
+    else
+      printf 'unknown\n'
+    fi
+    return 0
+  fi
+
+  local tag=""
+  if tag="$(git -C "$repo" describe --tags --exact-match 2>/dev/null)"; then
+    printf '%s\n' "$tag"
+    return 0
+  fi
+
+  local branch=""
+  if branch="$(git -C "$repo" symbolic-ref --short -q HEAD 2>/dev/null)"; then
+    printf '%s\n' "$branch"
+    return 0
+  fi
+
+  git -C "$repo" rev-parse --short HEAD
+}
+
+sync_repo_ref() {
+  [[ -n "$REF_SPEC" ]] || return 0
+
+  log "Syncing repository to ref ${REF_SPEC}"
+  git -C "${REPO_PATH}" fetch --tags --prune origin
+
+  if git -C "${REPO_PATH}" rev-parse --verify --quiet "${REF_SPEC}^{commit}" >/dev/null; then
+    git -C "${REPO_PATH}" checkout --force "${REF_SPEC}"
+    return 0
+  fi
+
+  if git -C "${REPO_PATH}" fetch origin "${REF_SPEC}" --depth=1 >/dev/null 2>&1; then
+    git -C "${REPO_PATH}" checkout --force FETCH_HEAD
+    return 0
+  fi
+
+  echo "Unable to resolve ref ${REF_SPEC} in ${REPO_PATH}" >&2
+  exit 1
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --repo-path)
@@ -78,6 +146,26 @@ while [[ $# -gt 0 ]]; do
     --marketplace-name)
       MARKETPLACE_NAME="$2"
       shift 2
+      ;;
+    --skill-mode)
+      SKILL_MODE="$2"
+      shift 2
+      ;;
+    --install-method)
+      INSTALL_METHOD="$2"
+      shift 2
+      ;;
+    --ref)
+      REF_SPEC="$2"
+      shift 2
+      ;;
+    --resolved-ref)
+      RESOLVED_REF_OVERRIDE="$2"
+      shift 2
+      ;;
+    --skip-repo-sync)
+      SKIP_REPO_SYNC=1
+      shift
       ;;
     --link)
       SKILL_MODE="link"
@@ -103,18 +191,39 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+case "$SKILL_MODE" in
+  auto|link|copy) ;;
+  *)
+    echo "Invalid skill mode: ${SKILL_MODE}" >&2
+    exit 1
+    ;;
+esac
+
+case "$INSTALL_METHOD" in
+  git|archive)
+    ;;
+  *)
+    echo "Invalid install method: ${INSTALL_METHOD}" >&2
+    exit 1
+    ;;
+esac
+
 REPO_PATH="$(normalize_path "$REPO_PATH")"
 CODEX_HOME="$(normalize_path "$CODEX_HOME")"
 MARKETPLACE_NAME="${MARKETPLACE_NAME:-$MARKETPLACE_NAME_DEFAULT}"
 
 SKILLS_ROOT="${CODEX_HOME}/skills"
+STATE_ROOT="${CODEX_HOME}/state"
+STATE_PATH="${STATE_ROOT}/agent-skills.json"
 CATALOG_PATH="${REPO_PATH}/marketplaces/catalog.json"
 
 clone_or_update_repo() {
   if [[ -d "${REPO_PATH}/.git" ]]; then
     log "Updating existing repository at ${REPO_PATH}"
     git -C "${REPO_PATH}" fetch --tags --prune
-    git -C "${REPO_PATH}" pull --ff-only
+    if [[ -z "$REF_SPEC" ]]; then
+      git -C "${REPO_PATH}" pull --ff-only
+    fi
   elif [[ -e "${REPO_PATH}" ]]; then
     echo "Target path ${REPO_PATH} exists but is not a git repository." >&2
     exit 1
@@ -123,6 +232,8 @@ clone_or_update_repo() {
     log "Cloning ${REPO_URL} into ${REPO_PATH}"
     git clone "${REPO_URL}" "${REPO_PATH}"
   fi
+
+  sync_repo_ref
 }
 
 cleanup_legacy_marketplace() {
@@ -170,7 +281,7 @@ PY
 register_marketplace() {
   if ! command -v codex >/dev/null 2>&1; then
     MARKETPLACE_STATUS="not registered automatically (codex CLI not found)"
-    warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add \"${REPO_PATH}\""
+    warn "codex CLI not found; skipping marketplace registration. Run manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace add \"${REPO_PATH}\""
     return
   fi
 
@@ -226,54 +337,129 @@ copy_skill() {
   return 0
 }
 
+install_one_skill() {
+  local source="$1"
+  local target="$2"
+  local name="$3"
+
+  case "$SKILL_MODE" in
+    link)
+      if link_skill "$source" "$target"; then
+        MANAGED_SKILLS+=("$name")
+        ((++LINKED_COUNT))
+      else
+        ((++SKIPPED_COUNT))
+      fi
+      ;;
+    copy)
+      if copy_skill "$source" "$target"; then
+        MANAGED_SKILLS+=("$name")
+        ((++COPIED_COUNT))
+      else
+        ((++SKIPPED_COUNT))
+      fi
+      ;;
+    auto)
+      if link_skill "$source" "$target"; then
+        MANAGED_SKILLS+=("$name")
+        ((++LINKED_COUNT))
+      else
+        warn "falling back to copy mode for ${name}"
+        if copy_skill "$source" "$target"; then
+          MANAGED_SKILLS+=("$name")
+          ((++COPIED_COUNT))
+        else
+          ((++SKIPPED_COUNT))
+        fi
+      fi
+      ;;
+  esac
+}
+
 install_skills() {
   mkdir -p "$SKILLS_ROOT"
-  local linked=0
-  local copied=0
-  local skipped=0
 
   for skill_dir in "${REPO_PATH}"/plugins/*/skills/*; do
     [[ -d "$skill_dir" ]] || continue
     local name target
     name="$(basename "$skill_dir")"
     target="${SKILLS_ROOT}/${name}"
-
-    if [[ "$SKILL_MODE" == "copy" ]]; then
-      if copy_skill "$skill_dir" "$target"; then
-        ((++copied))
-      else
-        ((++skipped))
-      fi
-    else
-      if link_skill "$skill_dir" "$target"; then
-        ((++linked))
-      else
-        ((++skipped))
-      fi
-    fi
+    install_one_skill "$skill_dir" "$target" "$name"
   done
 
-  log "Skills installed: linked=${linked} copied=${copied} skipped=${skipped}"
+  if [[ "$LINKED_COUNT" -gt 0 && "$COPIED_COUNT" -gt 0 ]]; then
+    ACTUAL_SKILL_MODE="mixed"
+  elif [[ "$COPIED_COUNT" -gt 0 ]]; then
+    ACTUAL_SKILL_MODE="copy"
+  elif [[ "$LINKED_COUNT" -gt 0 ]]; then
+    ACTUAL_SKILL_MODE="link"
+  else
+    ACTUAL_SKILL_MODE="$SKILL_MODE"
+  fi
+
+  log "Skills installed: linked=${LINKED_COUNT} copied=${COPIED_COUNT} skipped=${SKIPPED_COUNT}"
+}
+
+write_state() {
+  mkdir -p "$STATE_ROOT"
+  python3 - "$STATE_PATH" "$REPO_PATH" "$CODEX_HOME" "$MARKETPLACE_NAME" "$INSTALL_METHOD" "$ACTUAL_SKILL_MODE" "$(current_ref "$REPO_PATH")" -- "${MANAGED_SKILLS[@]}" <<'PY'
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+state_path = Path(sys.argv[1])
+repo_path = sys.argv[2]
+codex_home = sys.argv[3]
+marketplace_name = sys.argv[4]
+install_method = sys.argv[5]
+skill_mode = sys.argv[6]
+resolved_ref = sys.argv[7]
+skills = sys.argv[9:]
+
+payload = {
+    "schema_version": 1,
+    "repo_path": repo_path,
+    "codex_home": codex_home,
+    "marketplace_name": marketplace_name,
+    "install_method": install_method,
+    "skill_mode": skill_mode,
+    "resolved_ref": resolved_ref,
+    "managed_skills": skills,
+    "installed_at": datetime.now(timezone.utc).isoformat(),
+}
+
+state_path.write_text(json.dumps(payload, indent=2) + "\n")
+PY
 }
 
 main() {
-  clone_or_update_repo
+  if [[ "$SKIP_REPO_SYNC" -eq 0 ]]; then
+    clone_or_update_repo
+  else
+    log "Skipping repo sync for existing checkout at ${REPO_PATH}"
+  fi
 
   if [[ ! -f "$CATALOG_PATH" ]]; then
     echo "Catalog not found at ${CATALOG_PATH}" >&2
     exit 1
   fi
 
+  mkdir -p "$CODEX_HOME"
   cleanup_legacy_marketplace
   register_marketplace
   install_skills
+  write_state
 
   cat <<EOF
 
 Codex assets installed.
 - Repository path: ${REPO_PATH}
+- Managed ref: $(current_ref "$REPO_PATH")
+- Install method: ${INSTALL_METHOD}
 - Marketplace: ${MARKETPLACE_STATUS}
 - Skills directory: ${SKILLS_ROOT}
+- State file: ${STATE_PATH}
 
 Next steps:
 - Restart Codex if marketplace registration succeeded.

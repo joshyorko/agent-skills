@@ -6,31 +6,25 @@ param(
   [string]$RepoUrl = $(if ($env:REPO_URL) { $env:REPO_URL } else { "https://github.com/joshyorko/agent-skills.git" }),
   [string]$CodexHome = "$HOME/.codex",
   [string]$MarketplaceName = "agent-skills",
-  [ValidateSet("link", "copy")] [string]$SkillMode = "link",
+  [ValidateSet("auto", "link", "copy")] [string]$SkillMode = $(if ($env:SKILL_MODE) { $env:SKILL_MODE } else { "auto" }),
+  [ValidateSet("git", "archive")] [string]$InstallMethod = $(if ($env:INSTALL_METHOD) { $env:INSTALL_METHOD } else { "git" }),
+  [string]$Ref = $(if ($env:REF_SPEC) { $env:REF_SPEC } else { "" }),
+  [string]$ResolvedRef = $(if ($env:RESOLVED_REF) { $env:RESOLVED_REF } else { "" }),
+  [switch]$SkipRepoSync,
   [switch]$Force,
   [switch]$Help
 )
 
 function Show-Usage {
   @"
-Usage: pwsh -File scripts/install-codex-assets.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-MarketplaceName NAME] [-SkillMode link|copy] [-Force]
+Usage: pwsh -File scripts/install-codex-assets.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-MarketplaceName NAME] [-SkillMode auto|link|copy] [-InstallMethod git|archive] [-Ref REF] [-ResolvedRef REF] [-SkipRepoSync] [-Force]
 
 Bootstrap Codex plugins and skills from this repository into a user-level installation.
 
-Parameters:
-  -RepoPath          Destination for the agent-skills clone (default: $HOME/src/agent-skills)
-  -RepoUrl           Git clone URL to use (default: https://github.com/joshyorko/agent-skills.git)
-  -CodexHome         Codex user directory (default: $HOME/.codex)
-  -MarketplaceName   Marketplace name to register (default: agent-skills)
-  -SkillMode         link (default) or copy
-  -Force             Replace conflicting skill entries
-
 Examples:
-  # Fresh environment: clone once, then install from the stable checkout
-  if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
-
-  # Install into a custom location with copies instead of symlinks
-  pwsh -File "$HOME/code/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/code/agent-skills" -SkillMode copy -Force
+  pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
+  pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills" -SkillMode copy -Force
+  pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills" -SkipRepoSync -InstallMethod archive -ResolvedRef v1.2.3
 "@
 }
 
@@ -48,15 +42,6 @@ function Normalize-Path {
   return [IO.Path]::GetFullPath($resolved)
 }
 
-$RepoPath = Normalize-Path $RepoPath
-$CodexHome = Normalize-Path $CodexHome
-$MarketplaceName = $MarketplaceName
-$MarketplaceStatus = "not attempted"
-
-$SkillsRoot = Join-Path $CodexHome "skills"
-$CatalogPath = Join-Path $RepoPath "marketplaces/catalog.json"
-$LegacyAgentsHome = Normalize-Path "$HOME/.agents"
-
 function Ensure-Directory {
   param([string]$Path)
   if (-not (Test-Path -LiteralPath $Path)) {
@@ -64,11 +49,77 @@ function Ensure-Directory {
   }
 }
 
+function Get-CurrentRef {
+  if ($ResolvedRef) {
+    return $ResolvedRef
+  }
+
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoPath ".git"))) {
+    if ($Ref) {
+      return $Ref
+    }
+    return "unknown"
+  }
+
+  $tag = (& git -C $RepoPath describe --tags --exact-match 2>$null)
+  if ($LASTEXITCODE -eq 0 -and $tag) {
+    return $tag.Trim()
+  }
+
+  $branch = (& git -C $RepoPath symbolic-ref --short -q HEAD 2>$null)
+  if ($LASTEXITCODE -eq 0 -and $branch) {
+    return $branch.Trim()
+  }
+
+  return ((& git -C $RepoPath rev-parse --short HEAD).Trim())
+}
+
+function Sync-RepoRef {
+  if (-not $Ref) {
+    return
+  }
+
+  Log "Syncing repository to ref $Ref"
+  & git -C $RepoPath fetch --tags --prune origin | Out-Null
+
+  & git -C $RepoPath rev-parse --verify --quiet "$Ref^{commit}" | Out-Null
+  if ($LASTEXITCODE -eq 0) {
+    & git -C $RepoPath checkout --force $Ref | Out-Null
+    return
+  }
+
+  & git -C $RepoPath fetch origin $Ref --depth=1 | Out-Null
+  if ($LASTEXITCODE -eq 0) {
+    & git -C $RepoPath checkout --force FETCH_HEAD | Out-Null
+    return
+  }
+
+  throw "Unable to resolve ref $Ref in $RepoPath"
+}
+
+$RepoPath = Normalize-Path $RepoPath
+$CodexHome = Normalize-Path $CodexHome
+$MarketplaceStatus = "not attempted"
+
+$SkillsRoot = Join-Path $CodexHome "skills"
+$StateRoot = Join-Path $CodexHome "state"
+$StatePath = Join-Path $StateRoot "agent-skills.json"
+$CatalogPath = Join-Path $RepoPath "marketplaces/catalog.json"
+$LegacyAgentsHome = Normalize-Path "$HOME/.agents"
+
+$script:ManagedSkills = [System.Collections.Generic.List[string]]::new()
+$script:LinkedCount = 0
+$script:CopiedCount = 0
+$script:SkippedCount = 0
+$script:ActualSkillMode = ""
+
 function Clone-Or-UpdateRepo {
   if (Test-Path -LiteralPath (Join-Path $RepoPath ".git")) {
     Log "Updating existing repository at $RepoPath"
-    git -C $RepoPath fetch --tags --prune
-    git -C $RepoPath pull --ff-only
+    & git -C $RepoPath fetch --tags --prune | Out-Null
+    if (-not $Ref) {
+      & git -C $RepoPath pull --ff-only | Out-Null
+    }
   }
   elseif (Test-Path -LiteralPath $RepoPath) {
     throw "Target path $RepoPath exists but is not a git repository."
@@ -76,15 +127,17 @@ function Clone-Or-UpdateRepo {
   else {
     Ensure-Directory (Split-Path -Parent $RepoPath)
     Log "Cloning $RepoUrl into $RepoPath"
-    git clone $RepoUrl $RepoPath
+    & git clone $RepoUrl $RepoPath | Out-Null
   }
+
+  Sync-RepoRef
 }
 
 function Register-Marketplace {
   $codexCmd = Get-Command codex -ErrorAction SilentlyContinue
   if (-not $codexCmd) {
     $script:MarketplaceStatus = "not registered automatically (codex CLI not found)"
-    Warn "codex CLI not found; skipping marketplace registration. Run manually: codex marketplace add `"$RepoPath`""
+    Warn "codex CLI not found; skipping marketplace registration. Run manually: CODEX_HOME=`"$CodexHome`" codex marketplace add `"$RepoPath`""
     return
   }
 
@@ -200,7 +253,7 @@ function Link-Skill {
     return $true
   }
   catch {
-    Warn "failed to create symlink $targetFull -> $sourceFull ($_). Consider -SkillMode copy."
+    Warn "failed to create symlink $targetFull -> $sourceFull ($($_.Exception.Message))"
     return $false
   }
 }
@@ -221,46 +274,121 @@ function Copy-Skill {
   return $true
 }
 
+function Install-OneSkill {
+  param([System.IO.DirectoryInfo]$Skill)
+  $target = Join-Path $SkillsRoot $Skill.Name
+
+  switch ($SkillMode) {
+    "link" {
+      if (Link-Skill $Skill.FullName $target) {
+        $script:ManagedSkills.Add($Skill.Name)
+        $script:LinkedCount++
+      }
+      else {
+        $script:SkippedCount++
+      }
+    }
+    "copy" {
+      if (Copy-Skill $Skill.FullName $target) {
+        $script:ManagedSkills.Add($Skill.Name)
+        $script:CopiedCount++
+      }
+      else {
+        $script:SkippedCount++
+      }
+    }
+    "auto" {
+      if (Link-Skill $Skill.FullName $target) {
+        $script:ManagedSkills.Add($Skill.Name)
+        $script:LinkedCount++
+      }
+      else {
+        Warn "falling back to copy mode for $($Skill.Name)"
+        if (Copy-Skill $Skill.FullName $target) {
+          $script:ManagedSkills.Add($Skill.Name)
+          $script:CopiedCount++
+        }
+        else {
+          $script:SkippedCount++
+        }
+      }
+    }
+  }
+}
+
 function Install-Skills {
   Ensure-Directory $SkillsRoot
-  $linked = 0
-  $copied = 0
-  $skipped = 0
 
   $skillDirs = Get-ChildItem -Path (Join-Path $RepoPath "plugins") -Directory -ErrorAction SilentlyContinue | ForEach-Object {
     Get-ChildItem -Path (Join-Path $_.FullName "skills") -Directory -ErrorAction SilentlyContinue
   }
 
   foreach ($skill in $skillDirs) {
-    $target = Join-Path $SkillsRoot $skill.Name
-    if ($SkillMode -eq "copy") {
-      if (Copy-Skill $skill.FullName $target) { $copied++ } else { $skipped++ }
-    }
-    else {
-      if (Link-Skill $skill.FullName $target) { $linked++ } else { $skipped++ }
-    }
+    Install-OneSkill $skill
   }
 
-  Log "Skills installed: linked=$linked copied=$copied skipped=$skipped"
+  if ($LinkedCount -gt 0 -and $CopiedCount -gt 0) {
+    $script:ActualSkillMode = "mixed"
+  }
+  elseif ($CopiedCount -gt 0) {
+    $script:ActualSkillMode = "copy"
+  }
+  elseif ($LinkedCount -gt 0) {
+    $script:ActualSkillMode = "link"
+  }
+  else {
+    $script:ActualSkillMode = $SkillMode
+  }
+
+  Log "Skills installed: linked=$LinkedCount copied=$CopiedCount skipped=$SkippedCount"
+}
+
+function Write-State {
+  Ensure-Directory $StateRoot
+
+  $payload = [ordered]@{
+    schema_version = 1
+    repo_path = $RepoPath
+    codex_home = $CodexHome
+    marketplace_name = $MarketplaceName
+    install_method = $InstallMethod
+    skill_mode = $ActualSkillMode
+    resolved_ref = Get-CurrentRef
+    managed_skills = @($ManagedSkills)
+    installed_at = [DateTimeOffset]::UtcNow.ToString("o")
+  }
+
+  $json = $payload | ConvertTo-Json -Depth 6
+  Set-Content -LiteralPath $StatePath -Value ($json + "`n")
 }
 
 function Main {
-  Clone-Or-UpdateRepo
+  if (-not $SkipRepoSync) {
+    Clone-Or-UpdateRepo
+  }
+  else {
+    Log "Skipping repo sync for existing checkout at $RepoPath"
+  }
 
   if (-not (Test-Path -LiteralPath $CatalogPath)) {
     throw "Catalog not found at $CatalogPath"
   }
 
+  Ensure-Directory $CodexHome
   Remove-LegacyMarketplace
   Register-Marketplace
   Install-Skills
+  Write-State
 
   @"
 
 Codex assets installed.
 - Repository path: $RepoPath
+- Managed ref: $(Get-CurrentRef)
+- Install method: $InstallMethod
 - Marketplace: $MarketplaceStatus
 - Skills directory: $SkillsRoot
+- State file: $StatePath
 
 Next steps:
 - Restart Codex if marketplace registration succeeded.

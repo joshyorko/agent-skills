@@ -151,19 +151,34 @@ Primary docs:
 
 ### Codex Bootstrap
 
-Install this repo once per machine and expose its plugins/skills globally:
+Install this repo once per machine and expose its plugins/skills globally.
+
+macOS/Linux:
 
 ```bash
-if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko/agent-skills.git ~/src/agent-skills; fi && bash ~/src/agent-skills/scripts/install-codex-assets.sh --repo-path ~/src/agent-skills
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
+```
+
+Pinned macOS/Linux install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
 ```
 
 Windows (PowerShell):
 
 ```powershell
-if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
 ```
 
-See `docs/codex-bootstrap.md` for options, uninstall flow, and devcontainer usage.
+Pinned Windows install:
+
+```powershell
+$env:AGENT_SKILLS_REF = "v1.2.3"
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+```
+
+The remote entrypoints prefer a git checkout when available and fall back to verified release archives when git is unavailable. See [docs/codex-bootstrap.md](docs/codex-bootstrap.md) for options, manual fallback, uninstall flow, and devcontainer usage.
 
 ### Build Generated Views
 

@@ -1,0 +1,230 @@
+#!/usr/bin/env pwsh
+$ErrorActionPreference = "Stop"
+
+param(
+  [string]$RepoPath = $(if ($env:AGENT_SKILLS_REPO_PATH) { $env:AGENT_SKILLS_REPO_PATH } else { "$HOME/src/agent-skills" }),
+  [string]$RepoUrl = $(if ($env:AGENT_SKILLS_REPO_URL) { $env:AGENT_SKILLS_REPO_URL } else { "https://github.com/joshyorko/agent-skills.git" }),
+  [string]$CodexHome = $(if ($env:AGENT_SKILLS_CODEX_HOME) { $env:AGENT_SKILLS_CODEX_HOME } else { "$HOME/.codex" }),
+  [string]$MarketplaceName = $(if ($env:AGENT_SKILLS_MARKETPLACE_NAME) { $env:AGENT_SKILLS_MARKETPLACE_NAME } else { "agent-skills" }),
+  [ValidateSet("auto", "link", "copy")] [string]$SkillMode = $(if ($env:AGENT_SKILLS_SKILL_MODE) { $env:AGENT_SKILLS_SKILL_MODE } else { "auto" }),
+  [ValidateSet("auto", "git", "archive")] [string]$InstallMethod = $(if ($env:AGENT_SKILLS_INSTALL_METHOD) { $env:AGENT_SKILLS_INSTALL_METHOD } else { "auto" }),
+  [string]$Ref = $(if ($env:AGENT_SKILLS_REF) { $env:AGENT_SKILLS_REF } else { "" }),
+  [switch]$Force,
+  [switch]$Help
+)
+
+$RepoOwner = "joshyorko"
+$RepoName = "agent-skills"
+$ApiBase = "https://api.github.com/repos/$RepoOwner/$RepoName"
+
+function Show-Usage {
+  @"
+Usage: install.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-MarketplaceName NAME] [-SkillMode auto|link|copy] [-InstallMethod auto|git|archive] [-Ref REF] [-Force]
+
+Remote bootstrap for the Agent Skills marketplace.
+
+Examples:
+  irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+  `$env:AGENT_SKILLS_REF='v1.2.3'; irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+"@
+}
+
+if ($Help) {
+  Show-Usage
+  exit 0
+}
+
+function Log { param([string]$Message) Write-Host "[codex-bootstrap] $Message" }
+function Warn { param([string]$Message) Write-Warning "[codex-bootstrap] $Message" }
+
+function Normalize-Path {
+  param([string]$Path)
+  $resolved = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+  return [IO.Path]::GetFullPath($resolved)
+}
+
+function Ensure-Directory {
+  param([string]$Path)
+  if (-not (Test-Path -LiteralPath $Path)) {
+    New-Item -ItemType Directory -Path $Path -Force | Out-Null
+  }
+}
+
+function Get-LatestReleaseTag {
+  try {
+    $response = Invoke-RestMethod -Uri "$ApiBase/releases/latest" -Headers @{ Accept = "application/vnd.github+json" }
+    if (-not $response.tag_name) {
+      return $null
+    }
+    return [string]$response.tag_name
+  }
+  catch {
+    return $null
+  }
+}
+
+function Choose-InstallMethod {
+  if ($InstallMethod -ne "auto") {
+    return $InstallMethod
+  }
+
+  if (Test-Path -LiteralPath (Join-Path $RepoPath ".git")) {
+    return "git"
+  }
+
+  if (Test-Path -LiteralPath (Join-Path $RepoPath "marketplaces/catalog.json")) {
+    return "archive"
+  }
+
+  if (Get-Command git -ErrorAction SilentlyContinue) {
+    return "git"
+  }
+
+  return "archive"
+}
+
+function Install-FromGit {
+  $gitCmd = Get-Command git -ErrorAction SilentlyContinue
+  if (-not $gitCmd) {
+    throw "git is required for install method 'git'"
+  }
+
+  if (Test-Path -LiteralPath (Join-Path $RepoPath ".git")) {
+    Log "Updating existing git checkout at $RepoPath"
+    & git -C $RepoPath fetch --tags --prune | Out-Null
+  }
+  elseif (Test-Path -LiteralPath $RepoPath) {
+    throw "Target path $RepoPath exists but is not a git checkout. Use -InstallMethod archive or remove it first."
+  }
+  else {
+    Ensure-Directory (Split-Path -Parent $RepoPath)
+    Log "Cloning $RepoUrl into $RepoPath"
+    & git clone $RepoUrl $RepoPath | Out-Null
+  }
+
+  if ($Ref) {
+    & git -C $RepoPath rev-parse --verify --quiet "$Ref^{commit}" | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+      & git -C $RepoPath checkout --force $Ref | Out-Null
+    }
+    else {
+      & git -C $RepoPath fetch origin $Ref --depth=1 | Out-Null
+      if ($LASTEXITCODE -eq 0) {
+        & git -C $RepoPath checkout --force FETCH_HEAD | Out-Null
+      }
+      else {
+        throw "Unable to resolve ref $Ref"
+      }
+    }
+  }
+  else {
+    & git -C $RepoPath pull --ff-only | Out-Null
+  }
+
+  $resolvedRef = $Ref
+  if (-not $resolvedRef) {
+    $tag = (& git -C $RepoPath describe --tags --exact-match 2>$null)
+    if ($LASTEXITCODE -eq 0 -and $tag) {
+      $resolvedRef = $tag.Trim()
+    }
+    else {
+      $branch = (& git -C $RepoPath symbolic-ref --short -q HEAD 2>$null)
+      if ($LASTEXITCODE -eq 0 -and $branch) {
+        $resolvedRef = $branch.Trim()
+      }
+      else {
+        $resolvedRef = (& git -C $RepoPath rev-parse --short HEAD).Trim()
+      }
+    }
+  }
+
+  $args = @(
+    "-File", (Join-Path $RepoPath "scripts/install-codex-assets.ps1"),
+    "-RepoPath", $RepoPath,
+    "-CodexHome", $CodexHome,
+    "-MarketplaceName", $MarketplaceName,
+    "-SkillMode", $SkillMode,
+    "-InstallMethod", "git",
+    "-ResolvedRef", $resolvedRef,
+    "-SkipRepoSync"
+  )
+  if ($Force) { $args += "-Force" }
+  & pwsh @args
+}
+
+function Install-FromArchive {
+  $resolvedRef = $Ref
+  if (-not $resolvedRef) {
+    $resolvedRef = Get-LatestReleaseTag
+    if (-not $resolvedRef) {
+      $resolvedRef = "main"
+      Warn "No GitHub release found; falling back to main branch archive without checksum verification."
+    }
+  }
+
+  $tmpRoot = Join-Path ([IO.Path]::GetTempPath()) ("agent-skills-" + [guid]::NewGuid().ToString("N"))
+  Ensure-Directory $tmpRoot
+  try {
+    if ($resolvedRef -eq "main") {
+      $archivePath = Join-Path $tmpRoot "agent-skills-main.zip"
+      Invoke-WebRequest -Uri "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/main.zip" -OutFile $archivePath
+    }
+    else {
+      $archivePath = Join-Path $tmpRoot "agent-skills-$resolvedRef.zip"
+      $checksumsPath = Join-Path $tmpRoot "SHA256SUMS"
+      Invoke-WebRequest -Uri "https://github.com/$RepoOwner/$RepoName/releases/download/$resolvedRef/agent-skills-$resolvedRef.zip" -OutFile $archivePath -ErrorAction Stop
+      Invoke-WebRequest -Uri "https://github.com/$RepoOwner/$RepoName/releases/download/$resolvedRef/SHA256SUMS" -OutFile $checksumsPath
+
+      $expected = Select-String -Path $checksumsPath -Pattern "agent-skills-$resolvedRef.zip" | Select-Object -First 1
+      if (-not $expected) {
+        throw "Missing checksum for agent-skills-$resolvedRef.zip"
+      }
+      $expectedHash = ($expected.Line -split '\s+')[0].ToLowerInvariant()
+      $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $archivePath).Hash.ToLowerInvariant()
+      if ($expectedHash -ne $actualHash) {
+        throw "Checksum mismatch for agent-skills-$resolvedRef.zip"
+      }
+    }
+
+    $extractRoot = Join-Path $tmpRoot "expanded"
+    Expand-Archive -LiteralPath $archivePath -DestinationPath $extractRoot -Force
+    $sourceRoot = Get-ChildItem -LiteralPath $extractRoot | Select-Object -First 1
+    if (-not $sourceRoot) {
+      throw "Archive extraction did not produce repository contents."
+    }
+
+    if (Test-Path -LiteralPath $RepoPath) {
+      Remove-Item -LiteralPath $RepoPath -Recurse -Force
+    }
+    Ensure-Directory (Split-Path -Parent $RepoPath)
+    Move-Item -LiteralPath $sourceRoot.FullName -Destination $RepoPath
+
+    $args = @(
+      "-File", (Join-Path $RepoPath "scripts/install-codex-assets.ps1"),
+      "-RepoPath", $RepoPath,
+      "-CodexHome", $CodexHome,
+      "-MarketplaceName", $MarketplaceName,
+      "-SkillMode", $SkillMode,
+      "-InstallMethod", "archive",
+      "-ResolvedRef", $resolvedRef,
+      "-SkipRepoSync"
+    )
+    if ($Force) { $args += "-Force" }
+    & pwsh @args
+  }
+  finally {
+    Remove-Item -LiteralPath $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
+  }
+}
+
+$RepoPath = Normalize-Path $RepoPath
+$CodexHome = Normalize-Path $CodexHome
+
+$method = Choose-InstallMethod
+Log "Using install method: $method"
+
+switch ($method) {
+  "git" { Install-FromGit }
+  "archive" { Install-FromArchive }
+  default { throw "Unsupported install method: $method" }
+}

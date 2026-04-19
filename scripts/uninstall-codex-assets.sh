@@ -12,18 +12,23 @@ AGENTS_HOME="$AGENTS_HOME_DEFAULT"
 MARKETPLACE_NAME="$MARKETPLACE_NAME_DEFAULT"
 FORCE=0
 
+REPO_PATH_SET=0
+CODEX_HOME_SET=0
+AGENTS_HOME_SET=0
+MARKETPLACE_NAME_SET=0
+
 usage() {
   cat <<'EOF'
 Usage: scripts/uninstall-codex-assets.sh [options]
 
-Remove Codex skill symlinks and marketplace entries created by install-codex-assets.sh.
+Remove Codex skill links/copies and marketplace entries created by install-codex-assets.sh.
 
 Options:
-  --repo-path PATH        Location of the agent-skills clone (default: ~/src/agent-skills)
+  --repo-path PATH        Location of the agent-skills checkout (default: ~/src/agent-skills)
   --codex-home PATH       Codex user directory (default: ~/.codex)
   --agents-home PATH      Agents user directory for legacy marketplace metadata (default: ~/.agents)
   --marketplace-name NAME Marketplace name to remove (default: agent-skills)
-  --force                 Remove copy-mode skill directories that exactly match the repo source
+  --force                 Remove matching copy-mode skill directories
   -h, --help              Show this help message
 EOF
 }
@@ -49,18 +54,22 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --repo-path)
       REPO_PATH="$2"
+      REPO_PATH_SET=1
       shift 2
       ;;
     --codex-home)
       CODEX_HOME="$2"
+      CODEX_HOME_SET=1
       shift 2
       ;;
     --agents-home)
       AGENTS_HOME="$2"
+      AGENTS_HOME_SET=1
       shift 2
       ;;
     --marketplace-name)
       MARKETPLACE_NAME="$2"
+      MARKETPLACE_NAME_SET=1
       shift 2
       ;;
     --force)
@@ -79,12 +88,53 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+CODEX_HOME="$(normalize_path "$CODEX_HOME")"
+STATE_PATH="${CODEX_HOME}/state/agent-skills.json"
+
+load_state_defaults() {
+  [[ -f "$STATE_PATH" ]] || return 0
+
+  while IFS='=' read -r key value; do
+    case "$key" in
+      repo_path)
+        if [[ "$REPO_PATH_SET" -eq 0 ]]; then
+          REPO_PATH="$value"
+        fi
+        ;;
+      codex_home)
+        if [[ "$CODEX_HOME_SET" -eq 0 ]]; then
+          CODEX_HOME="$value"
+        fi
+        ;;
+      marketplace_name)
+        if [[ "$MARKETPLACE_NAME_SET" -eq 0 ]]; then
+          MARKETPLACE_NAME="$value"
+        fi
+        ;;
+    esac
+  done < <(python3 - "$STATE_PATH" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+data = json.loads(Path(sys.argv[1]).read_text())
+for key in ("repo_path", "codex_home", "marketplace_name"):
+    value = data.get(key)
+    if value:
+        print(f"{key}={value}")
+PY
+)
+}
+
+load_state_defaults
+
 REPO_PATH="$(normalize_path "$REPO_PATH")"
 CODEX_HOME="$(normalize_path "$CODEX_HOME")"
 AGENTS_HOME="$(normalize_path "$AGENTS_HOME")"
 MARKETPLACE_NAME="${MARKETPLACE_NAME:-$MARKETPLACE_NAME_DEFAULT}"
 
 SKILLS_ROOT="${CODEX_HOME}/skills"
+STATE_PATH="${CODEX_HOME}/state/agent-skills.json"
 
 resolve_link_target() {
   python3 - "$1" <<'PY'
@@ -97,6 +147,20 @@ if not os.path.isabs(link):
     link = os.path.join(os.path.dirname(target), link)
 print(os.path.realpath(link))
 PY
+}
+
+load_managed_skills() {
+  if [[ -f "$STATE_PATH" ]]; then
+    python3 - "$STATE_PATH" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+data = json.loads(Path(sys.argv[1]).read_text())
+for item in data.get("managed_skills", []):
+    print(item)
+PY
+  fi
 }
 
 remove_marketplace() {
@@ -195,23 +259,50 @@ remove_skills() {
 
   local removed=0
   local skipped=0
+  local skill_name target
+  local managed_any=0
 
-  for target in "${SKILLS_ROOT}"/*; do
-    [[ -e "$target" || -L "$target" ]] || continue
+  while IFS= read -r skill_name; do
+    [[ -n "$skill_name" ]] || continue
+    managed_any=1
+    target="${SKILLS_ROOT}/${skill_name}"
+    if [[ ! -e "$target" && ! -L "$target" ]]; then
+      continue
+    fi
 
     if remove_skill_target "$target"; then
       ((++removed))
     else
       ((++skipped))
     fi
-  done
+  done < <(load_managed_skills)
+
+  if [[ "$managed_any" -eq 0 ]]; then
+    for target in "${SKILLS_ROOT}"/*; do
+      [[ -e "$target" || -L "$target" ]] || continue
+
+      if remove_skill_target "$target"; then
+        ((++removed))
+      else
+        ((++skipped))
+      fi
+    done
+  fi
 
   log "Skills removed: ${removed}; skipped: ${skipped}"
+}
+
+remove_state() {
+  if [[ -f "$STATE_PATH" ]]; then
+    rm -f "$STATE_PATH"
+    log "Removed install state ${STATE_PATH}"
+  fi
 }
 
 main() {
   remove_marketplace
   remove_skills
+  remove_state
 
   cat <<EOF
 

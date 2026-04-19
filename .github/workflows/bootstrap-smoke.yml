@@ -1,0 +1,68 @@
+name: Bootstrap Smoke
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate repo
+        run: bin/check
+
+      - name: Lint shell entrypoints
+        run: bash -n install.sh scripts/install-codex-assets.sh scripts/uninstall-codex-assets.sh
+
+      - name: Smoke test local installer
+        run: |
+          tmp_root="$(mktemp -d)"
+          bash scripts/install-codex-assets.sh \
+            --repo-path "$PWD" \
+            --codex-home "$tmp_root/codex" \
+            --install-method git \
+            --resolved-ref ci \
+            --skip-repo-sync \
+            --force
+          test -f "$tmp_root/codex/state/agent-skills.json"
+          bash scripts/uninstall-codex-assets.sh --codex-home "$tmp_root/codex" --force
+
+  validate-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: PowerShell syntax smoke test
+        shell: pwsh
+        run: |
+          $tmpCodex = Join-Path $env:RUNNER_TEMP "codex"
+          pwsh -File scripts/install-codex-assets.ps1 `
+            -RepoPath $PWD `
+            -CodexHome $tmpCodex `
+            -InstallMethod git `
+            -ResolvedRef ci `
+            -SkipRepoSync `
+            -SkillMode copy `
+            -Force
+          if (-not (Test-Path (Join-Path $tmpCodex "state/agent-skills.json"))) {
+            throw "state file missing after install"
+          }
+
+      - name: Remote entrypoint help
+        shell: pwsh
+        run: |
+          pwsh -File install.ps1 -Help | Out-Null
