@@ -68,9 +68,16 @@ Kamal is the concrete deployment layer missing from the rest of the Rails / 37si
 ### Secrets and environment
 
 - Keep secrets in `.kamal/secrets`, `.kamal/secrets-common`, or destination-specific variants.
+- Prefer credentials-backed secret fetching when the app already keeps deploy secrets in Rails credentials.
 - Pass only the needed variables under `env`.
 - Keep clear values and secret values distinct.
 - Do not commit secrets or rely on ad hoc shell state that the deploy host cannot reproduce.
+
+Example:
+
+```sh
+KAMAL_REGISTRY_PASSWORD=$(rails credentials:fetch kamal.registry_password)
+```
 
 ### Accessories
 
@@ -88,6 +95,7 @@ Kamal is the concrete deployment layer missing from the rest of the Rails / 37si
 
 - Be explicit about target architecture when local and server architectures differ.
 - Use a remote builder when local builds are too slow or incompatible.
+- For simple deploys, local-registry flows are a valid default; move to a remote registry when scale or topology actually requires it.
 - Keep registry auth and build secrets out of the Dockerfile and out of git.
 
 ## Rails-specific guidance
