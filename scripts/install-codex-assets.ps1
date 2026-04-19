@@ -1,5 +1,4 @@
 #!/usr/bin/env pwsh
-$ErrorActionPreference = "Stop"
 
 param(
   [string]$RepoPath = "$HOME/src/agent-skills",
@@ -14,6 +13,8 @@ param(
   [switch]$Force,
   [switch]$Help
 )
+
+$ErrorActionPreference = "Stop"
 
 function Show-Usage {
   @"
