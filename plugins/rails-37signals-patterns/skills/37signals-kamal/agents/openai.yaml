@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Kamal"
+  short_description: "Deploys Rails applications with Kamal using roles, accessories, hooks, secrets, and deploy-safe operational patterns."
+  default_prompt: "Use $37signals-kamal when setting up Kamal, editing deploy config, shipping Rails changes, or debugging deploy and runtime issues."
+
+policy:
+  allow_implicit_invocation: true

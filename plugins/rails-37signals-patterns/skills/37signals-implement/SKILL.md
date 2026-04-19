@@ -44,10 +44,12 @@ Historical upstream examples refer to generic `@...-agent` names. In this repo, 
    - API endpoint
 2. Break the work into layers.
    - data and migrations
+   - tenancy model and runtime ownership
    - models and concerns
    - controllers and routes
    - views, Turbo, and Stimulus
    - jobs, mailers, and events
+   - deploy and operations
    - tests
 3. Invoke the right specialist skills in dependency order.
 4. Re-check the combined implementation for account scoping, naming consistency, and user-visible behavior.
@@ -56,19 +58,22 @@ Historical upstream examples refer to generic `@...-agent` names. In this repo, 
 ## Delegation Guide
 
 - `$37signals-migration` for schema and data changes.
+- `$37signals-active-record-tenanted` or `$37signals-multi-tenant` for choosing the tenancy model and enforcing it consistently.
 - `$37signals-model` and `$37signals-concerns` for core domain logic.
 - `$37signals-crud` for controller and route shape.
 - `$37signals-turbo` and `$37signals-stimulus` for interaction and real-time UX.
 - `$37signals-jobs`, `$37signals-mailer`, and `$37signals-events` for async and notification behavior.
 - `$37signals-api` for JSON endpoints.
+- `$37signals-kamal` for deploy config, runtime roles, and shipping changes safely.
 - `$37signals-test` for final coverage.
 
 ## Implementation Rules
 
 - Prefer resources over custom verbs.
 - Keep business logic in models and concerns.
-- Maintain explicit account scoping.
+- Maintain the chosen tenancy model consistently.
 - Use background jobs for expensive side effects.
+- Include deploy/runtime changes when the feature changes startup, workers, dependencies, or secrets.
 - Add tests with the implementation, not after the fact.
 
 ## Boundaries

@@ -34,8 +34,20 @@ Source adapted from the upstream `refactoring-agent.md`.
 - Keep the job shallow.
 - Move durable logic onto the model or a stable domain boundary.
 
+### Tenancy cleanup
+
+- Pick one tenancy model for the affected area before refactoring around it.
+- Shared-database refactors should converge on `Current.account` plus explicit account scoping.
+- Separate-database refactors should converge on `tenanted` plus `with_tenant`.
+
+### Runtime cleanup
+
+- When the refactor changes workers, env vars, or dependencies, update deploy/runtime config in the same change.
+- Remove stale role commands or secrets wiring once the new runtime path is proven.
+
 ## Risk management
 
 - Use staged deployments for data shape changes.
+- Pair app refactors with Kamal/runtime changes when startup or process topology changes.
 - Use deprecation warnings when public interfaces move.
 - Prefer compatibility layers over sudden removals when external callers may exist.

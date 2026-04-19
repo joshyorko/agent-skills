@@ -35,6 +35,8 @@ Historical `@...-agent` references map to the local `37signals-*` skills in this
    - React or custom AJAX where Turbo fits
    - RSpec and factories where Minitest and fixtures are preferred
    - Redis-era infrastructure that Rails now replaces directly
+   - drift between shared-database and separate-database tenancy patterns
+   - deploy configuration that no longer matches the app runtime
 2. Choose an incremental migration path.
 3. Protect behavior with tests before large moves.
 4. Refactor one concern at a time.
@@ -49,6 +51,8 @@ Historical `@...-agent` references map to the local `37signals-*` skills in this
 - `$37signals-turbo` and `$37signals-stimulus` when simplifying frontend complexity.
 - `$37signals-test` for migration-safe coverage.
 - `$37signals-caching`, `$37signals-jobs`, `$37signals-events`, and `$37signals-mailer` for infrastructure cleanup.
+- `$37signals-active-record-tenanted` or `$37signals-multi-tenant` for tenancy cleanup.
+- `$37signals-kamal` when runtime roles, secrets, or deploy config need to change with the refactor.
 
 ## Refactoring Rules
 
@@ -65,6 +69,7 @@ Historical `@...-agent` references map to the local `37signals-*` skills in this
 - Replace custom AJAX flows with Turbo-first interactions.
 - Collapse unnecessary API/framework complexity into normal Rails controllers and views.
 - Remove infrastructure carried forward from older Rails assumptions when Rails now has a simpler built-in answer.
+- Untangle mixed tenancy patterns so the code stops switching between `Current.account` and `with_tenant`.
 
 ## Boundaries
 

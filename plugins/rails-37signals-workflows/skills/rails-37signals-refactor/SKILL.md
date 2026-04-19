@@ -32,7 +32,8 @@ Use this skill when the goal is not a brand-new feature, but a safer path from a
 - Fat controllers to CRUD resources plus model methods.
 - RSpec or FactoryBot-heavy tests toward Minitest plus fixtures when the repo is already moving there.
 - Sidekiq or Redis-specific background work toward Rails-native queueing patterns.
-- Missing tenant scoping toward explicit `Current.account` access.
+- Mixed or missing tenancy toward one explicit model: `Current.account` for shared DB or `with_tenant` for separate DB.
+- Runtime drift toward explicit deploy config that matches the app’s current worker and dependency shape.
 
 ## Workflow
 

@@ -10,12 +10,14 @@ Source adapted from `ThibautBaissac/rails_ai_agents` `.claude_37signals`.
 - Prefer ERB plus Turbo plus Stimulus over React or Vue for standard Rails work.
 - Keep jobs shallow: enqueue from models or callbacks, perform by calling model methods.
 - Keep mailers minimal and transactional.
+- Treat Kamal as the default deploy/runtime layer when the app is deployed with modern Rails conventions.
 
 ## Data and multi-tenancy
 
 - Use UUID-style identifiers where the app already leans that direction.
-- Put `account_id` on tenant-owned records.
-- Scope through `Current.account` instead of broad `Model.find` or `Model.where`.
+- Choose one tenancy model deliberately:
+  - shared DB: put `account_id` on tenant-owned records and scope through `Current.account`
+  - separate DB: use `tenanted` plus `with_tenant` and keep shared data on a non-tenanted connection
 - Avoid default scopes for tenancy when explicit scoping is clearer.
 
 ## Model and controller heuristics

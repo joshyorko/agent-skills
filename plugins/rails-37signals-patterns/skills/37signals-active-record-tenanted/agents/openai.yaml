@@ -1,0 +1,7 @@
+interface:
+  display_name: "37signals Active Record Tenanted"
+  short_description: "Implements separate-database multi-tenancy with Active Record Tenanted using tenant-aware Rails conventions, resolver configuration, and safety guardrails."
+  default_prompt: "Use $37signals-active-record-tenanted when adding activerecord-tenanted, isolating each tenant in its own database, or adapting a Rails app to database-per-tenant architecture."
+
+policy:
+  allow_implicit_invocation: true
