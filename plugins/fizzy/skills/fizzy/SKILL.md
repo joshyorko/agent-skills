@@ -61,12 +61,13 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 **MUST follow these rules:**
 
 1. **Cards use NUMBER, not ID** — `fizzy card show 42` uses the card number. Other resources use their `id` field.
-2. **Parse JSON with jq** to reduce token output — `fizzy card list | jq '[.data[] | {number, title}]'`
-3. **Check breadcrumbs** in responses for available next actions with pre-filled values
-4. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards
-5. **Rich text fields accept HTML** — use `<p>` tags for paragraphs, `<action-text-attachment>` for inline images
-6. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`
-7. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
+2. **Prefer the clean built-in human output first** — use plain output, `--markdown`, or `--styled` when they already answer the question. Use built-in `--jq` only when you need to reduce a large payload or extract specific fields. Never pipe to external jq — use `--jq` instead when filtering is actually needed.
+3. **Check breadcrumbs** in responses for available next actions with pre-filled values.
+4. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards.
+5. **Use `fizzy doctor` for setup/config/auth issues** before guessing — it is the primary read-only health check and includes remediation hints.
+6. **Rich text fields accept markdown or HTML** — use repeatable `--attach PATH` for simple end-appended inline attachments, or embed `<action-text-attachment>` tags manually when exact placement matters.
+7. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`.
+8. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
 
 ## Decision Trees
 
@@ -96,42 +97,43 @@ Want to change something?
 
 ## Quick Reference
 
-| Resource     | List                         | Show                            | Create            | Update                    | Delete               | Other                                                                                                                                                        |
-| ------------ | ---------------------------- | ------------------------------- | ----------------- | ------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| account      | -                            | `account show`                  | -                 | `account settings-update` | -                    | `account entropy`, `account export-create`, `account export-show EXPORT_ID`, `account join-code-show`, `account join-code-reset`, `account join-code-update` |
-| board        | `board list`                 | `board show ID`                 | `board create`    | `board update ID`         | `board delete ID`    | `board publish ID`, `board unpublish ID`, `board entropy ID`, `board closed`, `board postponed`, `board stream`, `board involvement ID`, `migrate board ID`  |
-| card         | `card list`                  | `card show NUMBER`              | `card create`     | `card update NUMBER`      | `card delete NUMBER` | `card move NUMBER`, `card publish NUMBER`, `card mark-read NUMBER`, `card mark-unread NUMBER`                                                                |
-| search       | `search QUERY`               | -                               | -                 | -                         | -                    | -                                                                                                                                                            |
-| column       | `column list --board ID`     | `column show ID --board ID`     | `column create`   | `column update ID`        | `column delete ID`   | `column move-left ID`, `column move-right ID`                                                                                                                |
-| comment      | `comment list --card NUMBER` | `comment show ID --card NUMBER` | `comment create`  | `comment update ID`       | `comment delete ID`  | `comment attachments show --card NUMBER`                                                                                                                     |
-| step         | `step list --card NUMBER`    | `step show ID --card NUMBER`    | `step create`     | `step update ID`          | `step delete ID`     | -                                                                                                                                                            |
-| reaction     | `reaction list`              | -                               | `reaction create` | -                         | `reaction delete ID` | -                                                                                                                                                            |
-| tag          | `tag list`                   | -                               | -                 | -                         | -                    | -                                                                                                                                                            |
-| user         | `user list`                  | `user show ID`                  | -                 | `user update ID`          | -                    | `user deactivate ID`, `user role ID`, `user avatar-remove ID`, `user push-subscription-create`, `user push-subscription-delete ID`                           |
-| notification | `notification list`          | -                               | -                 | -                         | -                    | `notification tray`, `notification read-all`, `notification settings-show`, `notification settings-update`                                                   |
-| pin          | `pin list`                   | -                               | -                 | -                         | -                    | `card pin NUMBER`, `card unpin NUMBER`                                                                                                                       |
-| webhook      | `webhook list --board ID`    | `webhook show ID --board ID`    | `webhook create`  | `webhook update ID`       | `webhook delete ID`  | `webhook reactivate ID`                                                                                                                                      |
+| Resource | List | Show | Create | Update | Delete | Other |
+|----------|------|------|--------|--------|--------|-------|
+| account | - | `account show` | - | `account settings-update` | - | `account entropy`, `account export-create`, `account export-show EXPORT_ID`, `account join-code-show`, `account join-code-reset`, `account join-code-update` |
+| board | `board list` | `board show ID` | `board create` | `board update ID` | `board delete ID` | `board publish ID`, `board unpublish ID`, `board entropy ID`, `board closed`, `board postponed`, `board stream`, `board involvement ID`, `migrate board ID` |
+| card | `card list` | `card show NUMBER` | `card create` | `card update NUMBER` | `card delete NUMBER` | `card move NUMBER`, `card publish NUMBER`, `card mark-read NUMBER`, `card mark-unread NUMBER` |
+| search | `search QUERY` | - | - | - | - | - |
+| column | `column list --board ID` | `column show ID --board ID` | `column create` | `column update ID` | `column delete ID` | `column move-left ID`, `column move-right ID` |
+| comment | `comment list --card NUMBER` | `comment show ID --card NUMBER` | `comment create` | `comment update ID` | `comment delete ID` | `comment attachments show --card NUMBER` |
+| step | `step list --card NUMBER` | `step show ID --card NUMBER` | `step create` | `step update ID` | `step delete ID` | - |
+| reaction | `reaction list` | - | `reaction create` | - | `reaction delete ID` | - |
+| tag | `tag list` | - | - | - | - | - |
+| user | `user list` | `user show ID` | - | `user update ID` | - | `user deactivate ID`, `user role ID`, `user avatar-remove ID`, `user push-subscription-create`, `user push-subscription-delete ID` |
+| notification | `notification list` | - | - | - | - | `notification tray`, `notification read-all`, `notification settings-show`, `notification settings-update` |
+| pin | `pin list` | - | - | - | - | `card pin NUMBER`, `card unpin NUMBER` |
+| webhook | `webhook list --board ID` | `webhook show ID --board ID` | `webhook create` | `webhook update ID` | `webhook delete ID` | `webhook reactivate ID` |
 
 ---
 
 ## Global Flags
 
-All commands support:
+All commands support these global flags unless noted otherwise:
 
-| Flag             | Description                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| `--token TOKEN`  | API access token                                                  |
-| `--profile NAME` | Named profile (for multi-account users)                           |
-| `--api-url URL`  | API base URL (default: https://app.fizzy.do)                      |
-| `--json`         | JSON envelope output                                              |
-| `--quiet`        | Raw JSON data without envelope                                    |
-| `--styled`       | Human-readable styled output (tables, colors)                     |
-| `--markdown`     | GFM markdown output (for agents)                                  |
-| `--agent`        | Agent mode (defaults to quiet; combinable with --json/--markdown) |
-| `--ids-only`     | Print one ID per line                                             |
-| `--count`        | Print count of results                                            |
-| `--limit N`      | Client-side truncation of list results                            |
-| `--verbose`      | Show request/response details                                     |
+| Flag | Description |
+|------|-------------|
+| `--token TOKEN` | API access token |
+| `--profile NAME` | Named profile (for multi-account users) |
+| `--api-url URL` | API base URL (default: https://app.fizzy.do) |
+| `--jq EXPR` | Built-in jq filter for machine-readable JSON output (no external jq required; implies --json, or filters raw data with --quiet/--agent; unsupported on `completion`, `setup`, top-level `skill`, and `version` with a jq-specific usage error; incompatible with --styled, --markdown, --ids-only, and --count) |
+| `--json` | JSON envelope output |
+| `--quiet` | Raw JSON data without envelope |
+| `--styled` | Human-readable styled output (tables, colors) |
+| `--markdown` | GFM markdown output (for agents) |
+| `--agent` | Agent mode (defaults to quiet; combinable with --json/--markdown) |
+| `--ids-only` | Print one ID per line |
+| `--count` | Print count of results |
+| `--limit N` | Client-side truncation of list results |
+| `--verbose` | Show request/response details |
 
 Output format defaults to auto-detection: styled for TTY, JSON for pipes/non-TTY.
 
@@ -155,7 +157,6 @@ Note: `--limit` and `--all` cannot be used together.
 **IMPORTANT:** The `--all` flag controls pagination only - it fetches all pages of results for your current filter. It does NOT change which cards are included. By default, `card list` returns only open cards. See [Card Statuses](#card-statuses) for how to fetch closed or postponed cards.
 
 Commands supporting `--all` and `--page`:
-
 - `board list`
 - `board closed`
 - `board postponed`
@@ -180,16 +181,12 @@ Commands supporting `--all` and `--page`:
 ```
 
 **Per-repo config:** `.fizzy.yaml`
-
 ```yaml
 account: 123456789
 board: 03foq1hqmyy91tuyz3ghugg6c
 ```
 
-Add `api_url: https://...` when the project should target a hosted or self-hosted Fizzy instance instead of the upstream default.
-
 **Priority (highest to lowest):**
-
 1. CLI flags (`--token`, `--profile`, `--api-url`, `--board`)
 2. Environment variables (`FIZZY_TOKEN`, `FIZZY_PROFILE`, `FIZZY_API_URL`, `FIZZY_BOARD`)
 3. Named profile settings (base URL, board from `config.json`)
@@ -197,15 +194,16 @@ Add `api_url: https://...` when the project should target a hosted or self-hoste
 5. Global config (`~/.config/fizzy/config.yaml` or `~/.fizzy/config.yaml`)
 
 **Check context:**
-
 ```bash
 cat .fizzy.yaml 2>/dev/null || echo "No project configured"
+fizzy config show
+fizzy config explain
 ```
 
 **Setup:**
-
 ```bash
 fizzy setup                              # Interactive wizard
+fizzy doctor                             # Full install/config/auth/API/agent health check
 fizzy auth login TOKEN                   # Save token for current profile
 fizzy auth status                        # Check auth status
 fizzy auth list                          # List all authenticated profiles
@@ -215,18 +213,14 @@ fizzy auth logout --all                  # Log out all profiles
 fizzy identity show                      # Show profiles
 ```
 
-**Local bootstrap note:** If `fizzy` is not installed or not on `PATH`, first have the user run `bash skills/fizzy/scripts/install.sh`. That script follows the upstream release binary/checksum flow, keeps the hosted default `FIZZY_API_URL`, and prints the exact `PATH` fix if the binary lands outside the current shell path. After the CLI is installed, the user can run `fizzy skill` to install the upstream skill if they want it. For first-run auth on hosted or self-hosted instances, prefer `fizzy setup --api-url "$FIZZY_API_URL"`. If `fizzy identity show --api-url "$FIZZY_API_URL"` already works, continue without redoing setup.
-
 ### Signup (New User or Token Generation)
 
 Interactive:
-
 ```bash
 fizzy signup                                    # Full interactive wizard
 ```
 
 Step-by-step (for agents):
-
 ```bash
 # Step 1: Request magic link
 fizzy signup start --email user@example.com
@@ -287,7 +281,6 @@ All responses follow this structure:
 | `notification list` | "8 notifications (3 unread)" |
 
 **List responses with pagination:**
-
 ```json
 {
   "ok": true,
@@ -305,44 +298,26 @@ All responses follow this structure:
 **Breadcrumbs (contextual next actions):**
 
 Responses include a `breadcrumbs` array suggesting what you can do next. Each breadcrumb has:
-
 - `action`: Short action name (e.g., "comment", "close", "assign")
 - `cmd`: Ready-to-run command with actual values interpolated
 - `description`: Human-readable description
 
 ```bash
-fizzy card show 42 | jq '.breadcrumbs'
+fizzy card show 42 --jq '.breadcrumbs'
 ```
 
 ```json
 [
-  {
-    "action": "comment",
-    "cmd": "fizzy comment create --card 42 --body \"text\"",
-    "description": "Add comment"
-  },
-  {
-    "action": "triage",
-    "cmd": "fizzy card column 42 --column <column_id>",
-    "description": "Move to column"
-  },
-  {
-    "action": "close",
-    "cmd": "fizzy card close 42",
-    "description": "Close card"
-  },
-  {
-    "action": "assign",
-    "cmd": "fizzy card assign 42 --user <user_id>",
-    "description": "Assign user"
-  }
+  {"action": "comment", "cmd": "fizzy comment create --card 42 --body \"text\"", "description": "Add comment"},
+  {"action": "triage", "cmd": "fizzy card column 42 --column <column_id>", "description": "Move to column"},
+  {"action": "close", "cmd": "fizzy card close 42", "description": "Close card"},
+  {"action": "assign", "cmd": "fizzy card assign 42 --user <user_id>", "description": "Assign user"}
 ]
 ```
 
 Use breadcrumbs to discover available actions without memorizing the full CLI. Values like card numbers and board IDs are pre-filled; placeholders like `<column_id>` need to be replaced.
 
 **Create/update responses include location:**
-
 ```json
 {
   "ok": true,
@@ -359,10 +334,10 @@ Use breadcrumbs to discover available actions without memorizing the full CLI. V
 
 **IMPORTANT:** Cards use TWO identifiers:
 
-| Field    | Format                      | Use For                                         |
-| -------- | --------------------------- | ----------------------------------------------- |
-| `id`     | `03fe4rug9kt1mpgyy51lq8i5i` | Internal ID (in JSON responses)                 |
-| `number` | `579`                       | CLI commands (`card show`, `card update`, etc.) |
+| Field | Format | Use For |
+|-------|--------|---------|
+| `id` | `03fe4rug9kt1mpgyy51lq8i5i` | Internal ID (in JSON responses) |
+| `number` | `579` | CLI commands (`card show`, `card update`, etc.) |
 
 **All card CLI commands use the card NUMBER, not the ID.**
 
@@ -374,13 +349,13 @@ Other resources (boards, columns, comments, steps, reactions, users) use their `
 
 Cards exist in different states. By default, `fizzy card list` returns **open cards only** (cards in triage or columns). To fetch cards in other states, use the `--indexed-by` or `--column` flags:
 
-| Status         | How to fetch                           | Description                              |
-| -------------- | -------------------------------------- | ---------------------------------------- |
-| Open (default) | `fizzy card list`                      | Cards in triage ("Maybe?") or any column |
-| Closed/Done    | `fizzy card list --indexed-by closed`  | Completed cards                          |
-| Not Now        | `fizzy card list --indexed-by not_now` | Postponed cards                          |
-| Golden         | `fizzy card list --indexed-by golden`  | Starred/important cards                  |
-| Stalled        | `fizzy card list --indexed-by stalled` | Cards with no recent activity            |
+| Status | How to fetch | Description |
+|--------|--------------|-------------|
+| Open (default) | `fizzy card list` | Cards in triage ("Maybe?") or any column |
+| Closed/Done | `fizzy card list --indexed-by closed` | Completed cards |
+| Not Now | `fizzy card list --indexed-by not_now` | Postponed cards |
+| Golden | `fizzy card list --indexed-by golden` | Starred/important cards |
+| Stalled | `fizzy card list --indexed-by stalled` | Cards with no recent activity |
 
 You can also use pseudo-columns:
 
@@ -407,64 +382,69 @@ fizzy card list --board BOARD_ID --indexed-by not_now --all
 
 ---
 
-## Common jq Patterns
+## Built-in jq Filtering
+
+Use the default output, `--markdown`, or `--styled` when the CLI already renders the answer clearly. Reach for `--jq` when you need filtering or extraction. `--jq` implies `--json` (or filters raw data with `--quiet` / `--agent`) — no need to pass both. Never pipe to external jq — use `--jq` instead. `--jq` is for machine-readable JSON output and cannot be combined with `--styled`, `--markdown`, `--ids-only`, or `--count`.
 
 ### Reducing Output
 
 ```bash
 # Card summary (most useful)
-fizzy card list | jq '[.data[] | {number, title, status, board: .board.name}]'
+fizzy card list --jq '[.data[] | {number, title, status, board: .board.name}]'
 
-# First N items
-fizzy card list | jq '.data[:5]'
+# First N items from the JSON envelope
+fizzy card list --jq '.data[:5]'
+
+# First N items from raw data only
+fizzy card list --quiet --jq '.[0:5]'
 
 # Just IDs
-fizzy board list | jq '[.data[].id]'
+fizzy board list --jq '[.data[].id]'
 
 # Specific fields from single item
-fizzy card show 579 | jq '.data | {number, title, status, golden}'
+fizzy card show 579 --jq '.data | {number, title, status, golden}'
 
 # Card with description length (description is a string, not object)
-fizzy card show 579 | jq '.data | {number, title, desc_length: (.description | length)}'
+fizzy card show 579 --jq '.data | {number, title, desc_length: (.description | length)}'
 ```
 
 ### Filtering
 
 ```bash
 # Cards with a specific status
-fizzy card list --all | jq '[.data[] | select(.status == "published")]'
+fizzy card list --all --jq '[.data[] | select(.status == "published")]'
 
 # Golden cards only
-fizzy card list --indexed-by golden | jq '[.data[] | {number, title}]'
+fizzy card list --indexed-by golden --jq '[.data[] | {number, title}]'
 
 # Cards with non-empty descriptions
-fizzy card list | jq '[.data[] | select(.description | length > 0) | {number, title}]'
+fizzy card list --jq '[.data[] | select(.description | length > 0) | {number, title}]'
 
 # Cards with steps (must use card show, steps not in list)
-fizzy card show 579 | jq '.data.steps'
+fizzy card show 579 --jq '.data.steps'
 ```
 
 ### Extracting Nested Data
 
 ```bash
 # Comment text only (body.plain_text for comments)
-fizzy comment list --card 579 | jq '[.data[].body.plain_text]'
+fizzy comment list --card 579 --jq '[.data[].body.plain_text]'
 
 # Card description (just .description for cards - it's a string)
-fizzy card show 579 | jq '.data.description'
+fizzy card show 579 --jq '.data.description'
 
 # Step completion status
-fizzy card show 579 | jq '[.data.steps[] | {content, completed}]'
+fizzy card show 579 --jq '[.data.steps[] | {content, completed}]'
 ```
 
 ### Activity Analysis
 
 ```bash
 # Cards with steps count (requires card show for each)
-fizzy card show 579 | jq '.data | {number, title, steps_count: (.steps | length)}'
+fizzy card show 579 --jq '.data | {number, title, steps_count: (.steps | length)}'
 
 # Comments count for a card
-fizzy comment list --card 579 | jq '.data | length'
+fizzy comment list --card 579 --jq '.data | length'
 ```
 
 ---
@@ -502,7 +482,6 @@ fizzy search QUERY [flags]
 ```
 
 **Examples:**
-
 ```bash
 fizzy search "bug"                     # Search for "bug"
 fizzy search "login error"             # Search for cards containing both "login" AND "error"
@@ -544,7 +523,6 @@ fizzy migrate board BOARD_ID --from SOURCE_SLUG --to TARGET_SLUG [flags]
 ```
 
 **What gets migrated:**
-
 - Board with same name
 - All columns (preserving order and colors)
 - All cards with titles, descriptions, timestamps, and tags
@@ -552,7 +530,6 @@ fizzy migrate board BOARD_ID --from SOURCE_SLUG --to TARGET_SLUG [flags]
 - Optional: header images, inline attachments, comments, and steps
 
 **What cannot be migrated:**
-
 - Card creators (become the migrating user)
 - Card numbers (new sequential numbers in target)
 - Comment authors (become the migrating user)
@@ -600,16 +577,18 @@ fizzy card show CARD_NUMBER            # Show card details (includes steps)
 
 ```bash
 fizzy card create --board ID --title "Title" [flags]
-  --description "HTML"                 # Card description (HTML)
-  --description_file PATH              # Read description from file
+  --description "TEXT"                # Card description (markdown or HTML)
+  --description_file PATH              # Read description from file (markdown or HTML)
+  --attach PATH                        # Upload and append inline attachment at end (repeatable)
   --image SIGNED_ID                    # Header image (use signed_id from upload)
   --tag-ids "id1,id2"                  # Comma-separated tag IDs
   --created-at TIMESTAMP               # Custom created_at
 
 fizzy card update CARD_NUMBER [flags]
   --title "Title"
-  --description "HTML"
+  --description "TEXT"
   --description_file PATH
+  --attach PATH
   --image SIGNED_ID
   --created-at TIMESTAMP
 
@@ -626,7 +605,6 @@ fizzy card untriage CARD_NUMBER        # Remove from column, back to triage
 ```
 
 **Note:** Card `status` field stays "published" for active cards. Use:
-
 - `closed: true/false` to check if closed
 - `--indexed-by not_now` to find postponed cards
 - `--indexed-by closed` to find closed cards
@@ -678,8 +656,8 @@ fizzy column move-right COLUMN_ID            # Move column one position right
 ```bash
 fizzy comment list --card NUMBER [--page N] [--all]
 fizzy comment show COMMENT_ID --card NUMBER
-fizzy comment create --card NUMBER --body "HTML" [--body_file PATH] [--created-at TIMESTAMP]
-fizzy comment update COMMENT_ID --card NUMBER [--body "HTML"] [--body_file PATH]
+fizzy comment create --card NUMBER [--body "TEXT"] [--body_file PATH] [--attach PATH] [--created-at TIMESTAMP]
+fizzy comment update COMMENT_ID --card NUMBER [--body "TEXT"] [--body_file PATH] [--attach PATH]
 fizzy comment delete COMMENT_ID --card NUMBER
 ```
 
@@ -719,11 +697,11 @@ fizzy reaction create --card NUMBER --comment COMMENT_ID --content "emoji"
 fizzy reaction delete REACTION_ID --card NUMBER --comment COMMENT_ID
 ```
 
-| Flag        | Required     | Description                          |
-| ----------- | ------------ | ------------------------------------ |
-| `--card`    | Yes          | Card number (always required)        |
-| `--comment` | No           | Comment ID (omit for card reactions) |
-| `--content` | Yes (create) | Emoji or text, max 16 characters     |
+| Flag | Required | Description |
+|------|----------|-------------|
+| `--card` | Yes | Card number (always required) |
+| `--comment` | No | Comment ID (omit for card reactions) |
+| `--content` | Yes (create) | Emoji or text, max 16 characters |
 
 ### Tags
 
@@ -785,17 +763,17 @@ fizzy webhook reactivate WEBHOOK_ID --board ID    # Reactivate a deactivated web
 
 ### Webhook Schema
 
-| Field                | Type      | Description                       |
-| -------------------- | --------- | --------------------------------- |
-| `id`                 | string    | Webhook ID (use for CLI commands) |
-| `name`               | string    | Webhook name                      |
-| `payload_url`        | string    | Destination URL                   |
-| `active`             | boolean   | Whether webhook is active         |
-| `signing_secret`     | string    | Secret for verifying payloads     |
-| `subscribed_actions` | array     | List of subscribed event actions  |
-| `created_at`         | timestamp | ISO 8601                          |
-| `url`                | string    | API URL                           |
-| `board`              | object    | Nested Board                      |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Webhook ID (use for CLI commands) |
+| `name` | string | Webhook name |
+| `payload_url` | string | Destination URL |
+| `active` | boolean | Whether webhook is active |
+| `signing_secret` | string | Secret for verifying payloads |
+| `subscribed_actions` | array | List of subscribed event actions |
+| `created_at` | timestamp | ISO 8601 |
+| `url` | string | API URL |
+| `board` | object | Nested Board |
 
 ### Account
 
@@ -816,10 +794,12 @@ fizzy upload file PATH
 # Returns: { "signed_id": "...", "attachable_sgid": "..." }
 ```
 
-| ID                | Use For                                             |
-| ----------------- | --------------------------------------------------- |
-| `signed_id`       | Card header/background images (`--image` flag)      |
-| `attachable_sgid` | Inline images in rich text (descriptions, comments) |
+| ID | Use For |
+|---|---|
+| `signed_id` | Card header/background images (`--image` flag) |
+| `attachable_sgid` | Manual inline rich text embedding with `<action-text-attachment>` |
+
+**Simple inline attachment mode:** prefer `--attach PATH` on `card create`, `card update`, `comment create`, and `comment update` when appending attachments at the end is fine.
 
 ---
 
@@ -830,7 +810,7 @@ fizzy upload file PATH
 ```bash
 # Create the card
 CARD=$(fizzy card create --board BOARD_ID --title "New Feature" \
-  --description "<p>Feature description</p>" | jq -r '.data.number')
+  --description "<p>Feature description</p>" --jq '.data.number')
 
 # Add steps
 fizzy step create --card $CARD --content "Design the feature"
@@ -848,11 +828,17 @@ fizzy comment create --card 42 --body "<p>Commit $(git rev-parse --short HEAD): 
 fizzy card close 42
 ```
 
-### Create Card with Inline Image
+### Create Card with Inline Attachment
 
+Simple mode:
+```bash
+fizzy card create --board BOARD_ID --title "Bug Report" --description "See the screenshot below" --attach screenshot.png
+```
+
+Advanced/manual placement mode:
 ```bash
 # Upload image
-SGID=$(fizzy upload file screenshot.png | jq -r '.data.attachable_sgid')
+SGID=$(fizzy upload file screenshot.png --jq '.data.attachable_sgid')
 
 # Create description file with embedded image
 cat > desc.html << EOF
@@ -875,7 +861,7 @@ if [[ ! "$MIME" =~ ^image/ ]]; then
 fi
 
 # Upload and get signed_id
-SIGNED_ID=$(fizzy upload file /path/to/header.png | jq -r '.data.signed_id')
+SIGNED_ID=$(fizzy upload file /path/to/header.png --jq '.data.signed_id')
 
 # Create card with background
 fizzy card create --board BOARD_ID --title "Card" --image "$SIGNED_ID"
@@ -911,7 +897,7 @@ fizzy card move 579 --to TARGET_BOARD_ID
 
 ```bash
 # Quick search
-fizzy search "bug" | jq '[.data[] | {number, title}]'
+fizzy search "bug" --jq '[.data[] | {number, title}]'
 
 # Search with filters
 fizzy search "login" --board BOARD_ID --sort newest
@@ -933,14 +919,14 @@ fizzy card list --unassigned --board BOARD_ID
 fizzy reaction create --card 579 --content "👍"
 
 # List reactions on a card
-fizzy reaction list --card 579 | jq '[.data[] | {id, content, reacter: .reacter.name}]'
+fizzy reaction list --card 579 --jq '[.data[] | {id, content, reacter: .reacter.name}]'
 ```
 
 ### Add Comment with Reaction
 
 ```bash
 # Add comment
-COMMENT=$(fizzy comment create --card 579 --body "<p>Looks good!</p>" | jq -r '.data.id')
+COMMENT=$(fizzy comment create --card 579 --body "<p>Looks good!</p>" --jq '.data.id')
 
 # Add reaction to the comment
 fizzy reaction create --card 579 --comment $COMMENT --content "👍"
@@ -956,139 +942,141 @@ Complete field reference for all resources. Use these exact field paths in jq qu
 
 **IMPORTANT:** `card list` and `card show` return different fields. `steps` only in `card show`.
 
-| Field                | Type        | Description                            |
-| -------------------- | ----------- | -------------------------------------- |
-| `number`             | integer     | **Use this for CLI commands**          |
-| `id`                 | string      | Internal ID (in responses only)        |
-| `title`              | string      | Card title                             |
-| `description`        | string      | Plain text content (**NOT an object**) |
-| `description_html`   | string      | HTML version with attachments          |
-| `status`             | string      | Usually "published" for active cards   |
-| `closed`             | boolean     | true = card is closed                  |
-| `golden`             | boolean     | true = starred/important               |
-| `image_url`          | string/null | Header/background image URL            |
-| `has_attachments`    | boolean     | true = card has file attachments       |
-| `has_more_assignees` | boolean     | More assignees than shown              |
-| `created_at`         | timestamp   | ISO 8601                               |
-| `last_active_at`     | timestamp   | ISO 8601                               |
-| `url`                | string      | Web URL                                |
-| `comments_url`       | string      | Comments endpoint URL                  |
-| `board`              | object      | Nested Board (see below)               |
-| `creator`            | object      | Nested User (see below)                |
-| `assignees`          | array       | Array of User objects                  |
-| `tags`               | array       | Array of Tag objects                   |
-| `steps`              | array       | **Only in `card show`**, not in list   |
+| Field | Type | Description |
+|-------|------|-------------|
+| `number` | integer | **Use this for CLI commands** |
+| `id` | string | Internal ID (in responses only) |
+| `title` | string | Card title |
+| `description` | string | Plain text content (**NOT an object**) |
+| `description_html` | string | HTML version with attachments |
+| `status` | string | Usually "published" for active cards |
+| `closed` | boolean | true = card is closed |
+| `golden` | boolean | true = starred/important |
+| `image_url` | string/null | Header/background image URL |
+| `has_attachments` | boolean | true = card has file attachments |
+| `has_more_assignees` | boolean | More assignees than shown |
+| `created_at` | timestamp | ISO 8601 |
+| `last_active_at` | timestamp | ISO 8601 |
+| `url` | string | Web URL |
+| `comments_url` | string | Comments endpoint URL |
+| `board` | object | Nested Board (see below) |
+| `creator` | object | Nested User (see below) |
+| `assignees` | array | Array of User objects |
+| `tags` | array | Array of Tag objects |
+| `steps` | array | **Only in `card show`**, not in list |
 
 ### Board Schema
 
-| Field                          | Type      | Description                                        |
-| ------------------------------ | --------- | -------------------------------------------------- |
-| `id`                           | string    | Board ID (use for CLI commands)                    |
-| `name`                         | string    | Board name                                         |
-| `all_access`                   | boolean   | All users have access                              |
-| `auto_postpone_period_in_days` | integer   | Days of inactivity before cards are auto-postponed |
-| `created_at`                   | timestamp | ISO 8601                                           |
-| `url`                          | string    | Web URL                                            |
-| `creator`                      | object    | Nested User                                        |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Board ID (use for CLI commands) |
+| `name` | string | Board name |
+| `all_access` | boolean | All users have access |
+| `auto_postpone_period_in_days` | integer | Days of inactivity before cards are auto-postponed |
+| `created_at` | timestamp | ISO 8601 |
+| `url` | string | Web URL |
+| `creator` | object | Nested User |
 
 ### Account Settings Schema (from `account show`)
 
-| Field                          | Type      | Description                                |
-| ------------------------------ | --------- | ------------------------------------------ |
-| `id`                           | string    | Account ID                                 |
-| `name`                         | string    | Account name                               |
-| `cards_count`                  | integer   | Total cards in account                     |
-| `auto_postpone_period_in_days` | integer   | Account-level default auto-postpone period |
-| `created_at`                   | timestamp | ISO 8601                                   |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Account ID |
+| `name` | string | Account name |
+| `cards_count` | integer | Total cards in account |
+| `auto_postpone_period_in_days` | integer | Account-level default auto-postpone period |
+| `created_at` | timestamp | ISO 8601 |
 
 ### User Schema
 
-| Field           | Type      | Description                    |
-| --------------- | --------- | ------------------------------ |
-| `id`            | string    | User ID (use for CLI commands) |
-| `name`          | string    | Display name                   |
-| `email_address` | string    | Email                          |
-| `role`          | string    | "owner", "admin", or "member"  |
-| `active`        | boolean   | Account is active              |
-| `created_at`    | timestamp | ISO 8601                       |
-| `url`           | string    | Web URL                        |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | User ID (use for CLI commands) |
+| `name` | string | Display name |
+| `email_address` | string | Email |
+| `role` | string | "owner", "admin", or "member" |
+| `active` | boolean | Account is active |
+| `created_at` | timestamp | ISO 8601 |
+| `url` | string | Web URL |
 
 ### Comment Schema
 
-| Field             | Type      | Description                                |
-| ----------------- | --------- | ------------------------------------------ |
-| `id`              | string    | Comment ID (use for CLI commands)          |
-| `body`            | object    | **Nested object with html and plain_text** |
-| `body.html`       | string    | HTML content                               |
-| `body.plain_text` | string    | Plain text content                         |
-| `created_at`      | timestamp | ISO 8601                                   |
-| `updated_at`      | timestamp | ISO 8601                                   |
-| `url`             | string    | Web URL                                    |
-| `reactions_url`   | string    | Reactions endpoint URL                     |
-| `creator`         | object    | Nested User                                |
-| `card`            | object    | Nested {id, url}                           |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Comment ID (use for CLI commands) |
+| `body` | object | **Nested object with html and plain_text** |
+| `body.html` | string | HTML content |
+| `body.plain_text` | string | Plain text content |
+| `created_at` | timestamp | ISO 8601 |
+| `updated_at` | timestamp | ISO 8601 |
+| `url` | string | Web URL |
+| `reactions_url` | string | Reactions endpoint URL |
+| `creator` | object | Nested User |
+| `card` | object | Nested {id, url} |
 
 ### Step Schema
 
-| Field       | Type    | Description                    |
-| ----------- | ------- | ------------------------------ |
-| `id`        | string  | Step ID (use for CLI commands) |
-| `content`   | string  | Step text                      |
-| `completed` | boolean | Completion status              |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Step ID (use for CLI commands) |
+| `content` | string | Step text |
+| `completed` | boolean | Completion status |
 
 ### Column Schema
 
-| Field    | Type    | Description                                         |
-| -------- | ------- | --------------------------------------------------- |
-| `id`     | string  | Column ID or pseudo ID ("not-now", "maybe", "done") |
-| `name`   | string  | Display name                                        |
-| `kind`   | string  | "not_now", "triage", "closed", or custom            |
-| `pseudo` | boolean | true = built-in column                              |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Column ID or pseudo ID ("not-now", "maybe", "done") |
+| `name` | string | Display name |
+| `kind` | string | "not_now", "triage", "closed", or custom |
+| `pseudo` | boolean | true = built-in column |
 
 ### Tag Schema
 
-| Field        | Type      | Description |
-| ------------ | --------- | ----------- |
-| `id`         | string    | Tag ID      |
-| `title`      | string    | Tag name    |
-| `created_at` | timestamp | ISO 8601    |
-| `url`        | string    | Web URL     |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Tag ID |
+| `title` | string | Tag name |
+| `created_at` | timestamp | ISO 8601 |
+| `url` | string | Web URL |
 
 ### Reaction Schema
 
-| Field     | Type   | Description                        |
-| --------- | ------ | ---------------------------------- |
-| `id`      | string | Reaction ID (use for CLI commands) |
-| `content` | string | Emoji                              |
-| `url`     | string | Web URL                            |
-| `reacter` | object | Nested User                        |
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Reaction ID (use for CLI commands) |
+| `content` | string | Emoji |
+| `url` | string | Web URL |
+| `reacter` | object | Nested User |
 
 ### Identity Schema (from `identity show`)
 
-| Field             | Type   | Description                                                            |
-| ----------------- | ------ | ---------------------------------------------------------------------- |
-| `accounts`        | array  | Array of Account objects                                               |
-| `accounts[].id`   | string | Account ID                                                             |
-| `accounts[].name` | string | Account name                                                           |
+| Field | Type | Description |
+|-------|------|-------------|
+| `accounts` | array | Array of Account objects |
+| `accounts[].id` | string | Account ID |
+| `accounts[].name` | string | Account name |
 | `accounts[].slug` | string | Account slug (use with `signup complete --account` or as profile name) |
-| `accounts[].user` | object | Your User in this account                                              |
+| `accounts[].user` | object | Your User in this account |
 
 ### Key Schema Differences
 
-| Resource | Text Field                  | HTML Field                   |
-| -------- | --------------------------- | ---------------------------- |
-| Card     | `.description` (string)     | `.description_html` (string) |
-| Comment  | `.body.plain_text` (nested) | `.body.html` (nested)        |
+| Resource | Text Field | HTML Field |
+|----------|------------|------------|
+| Card | `.description` (string) | `.description_html` (string) |
+| Comment | `.body.plain_text` (nested) | `.body.html` (nested) |
 
 ---
 
 ## Rich Text Formatting
 
-Card descriptions and comments support HTML. For multiple paragraphs with spacing:
+Card descriptions and comments support markdown or HTML. For simple inline attachments appended at the end, use `--attach PATH`.
+
+For exact placement, upload first and embed `<action-text-attachment>` tags manually. For multiple paragraphs with spacing:
 
 ```html
 <p>First paragraph.</p>
-<p><br /></p>
+<p><br></p>
 <p>Second paragraph with spacing above.</p>
 ```
 
@@ -1104,7 +1092,6 @@ Card descriptions and comments support HTML. For multiple paragraphs with spacin
 ## Error Handling
 
 **Error response format:**
-
 ```json
 {
   "ok": false,
@@ -1116,21 +1103,21 @@ Card descriptions and comments support HTML. For multiple paragraphs with spacin
 
 **Exit codes:**
 
-| Code | Meaning                   |
-| ---- | ------------------------- |
-| 0    | Success                   |
-| 1    | Usage / invalid arguments |
-| 2    | Not found                 |
-| 3    | Authentication failure    |
-| 4    | Permission denied         |
-| 5    | Rate limited              |
-| 6    | Network error             |
-| 7    | API / server error        |
-| 8    | Ambiguous match           |
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | Usage / invalid arguments |
+| 2 | Not found |
+| 3 | Authentication failure |
+| 4 | Permission denied |
+| 5 | Rate limited |
+| 6 | Network error |
+| 7 | API / server error |
+| 8 | Ambiguous match |
 
 **Authentication errors (exit 3):**
-
 ```bash
+fizzy doctor                             # Full health check with hints
 fizzy auth status                        # Check auth
 fizzy auth list                          # Check which profiles are configured
 fizzy auth switch PROFILE                # Switch to correct profile
@@ -1143,8 +1130,9 @@ fizzy setup                              # Full interactive setup
 **Permission denied (exit 4):** Some operations (user update, user deactivate) require admin/owner role.
 
 **Network errors (exit 6):** Check API URL configuration:
-
 ```bash
+fizzy doctor                             # Full connectivity + API URL diagnostics
+fizzy config explain                     # Why this API URL won
 fizzy auth status                        # Shows configured profile and API URL
 ```
 

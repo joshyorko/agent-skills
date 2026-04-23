@@ -96,19 +96,25 @@ The `plugins/rails-37signals-workflows/skills/rails-37signals-*` folders are sta
 
 This repo standardizes on a CLI-only Fizzy workflow for the hosted instance at `https://fizzy.joshyorko.com`.
 
-Rule: use the upstream [`fizzy` CLI](https://github.com/basecamp/fizzy-cli) only. Do not fall back to raw API calls, endpoint probing, or HTML scraping.
+Rule: use the installed [`fizzy` CLI](https://github.com/basecamp/fizzy-cli) only. Do not fall back to raw API calls, endpoint probing, or HTML scraping.
 
-Bootstrap the CLI with the local wrapper:
+Install the CLI from the self-managed tap:
+
+```bash
+brew install joshyorko/tools/fizzy-cli-master
+```
+
+The formula name stays unique as `fizzy-cli-master`, but the installed executable is still `fizzy`. If you want a repo-local helper for that same Homebrew flow, use:
 
 ```bash
 bash plugins/fizzy/skills/fizzy/scripts/install.sh
 ```
 
-That wrapper follows the upstream release/checksum install flow, preserves the hosted default `FIZZY_API_URL`, and prints the exact `PATH` fix when the binary lands outside the current shell path.
-
 Once the CLI is installed, the intended flow is:
 
 ```bash
+fizzy doctor
+fizzy config show
 fizzy skill
 fizzy setup --api-url "https://fizzy.joshyorko.com"
 ```
@@ -119,14 +125,14 @@ Or, for token-based setup:
 export FIZZY_API_URL=https://fizzy.joshyorko.com
 export FIZZY_TOKEN=fizzy_your_token_here
 fizzy auth login "$FIZZY_TOKEN" --api-url "$FIZZY_API_URL"
-fizzy identity show --api-url "$FIZZY_API_URL" --json | jq .
-fizzy board list --api-url "$FIZZY_API_URL" --limit 5
+fizzy identity show --api-url "$FIZZY_API_URL" --markdown
+fizzy board list --api-url "$FIZZY_API_URL" --limit 5 --markdown
 ```
 
 Primary docs:
 
 - [Fizzy skill](plugins/fizzy/skills/fizzy/SKILL.md)
-- [Fizzy install wrapper](plugins/fizzy/skills/fizzy/scripts/install.sh)
+- [Fizzy install helper](plugins/fizzy/skills/fizzy/scripts/install.sh)
 
 ### RCC
 
@@ -202,6 +208,12 @@ The repo emits two generated skill views:
 If you're unsure where to start on a Rails task, begin with one of the `rails-37signals-*` workflow skills and then drill into the specialist `37signals-*` skills as needed.
 
 For Fizzy specifically, install the CLI first with:
+
+```bash
+brew install joshyorko/tools/fizzy-cli-master
+```
+
+Or use the repo helper for the same tap-driven install:
 
 ```bash
 bash plugins/fizzy/skills/fizzy/scripts/install.sh
