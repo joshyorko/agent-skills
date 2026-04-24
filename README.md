@@ -203,7 +203,7 @@ The repo emits two generated skill views:
 
 - `skills/` for a flat, agent-agnostic standalone view
 - `.agents/skills/` for standard in-repo agent discovery
-- `.agents/plugins/marketplace.json` for the repo-local Codex marketplace manifest used by `codex marketplace add /path/to/agent-skills`
+- `.agents/plugins/marketplace.json` for the repo-local Codex marketplace manifest used by the installer's Codex marketplace registration command
 
 If you're unsure where to start on a Rails task, begin with one of the `rails-37signals-*` workflow skills and then drill into the specialist `37signals-*` skills as needed.
 
