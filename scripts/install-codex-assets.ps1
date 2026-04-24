@@ -102,6 +102,7 @@ function Sync-RepoRef {
 $RepoPath = Normalize-Path $RepoPath
 $CodexHome = Normalize-Path $CodexHome
 $MarketplaceStatus = "not attempted"
+$script:MarketplaceAddArgs = $null
 
 $SkillsRoot = Join-Path $CodexHome "skills"
 $StateRoot = Join-Path $CodexHome "state"
@@ -137,31 +138,71 @@ function Clone-Or-UpdateRepo {
 
 function Register-Marketplace {
   $codexCmd = Get-Command codex -ErrorAction SilentlyContinue
+  $marketplaceAddArgs = Get-MarketplaceAddArgs
+  $marketplaceAddCommand = "codex $($marketplaceAddArgs -join ' ')"
   if (-not $codexCmd) {
     $script:MarketplaceStatus = "not registered automatically (codex CLI not found)"
-    Warn "codex CLI not found; skipping marketplace registration. Run manually: CODEX_HOME=`"$CodexHome`" codex marketplace add `"$RepoPath`""
+    Warn "codex CLI not found; skipping marketplace registration. Run manually: $(Get-MarketplaceAddCommandText)"
     return
   }
 
   $originalCodexHome = $env:CODEX_HOME
   $env:CODEX_HOME = $CodexHome
   try {
-    & codex marketplace add $RepoPath | Out-Null
+    & codex @marketplaceAddArgs $RepoPath | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      $script:MarketplaceStatus = "registered via ``codex marketplace add `"$RepoPath`"``"
-      Log "Registered marketplace `"$MarketplaceName`" via codex marketplace add $RepoPath"
+      $script:MarketplaceStatus = "registered via ``$marketplaceAddCommand `"$RepoPath`"``"
+      Log "Registered marketplace `"$MarketplaceName`" via $marketplaceAddCommand $RepoPath"
     }
     else {
-      throw "codex marketplace add returned exit code $LASTEXITCODE"
+      throw "$marketplaceAddCommand returned exit code $LASTEXITCODE"
     }
   }
   catch {
-    $script:MarketplaceStatus = "not registered automatically (codex marketplace add failed)"
-    Warn "failed to register marketplace via codex; run manually: CODEX_HOME=`"$CodexHome`" codex marketplace add `"$RepoPath`" ($($_.Exception.Message))"
+    $script:MarketplaceStatus = "not registered automatically ($marketplaceAddCommand failed)"
+    Warn "failed to register marketplace via codex; run manually: $(Get-MarketplaceAddCommandText) ($($_.Exception.Message))"
   }
   finally {
     $env:CODEX_HOME = $originalCodexHome
   }
+}
+
+function Get-MarketplaceAddArgs {
+  if ($script:MarketplaceAddArgs) {
+    return $script:MarketplaceAddArgs
+  }
+
+  $script:MarketplaceAddArgs = @("plugin", "marketplace", "add")
+
+  if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
+    return $script:MarketplaceAddArgs
+  }
+
+  $originalCodexHome = $env:CODEX_HOME
+  $env:CODEX_HOME = $CodexHome
+  try {
+    & codex plugin marketplace add --help *> $null
+    if ($LASTEXITCODE -eq 0) {
+      $script:MarketplaceAddArgs = @("plugin", "marketplace", "add")
+      return $script:MarketplaceAddArgs
+    }
+
+    & codex marketplace add --help *> $null
+    if ($LASTEXITCODE -eq 0) {
+      $script:MarketplaceAddArgs = @("marketplace", "add")
+      return $script:MarketplaceAddArgs
+    }
+  }
+  finally {
+    $env:CODEX_HOME = $originalCodexHome
+  }
+
+  return $script:MarketplaceAddArgs
+}
+
+function Get-MarketplaceAddCommandText {
+  $marketplaceAddArgs = Get-MarketplaceAddArgs
+  return "CODEX_HOME=`"$CodexHome`" codex $($marketplaceAddArgs -join ' ') `"$RepoPath`""
 }
 
 function Remove-LegacyMarketplace {
@@ -395,7 +436,7 @@ Codex assets installed.
 Next steps:
 - Restart Codex if marketplace registration succeeded.
 - Run "/plugins" or inspect available skills in your client.
-- If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="$CodexHome" codex marketplace add "$RepoPath"
+- If marketplace registration failed or Codex is not installed, run manually: $(Get-MarketplaceAddCommandText)
 "@ | Write-Host
 }
 

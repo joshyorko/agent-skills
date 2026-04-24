@@ -55,10 +55,10 @@ What it does:
 
 - Materializes `agent-skills` at `~/src/agent-skills` by cloning with git or downloading a release archive.
 - Defaults to the latest release. Use `--ref` or `AGENT_SKILLS_REF` to pin a release tag.
-- Registers this repo as a local Codex marketplace via `codex marketplace add "$REPO_PATH"`, keeping plugin paths relative to the repo root.
+- Registers this repo as a local Codex marketplace via `codex plugin marketplace add "$REPO_PATH"` on current Codex builds, with a fallback to `codex marketplace add "$REPO_PATH"` for older clients, keeping plugin paths relative to the repo root.
 - Installs all skills into `~/.codex/skills` using `auto`, `link`, or `copy` mode. In `auto`, the installer prefers symlinks and falls back to copies when needed.
 - Writes install state to `~/.codex/state/agent-skills.json` so uninstall can target only the managed marketplace and skill entries.
-- Prints whether marketplace registration actually succeeded, was skipped, or failed, along with the manual `codex marketplace add` command when needed.
+- Prints whether marketplace registration actually succeeded, was skipped, or failed, along with the compatible manual marketplace command when needed.
 
 Common options:
 

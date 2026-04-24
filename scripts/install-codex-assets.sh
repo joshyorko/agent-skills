@@ -26,6 +26,7 @@ LINKED_COUNT=0
 COPIED_COUNT=0
 SKIPPED_COUNT=0
 ACTUAL_SKILL_MODE=""
+MARKETPLACE_ADD_MODE=""
 
 usage() {
   cat <<'EOF'
@@ -279,19 +280,67 @@ PY
 }
 
 register_marketplace() {
+  select_marketplace_add_command
+
   if ! command -v codex >/dev/null 2>&1; then
     MARKETPLACE_STATUS="not registered automatically (codex CLI not found)"
-    warn "codex CLI not found; skipping marketplace registration. Run manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace add \"${REPO_PATH}\""
+    warn "codex CLI not found; skipping marketplace registration. Run manually: $(manual_marketplace_add_command)"
     return
   fi
 
-  if CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"; then
-    MARKETPLACE_STATUS="registered via \`codex marketplace add \"${REPO_PATH}\"\`"
-    log "Registered marketplace \"${MARKETPLACE_NAME}\" via codex marketplace add ${REPO_PATH}"
+  if run_marketplace_add_command; then
+    MARKETPLACE_STATUS="registered via \`$(marketplace_add_command) \"${REPO_PATH}\"\`"
+    log "Registered marketplace \"${MARKETPLACE_NAME}\" via $(marketplace_add_command) ${REPO_PATH}"
   else
-    MARKETPLACE_STATUS="not registered automatically (codex marketplace add failed)"
-    warn "failed to register marketplace via codex; run manually: CODEX_HOME=\"${CODEX_HOME}\" codex marketplace add \"${REPO_PATH}\""
+    MARKETPLACE_STATUS="not registered automatically ($(marketplace_add_command) failed)"
+    warn "failed to register marketplace via codex; run manually: $(manual_marketplace_add_command)"
   fi
+}
+
+select_marketplace_add_command() {
+  if [[ -n "$MARKETPLACE_ADD_MODE" ]]; then
+    return 0
+  fi
+
+  if ! command -v codex >/dev/null 2>&1; then
+    MARKETPLACE_ADD_MODE="plugin"
+  elif CODEX_HOME="${CODEX_HOME}" codex plugin marketplace add --help >/dev/null 2>&1; then
+    MARKETPLACE_ADD_MODE="plugin"
+  elif CODEX_HOME="${CODEX_HOME}" codex marketplace add --help >/dev/null 2>&1; then
+    MARKETPLACE_ADD_MODE="legacy"
+  else
+    MARKETPLACE_ADD_MODE="plugin"
+  fi
+}
+
+marketplace_add_command() {
+  select_marketplace_add_command
+
+  case "$MARKETPLACE_ADD_MODE" in
+    legacy)
+      printf 'codex marketplace add'
+      ;;
+    *)
+      printf 'codex plugin marketplace add'
+      ;;
+  esac
+}
+
+manual_marketplace_add_command() {
+  printf 'CODEX_HOME="%s" %s "%s"' "${CODEX_HOME}" "$(marketplace_add_command)" "${REPO_PATH}"
+}
+
+run_marketplace_add_command() {
+  select_marketplace_add_command
+
+  case "$MARKETPLACE_ADD_MODE" in
+    legacy)
+      CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"
+      ;;
+    *)
+      CODEX_HOME="${CODEX_HOME}" codex plugin marketplace add "${REPO_PATH}"
+      ;;
+  esac
 }
 
 link_skill() {
@@ -464,7 +513,7 @@ Codex assets installed.
 Next steps:
 - Restart Codex if marketplace registration succeeded.
 - Run "/plugins" or inspect available skills in your client.
-- If marketplace registration failed or Codex is not installed, run manually: CODEX_HOME="${CODEX_HOME}" codex marketplace add "${REPO_PATH}"
+- If marketplace registration failed or Codex is not installed, run manually: $(manual_marketplace_add_command)
 EOF
 }
 
