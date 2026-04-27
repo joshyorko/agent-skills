@@ -63,7 +63,7 @@ dependencies:
 #   - rfbrowser init
 ```
 
-RCC templates in this skill use `uv` for faster pip dependency installation. Pins were checked against PyPI during the 2026-04-27 skill refresh; recheck before bumping.
+RCC templates in this skill use `uv` for faster pip dependency installation. Package metadata was fetched from PyPI during the 2026-04-27 skill refresh; recheck exact pins before bumping.
 
 ## Prebuild And Inspect Holotree
 

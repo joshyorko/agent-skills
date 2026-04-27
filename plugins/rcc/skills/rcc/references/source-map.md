@@ -29,12 +29,15 @@ This file records the sources inspected for the 2026-04-27 RCC skill refresh and
   - Branch/commit inspected: `self-hosted` / `b265fbc`
   - Supports RCC remote deployment/client orientation and `RCC_REMOTE_ORIGIN` usage.
 
+- `https://github.com/joshyorko/robocorp-action-server041.git`
+  - Research checkout: `/tmp/agent-skills-rcc-research/robocorp-action-server041`
+  - Branch/commit inspected: `main` / `2c860cc`
+  - Optional probe result: available during this run.
+  - Supports historical Robocorp/Action Server 0.4.1 source orientation only; do not use it for current-version claims.
+
 ## Optional Repository Probe
 
-- `https://github.com/joshyorko/robocorp-action-server041.git`
-  - Probe result: unavailable/private during this run.
-  - Recorded at: `/tmp/agent-skills-rcc-research/OPTIONAL-UNAVAILABLE.txt`.
-  - Not used as a blocking source.
+- No optional Josh repositories were private/unavailable during this run. Probe status is recorded in `/tmp/agent-skills-rcc-research/OPTIONAL-UNAVAILABLE.txt`.
 
 ## Official Docs Fetched
 
@@ -63,17 +66,32 @@ The RPA Framework Assistant raw docs URL tried during the run returned 404. Assi
 
 ## PyPI Metadata Fetched
 
-Fetched JSON files are under `/tmp/agent-skills-rcc-research/official-docs/pypi-*.json`.
+Fetched JSON files are under `/tmp/agent-skills-rcc-research/official-docs/pypi-*.json`. The versions below are the fetched `info.version` values used for package availability/version context; they are not automatic template pin recommendations.
 
-- `uv`: `0.11.8`
+- `actions-work-items`: `0.2.1`
+- `black`: `26.3.1`
+- `fastapi`: `0.136.1`
+- `httpx`: `0.28.1`
+- `joblib`: `1.5.3`
+- `openpyxl`: `3.1.5`
+- `pydantic`: `2.13.3`
+- `pytest`: `9.0.3`
+- `pytest-asyncio`: `1.3.0`
+- `python-multipart`: `0.0.27`
+- `requests`: `2.33.1`
 - `robocorp`: `3.1.1`
-- `robocorp-tasks`: `4.1.1`
-- `robocorp-workitems`: `1.5.0`
+- `robocorp-adapters-custom`: `0.1.5`
 - `robocorp-browser`: `2.4.0`
+- `robocorp-tasks`: `4.1.1`
+- `robocorp-truststore`: `0.9.1`
+- `robocorp-workitems`: `1.5.0`
+- `robotframework`: `7.4.2`
+- `robotframework-browser`: `19.14.2`
 - `rpaframework`: `31.2.0`
 - `rpaframework-assistant`: `5.0.0`
-- `sema4ai-actions`: `1.6.6`
+- `ruff`: `0.15.12`
 - `sema4ai-action-server`: `3.2.0`
+- `sema4ai-actions`: `1.6.6`
 - `sema4ai-mcp`: `0.0.3`
-- `actions-work-items`: `0.2.1`
-- `robocorp-adapters-custom`: `0.1.5`
+- `uv`: `0.11.8`
+- `uvicorn`: `0.46.0`

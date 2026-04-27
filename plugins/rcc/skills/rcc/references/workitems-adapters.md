@@ -54,6 +54,7 @@ init(adapter)
 Environment variables used by the SQLite/file local adapters:
 
 ```text
+RC_WORKITEM_ADAPTER
 RC_WORKITEM_DB_PATH
 RC_WORKITEM_QUEUE_NAME
 RC_WORKITEM_OUTPUT_QUEUE_NAME
@@ -64,7 +65,7 @@ RC_WORKITEM_OUTPUT_PATH
 
 ## Custom Adapter Contract
 
-Custom adapters follow the Robocorp work item adapter shape:
+Custom adapters follow the Robocorp work item adapter shape. Josh's `robocorp_adapters_custom` adapters use:
 
 - `reserve_input() -> str`
 - `release_input(item_id, state, exception=None)`
@@ -73,8 +74,10 @@ Custom adapters follow the Robocorp work item adapter shape:
 - `save_payload(item_id, payload)`
 - `list_files(item_id)`
 - `get_file(item_id, name)`
-- `add_file(item_id, name, path_or_content)`
+- `add_file(item_id, name, content)`
 - `remove_file(item_id, name)`
+
+Josh's `actions-work-items` base adapter is similar but its `release_input` splits error fields into `exception_type`, `code`, and `message`, and its `add_file` signature includes `original_name`.
 
 Adapter implementations should make reservation, release, payload, and file behavior testable independently. Use local SQLite or file adapters in CI before testing distributed backends.
 

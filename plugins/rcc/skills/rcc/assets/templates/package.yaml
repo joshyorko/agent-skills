@@ -1,7 +1,8 @@
 # Sema4AI Actions package.yaml (v2 spec)
 # Community fork compatible:
 # https://github.com/joshyorko/actions/tree/community
-# Pins below were verified from PyPI during the 2026-04-27 skill refresh.
+# PyPI package metadata was fetched during the 2026-04-27 skill refresh;
+# recheck exact pins before repinning.
 
 spec-version: v2
 

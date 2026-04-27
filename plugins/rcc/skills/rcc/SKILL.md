@@ -1,6 +1,6 @@
 ---
 name: rcc
-description: RCC (Repeatable, Contained Code), Robocorp robots, Action Server/Sema4AI actions, MCP, work items, adapters, templates, and validation workflows. Use when asked to create, run, debug, package, or review RCC robots or Sema4AI action packages.
+description: Use when asked to create, run, debug, package, or review RCC robots, Robocorp automation, Action Server/Sema4AI action packages, MCP tools, work items, adapters, templates, or validation workflows.
 ---
 
 # RCC

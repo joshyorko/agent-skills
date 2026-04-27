@@ -48,7 +48,7 @@ dev-tasks:
   lint: ruff check src tests
 ```
 
-`package.yaml` v2 is the current package format in the official Sema4AI Action Server docs fetched for this refresh.
+`package.yaml` v2 is the documented package format shown in the official Sema4AI Action Server docs fetched for this refresh.
 
 ## Run And Inspect
 

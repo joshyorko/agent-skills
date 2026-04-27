@@ -179,26 +179,16 @@ def validate_conda_yaml(path: Path, result: ValidationResult) -> Dict[str, Any]:
         result.error(error)
         return {}
 
-    # Check required fields
-    if "channels" not in data:
-        result.error("No 'channels' defined")
-    elif not isinstance(data["channels"], list):
-        result.error("'channels' must be a list")
-    elif len(data["channels"]) == 0:
-        result.error("'channels' is empty")
-    else:
-        if "conda-forge" not in data["channels"]:
-            result.warn("Consider using 'conda-forge' channel for better compatibility")
+    has_python = False
+    has_uv = False
+    has_pip = False
+    pip_deps = []
 
     if "dependencies" not in data:
         result.error("No 'dependencies' defined")
     elif not isinstance(data["dependencies"], list):
         result.error("'dependencies' must be a list")
     else:
-        has_python = False
-        has_pip = False
-        pip_deps = []
-
         for dep in data["dependencies"]:
             if isinstance(dep, str):
                 if dep.startswith("python"):
@@ -206,6 +196,8 @@ def validate_conda_yaml(path: Path, result: ValidationResult) -> Dict[str, Any]:
                     # Check version format
                     if "=" in dep and "==" not in dep:
                         result.info_msg(f"Python version: {dep.split('=')[1]}")
+                elif dep.startswith("uv"):
+                    has_uv = True
                 elif dep.startswith("pip"):
                     has_pip = True
             elif isinstance(dep, dict) and "pip" in dep:
@@ -221,6 +213,20 @@ def validate_conda_yaml(path: Path, result: ValidationResult) -> Dict[str, Any]:
         for pip_dep in pip_deps:
             if "==" not in pip_dep and ">=" not in pip_dep and "<=" not in pip_dep:
                 result.warn(f"pip package without version pin: {pip_dep}")
+
+    # Check environment source. RCC uv-native mode intentionally omits channels.
+    uv_native = has_python and has_uv and "channels" not in data
+    if uv_native:
+        result.info_msg("No channels defined; using RCC uv-native mode")
+    elif "channels" not in data:
+        result.error("No 'channels' defined")
+    elif not isinstance(data["channels"], list):
+        result.error("'channels' must be a list")
+    elif len(data["channels"]) == 0:
+        result.error("'channels' is empty")
+    else:
+        if "conda-forge" not in data["channels"]:
+            result.warn("Consider using 'conda-forge' channel for better compatibility")
 
     # Check rccPostInstall
     if "rccPostInstall" in data:
