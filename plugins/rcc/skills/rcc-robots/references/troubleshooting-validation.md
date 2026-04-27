@@ -105,7 +105,7 @@ python3 -m json.tool path/to/file.json
 For edited robot configs:
 
 ```bash
-python3 plugins/rcc/skills/rcc/scripts/validate_robot.py path/to/robot.yaml
+python3 plugins/rcc/skills/rcc-robots/scripts/validate_robot.py path/to/robot.yaml
 ```
 
 If PyYAML or RCC is unavailable, record the skipped validation plainly with the missing dependency.

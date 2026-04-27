@@ -1,0 +1,5 @@
+interface:
+  display_name: "Sema4AI Action Server"
+  short_description: "Sema4AI Action Server packages, package.yaml v2, actions, MCP exposure, and secrets."
+  default_prompt: "Use $sema4ai-action-server for ordinary Sema4AI Action Server packages, package.yaml v2, sema4ai-actions, sema4ai-mcp, OpenAPI/MCP validation, secrets, and dev tasks."
+

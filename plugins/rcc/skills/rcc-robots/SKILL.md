@@ -1,0 +1,39 @@
+---
+name: rcc-robots
+description: RCC robot/runtime specialist. Use for RCC CLI commands, Robocorp robot projects, robot.yaml, conda.yaml, holotree, freeze files, bundles, templates, environment validation, and robot task debugging.
+---
+
+# RCC Robots
+
+Use this skill for RCC-backed robot projects and runtime/environment work.
+
+## First Inspection
+
+1. Locate the robot root by finding `robot.yaml`; inspect nearby `conda.yaml`, `devdata/*.json`, `.gitignore`, freeze files, and output/artifacts policy.
+2. Read `robot.yaml` before task code: tasks, `devTasks`, `environmentConfigs`, `artifactsDir`, `PATH`, `PYTHONPATH`, and ignored files decide how RCC runs the project.
+3. Read `conda.yaml` next: channels, Python version, `uv`, pip packages, `rccPostInstall`, and environment variables.
+4. Inspect task entry points only after config: `tasks.py`, `src/**`, tests, scripts, and any templates copied into the project.
+
+## Operating Rules
+
+- Run or request `rcc ht vars -r robot.yaml` first when startup fails; it separates RCC/holotree resolution from Python/task failures.
+- Prefer `environmentConfigs` with platform freeze fallbacks for reproducible robots. Use single `condaConfigFile` only for simple local work.
+- Use RCC environment commands for Python checks, not host Python.
+- Use `ROBOT_ROOT` and `ROBOT_ARTIFACTS` for raw path resolution; in `robocorp.tasks`, prefer `get_output_dir()` and `get_current_task()`.
+- If changing package pins, verify PyPI or source metadata in the current run. Keep shared template pins consistent.
+
+## References
+
+- `references/rcc-command-recipes.md`: command selection, `robot.yaml`, `conda.yaml`, holotree, bundles, and cache hygiene.
+- `references/robot-project-recipes.md`: Josh robot templates, Python/browser/work item/UV-native patterns, and template release behavior.
+- `references/troubleshooting-validation.md`: environment, dependency, runtime, work item, Action Server, and repo validation playbooks.
+- `references/hooks.md`: optional Claude Code hook assets and command guardrails for RCC projects.
+- `../rcc/references/source-map.md`: source evidence for current recipes.
+
+## Assets And Scripts
+
+- Robot templates live in `assets/templates/`.
+- HITL Assistant + work item starter lives in `assets/templates/hitl-assistant/`.
+- Optional Claude hook assets live in `assets/claude-hooks/`; use only when mirroring Claude Code hook behavior.
+- Run `python3 plugins/rcc/skills/rcc-robots/scripts/validate_robot.py path/to/robot.yaml` for static robot config validation when PyYAML is available.
+- Run `python3 plugins/rcc/skills/rcc-robots/scripts/env_check.py --skip-network` for quick local RCC/project health checks.

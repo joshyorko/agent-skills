@@ -1,0 +1,5 @@
+interface:
+  display_name: "RCC Work Items"
+  short_description: "Robocorp work items, actions-work-items, producer/consumer flows, and adapters."
+  default_prompt: "Use $rcc-workitems for producer/consumer/reporter queues, robocorp.workitems, actions-work-items, local SQLite/file queues, and custom adapters."
+
