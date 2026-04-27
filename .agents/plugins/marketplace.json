@@ -127,7 +127,7 @@
     },
     {
       "name": "rcc",
-      "description": "Focused RCC-family skills for robots, holotree environments, work items, Action Server packages, and CI maintenance.",
+      "description": "Focused RCC-family skills for RCC itself, robots, holotree environments, work items, Action Server packages, and CI maintenance.",
       "tags": [
         "rcc",
         "robocorp",
@@ -142,8 +142,8 @@
       ],
       "interface": {
         "displayName": "RCC Automation",
-        "shortDescription": "Focused RCC skills for robots, work items, action packages, and CI maintenance.",
-        "longDescription": "RCC-family workflows split into focused skills for robot scaffolding and holotree environments, work item adapters, ordinary Action Server packages, and RCC-powered CI maintenance.",
+        "shortDescription": "Focused RCC skills for RCC core, robots, work items, action packages, and CI maintenance.",
+        "longDescription": "RCC-family workflows split into focused skills for RCC CLI/source orientation, robot scaffolding and holotree environments, work item adapters, ordinary Action Server packages, and RCC-powered CI maintenance.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -155,6 +155,7 @@
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
           "Choose the right RCC specialist skill for this task.",
+          "Orient me in RCC source, holotree, caches, endpoints, or templates.",
           "Debug this robot.yaml or conda.yaml setup.",
           "Design a local work item queue or adapter flow.",
           "Validate an Action Server package.",

@@ -2,6 +2,8 @@
 
 Use this guide when RCC, Python dependencies, Action Server, or work item flows fail.
 
+If the failure is in RCC install, source, endpoint configuration, or holotree/cache behavior before a project is involved, use `$rcc-core`.
+
 ## Split The Failure
 
 Run these in order:
@@ -25,7 +27,10 @@ Interpretation:
 Useful commands:
 
 ```bash
-rcc configure diagnostics
+rcc configuration diagnostics
+rcc diagnostics --quick --json
+rcc diagnostics --robot robot.yaml --json
+rcc configuration diagnostics --quick --json
 rcc ht vars -r robot.yaml --debug
 rcc ht vars -r robot.yaml --trace
 rcc ht vars -r robot.yaml --timeline
@@ -56,7 +61,7 @@ Common fixes:
 - Add missing packages to `conda.yaml` or `package.yaml`.
 - Keep packages under `pip:` unless they require conda native dependencies.
 - Rebuild after changing dependencies: `rcc ht vars -r robot.yaml`.
-- For browser packages, verify post-install steps such as `rfbrowser init`.
+- For `robocorp.browser`, verify post-install steps such as `python -m robocorp.browser install chromium --isolated`. Use `rfbrowser init` only for Robot Framework Browser projects.
 
 ## Work Item Failures
 

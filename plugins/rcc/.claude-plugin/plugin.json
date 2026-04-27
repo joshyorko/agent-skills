@@ -1,7 +1,7 @@
 {
   "name": "rcc",
   "version": "0.1.0",
-  "description": "Focused RCC-family skills for robots, holotree environments, work items, Action Server packages, and CI maintenance workflows.",
+  "description": "Focused RCC-family skills for RCC itself, robots, holotree environments, work items, Action Server packages, and CI maintenance workflows.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",

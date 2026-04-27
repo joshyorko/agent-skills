@@ -53,7 +53,7 @@
       "name": "rcc",
       "category": "Developer Tools",
       "claude_category": "development",
-      "description": "Focused RCC-family skills for robots, holotree environments, work items, Action Server packages, and CI maintenance.",
+      "description": "Focused RCC-family skills for RCC itself, robots, holotree environments, work items, Action Server packages, and CI maintenance.",
       "tags": [
         "rcc",
         "robocorp",

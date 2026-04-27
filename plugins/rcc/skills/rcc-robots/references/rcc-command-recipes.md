@@ -2,11 +2,14 @@
 
 Use this guide for RCC command selection, robot configuration, environment prebuilds, and cache hygiene.
 
+For RCC source, endpoint, holotree internals, or cache behavior not tied to a specific robot, switch to `$rcc-core`.
+
 ## Create Or Locate A Robot
 
 ```bash
 rcc robot init --json
 rcc robot init -t python -d my-robot
+rcc create
 rcc pull github.com/joshyorko/template-python-browser
 ```
 
@@ -58,7 +61,11 @@ dependencies:
       - robocorp==3.1.1
       - requests==2.32.5
 
-# Browser projects often need:
+# robocorp.browser projects often need:
+# rccPostInstall:
+#   - python -m robocorp.browser install chromium --isolated
+#
+# Robot Framework Browser projects often need:
 # rccPostInstall:
 #   - rfbrowser init
 ```
@@ -71,6 +78,8 @@ RCC templates in this skill use `uv` for faster pip dependency installation. Pac
 rcc ht vars -r robot.yaml
 rcc ht vars -r robot.yaml --json
 rcc ht vars -r robot.yaml --space dev
+rcc diagnostics --robot robot.yaml --json
+rcc robot diagnostics -r robot.yaml --json
 rcc task shell -r robot.yaml
 rcc task script -r robot.yaml --silent -- python -m pip list
 ```
@@ -97,6 +106,26 @@ rcc robot run-from-bundle my-robot.py --task Main
 
 Bundle after the robot validates locally. Do not commit `output/`, transient bundle outputs, or generated freeze files unless the project intentionally tracks them.
 
+## Freeze Files And Dependency Exports
+
+RCC writes platform freeze files during a real run. Copy the freeze file from `output/` only when the project intentionally tracks reproducible environment locks:
+
+```bash
+rcc run -r robot.yaml -t Main --silent
+cp output/environment_linux_amd64_freeze.yaml .
+rcc robot dependencies -r robot.yaml --space user --export
+```
+
+`rcc robot dependencies --export` writes dependency export data such as `dependencies.yaml`; it does not create the platform freeze file. Keep freeze-first fallback order in `environmentConfigs`:
+
+```yaml
+environmentConfigs:
+  - environment_linux_amd64_freeze.yaml
+  - environment_windows_amd64_freeze.yaml
+  - environment_darwin_amd64_freeze.yaml
+  - conda.yaml
+```
+
 ## Cache And Home Directories
 
 Set `ROBOCORP_HOME` in CI or experiments to keep RCC state isolated:
@@ -111,8 +140,9 @@ Common cache commands:
 ```bash
 rcc holotree list
 rcc holotree delete --space <space>
+rcc holotree check --retries 5
 rcc holotree shared --enable
-rcc configure diagnostics
+rcc diagnostics --quick --json
 ```
 
 Use targeted deletes by space. Avoid broad cache deletion in shared developer machines or CI caches unless the cache is known corrupt.
@@ -123,8 +153,8 @@ Josh's `rccremote-docker` repo uses `RCC_REMOTE_ORIGIN` for clients:
 
 ```bash
 export RCC_REMOTE_ORIGIN=https://rccremote.example.com
-rcc holotree catalogs
-rcc holotree pull
+rcc holotree pull -r robot.yaml
+rcc holotree pull -r robot.yaml --origin https://rccremote.example.com
 ```
 
 For self-hosted remote caches, validate server bootstrapping from the deployment repo first, then validate client connectivity with catalog/list/pull commands before changing robot dependencies.

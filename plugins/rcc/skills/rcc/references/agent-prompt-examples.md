@@ -2,6 +2,12 @@
 
 Use these short prompts when handing RCC-family work to future Codex agents.
 
+## Inspect RCC Itself
+
+```text
+Use $rcc-core. Inspect RCC before debugging robot code: installed binary/version, configuration diagnostics, ROBOCORP_HOME, endpoint overrides, holotree state, and the relevant source/docs in github.com/joshyorko/rcc or github.com/robocorp/rcc.
+```
+
 ## Inspect A Robot
 
 ```text
@@ -11,7 +17,7 @@ Use $rcc-robots. Inspect this robot root before editing: robot.yaml, conda.yaml,
 ## Fix A Dependency Failure
 
 ```text
-Use $rcc-robots. The robot fails during environment creation. Reproduce with rcc ht vars -r robot.yaml, inspect conda.yaml and environmentConfigs, then change the smallest dependency/config surface. Do not edit generated output or freeze files unless the project intentionally tracks them.
+Use $rcc-core first if the failure is holotree/cache/endpoint/install related; otherwise use $rcc-robots. Reproduce with rcc ht vars -r robot.yaml, inspect conda.yaml and environmentConfigs, then change the smallest dependency/config surface. Do not edit generated output or freeze files unless the project intentionally tracks them.
 ```
 
 ## Add A Work Item Consumer

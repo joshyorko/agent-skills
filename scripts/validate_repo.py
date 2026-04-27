@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "marketplaces" / "catalog.json"
+SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def fail(message: str) -> None:
@@ -16,6 +18,80 @@ def fail(message: str) -> None:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text())
+
+
+def parse_skill_frontmatter(path: Path) -> dict[str, str]:
+    text = path.read_text()
+    if not text.startswith("---\n"):
+        fail(f"missing YAML frontmatter start: {path}")
+    parts = text.split("---\n", 2)
+    if len(parts) < 3:
+        fail(f"missing YAML frontmatter close: {path}")
+    frontmatter = parts[1]
+
+    data: dict[str, str] = {}
+    lines = frontmatter.splitlines()
+    index = 0
+    while index < len(lines):
+        line = lines[index]
+        if not line.strip():
+            index += 1
+            continue
+        if line.startswith((" ", "\t")):
+            index += 1
+            continue
+        match = re.match(r"^([A-Za-z0-9_-]+):(?:\s*(.*))?$", line)
+        if not match:
+            fail(f"invalid frontmatter line in {path}: {line}")
+        key, value = match.groups()
+        value = value or ""
+        if value.startswith(("|", ">")):
+            block_lines = []
+            index += 1
+            while index < len(lines) and (
+                not lines[index].strip()
+                or lines[index].startswith((" ", "\t"))
+            ):
+                block_lines.append(lines[index].strip())
+                index += 1
+            data[key] = "\n".join(block_lines).strip()
+            continue
+        if not value.strip():
+            index += 1
+            while index < len(lines) and (
+                not lines[index].strip()
+                or lines[index].startswith((" ", "\t"))
+            ):
+                index += 1
+            data[key] = ""
+            continue
+        stripped = value.strip()
+        if (
+            ": " in stripped
+            and not stripped.startswith(("'", '"', "{", "["))
+        ):
+            fail(f"quote frontmatter values containing ': ' in {path}: {line}")
+        data[key] = stripped.strip("'\"")
+        index += 1
+
+    return data
+
+
+def validate_skill_frontmatter(skill_dir: Path) -> None:
+    path = skill_dir / "SKILL.md"
+    data = parse_skill_frontmatter(path)
+    name = data.get("name", "")
+    description = data.get("description", "")
+    if not name:
+        fail(f"missing skill name in {path}")
+    if name != skill_dir.name:
+        fail(f"skill name must match directory for {path}: {name} != {skill_dir.name}")
+    if not SKILL_NAME_RE.match(name):
+        fail(f"invalid skill name in {path}: {name}")
+    if not description:
+        fail(f"missing skill description in {path}")
+    if len(description) > 1024:
+        fail(f"skill description exceeds 1024 characters in {path}")
 
 
 def main() -> int:
@@ -50,6 +126,7 @@ def main() -> int:
             expected_standalone_entries[skill_dir.name] = skill_dir
             if not (skill_dir / "SKILL.md").exists():
                 fail(f"missing SKILL.md in {skill_dir}")
+            validate_skill_frontmatter(skill_dir)
 
     for name, target in expected_agent_entries.items():
         link_path = ROOT / ".agents" / "skills" / name

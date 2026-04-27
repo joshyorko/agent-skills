@@ -23,5 +23,9 @@ dependencies:
       # - package-name==x.y.z
 
 # Post-install scripts (optional)
+# For robocorp.browser:
 # rccPostInstall:
-#   - rfbrowser init  # For browser automation
+#   - python -m robocorp.browser install chromium --isolated
+# For Robot Framework Browser:
+# rccPostInstall:
+#   - rfbrowser init

@@ -3,4 +3,5 @@ set -euo pipefail
 
 python3 scripts/build_marketplaces.py --check
 python3 scripts/build_runtime_views.py --check
+python3 -m unittest discover -s tests
 python3 scripts/validate_repo.py
