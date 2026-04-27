@@ -11,7 +11,10 @@ from robocorp.tasks import task
 
 @task
 def producer() -> None:
-    workitems.outputs.create({"id": "one", "status": "new"})
+    for seed in workitems.inputs:
+        with seed:
+            for row in seed.payload["rows"]:
+                workitems.outputs.create({"id": row["id"], "status": "new"})
 
 
 @task
@@ -22,7 +25,7 @@ def consumer() -> None:
             workitems.outputs.create({"processed": True, "source": payload})
 ```
 
-Use `with item:` so input items are released consistently. Raise business errors for non-retryable data problems and application errors for retryable technical failures.
+Use `with item:` so input items are released consistently. `outputs.create(...)` needs a currently reserved input item, so pure producers should start from a seed input or use an adapter-specific queue seeding script. Raise `BusinessException` for non-retryable data/business problems and `ApplicationException` for retryable technical failures. At task boundaries those exceptions fail the item; inside `with item:` loops, the context manager records the failed item and lets the loop continue.
 
 ## actions-work-items
 
@@ -63,6 +66,8 @@ RC_WORKITEM_INPUT_PATH
 RC_WORKITEM_OUTPUT_PATH
 ```
 
+`RC_WORKITEM_FILES_DIR`, `RC_WORKITEM_DB_PATH`, and queue-name envs are custom/local adapter concerns. The built-in modern FileAdapter path is intentionally smaller: `RC_WORKITEM_ADAPTER`, `RC_WORKITEM_INPUT_PATH`, and `RC_WORKITEM_OUTPUT_PATH`.
+
 ## Custom Adapter Contract
 
 Custom adapters follow the Robocorp work item adapter shape. Josh's `robocorp_adapters_custom` adapters use:
@@ -102,6 +107,26 @@ Common SQLite env file:
 }
 ```
 
+Role-specific env files should set output queue names explicitly. Do not rely on adapter defaults in multi-stage flows:
+
+```json
+{
+  "RC_WORKITEM_ADAPTER": "robocorp_adapters_custom._sqlite.SQLiteAdapter",
+  "RC_WORKITEM_DB_PATH": "devdata/work_items.db",
+  "RC_WORKITEM_FILES_DIR": "devdata/work_item_files",
+  "RC_WORKITEM_QUEUE_NAME": "repos",
+  "RC_WORKITEM_OUTPUT_QUEUE_NAME": "repo_results"
+}
+```
+
+If producer, consumer, and reporter share one backend, write down the ladder:
+
+```text
+seed input -> producer queue -> consumer queue -> reporter queue -> final artifact
+```
+
+The common bug is cascading default names such as `queue_output_output`. Fix it by making each role's input and output queue explicit.
+
 Common Redis env file:
 
 ```json
@@ -132,6 +157,113 @@ Common DocumentDB/MongoDB env file:
 - File adapters are closest to Control Room JSON input/output fixtures and are best for tiny deterministic tests.
 - Redis and DocumentDB support distributed workers but add service availability and locking/failure modes.
 - Keep queue name and output queue name explicit in env files when multiple roles share one database.
+- Older examples may use adapter paths such as `robocorp_adapters_custom.sqlite_adapter.SQLiteAdapter`; verify the installed package version. Current canonical paths use underscored modules such as `robocorp_adapters_custom._sqlite.SQLiteAdapter`.
+
+## Modern Python Vs Legacy Robot Framework
+
+Modern Python robots use `robocorp.workitems` and these local development env names:
+
+```text
+RC_WORKITEM_ADAPTER=FileAdapter
+RC_WORKITEM_INPUT_PATH=devdata/work-items-in/test-input/work-items.json
+RC_WORKITEM_OUTPUT_PATH=devdata/work-items-out/last-run/work-items.json
+```
+
+Legacy Robot Framework / RPA Framework flows use `RPA.Robocorp.WorkItems` and older env names:
+
+```text
+RPA_WORKITEMS_ADAPTER=RPA.Robocorp.WorkItems.FileAdapter
+RPA_INPUT_WORKITEM_PATH=devdata/work-items-in/test-input/work-items.json
+RPA_OUTPUT_WORKITEM_PATH=devdata/work-items-out/last-run/work-items.json
+```
+
+Do not mix the two env families inside one run unless you are intentionally bridging old and new code.
+
+## Full Producer / Consumer / Reporter Flow
+
+Use this structure for serious work item robots:
+
+```python
+from pathlib import Path
+
+from robocorp import workitems
+from robocorp.tasks import task
+
+
+@task
+def producer() -> None:
+    for source in workitems.inputs:
+        with source:
+            repos = source.payload["repos"]
+            for repo in repos:
+                workitems.outputs.create({"repo": repo, "status": "queued"})
+
+
+@task
+def consumer() -> None:
+    output = Path("output")
+    output.mkdir(exist_ok=True)
+    for item in workitems.inputs:
+        with item:
+            repo = item.payload["repo"]
+            artifact = output / f"{repo.replace('/', '_')}.json"
+            artifact.write_text('{"status": "done"}')
+            workitems.outputs.create(
+                {"repo": repo, "status": "done", "artifact": str(artifact)}
+            )
+
+
+@task
+def reporter() -> None:
+    counts = {"done": 0, "failed": 0}
+    for item in workitems.inputs:
+        with item:
+            counts[item.payload.get("status", "failed")] += 1
+    Path("output/final_report.json").write_text(str(counts))
+```
+
+Release each input inside the loop. For Robot Framework, mirror the same behavior with `Release Input Work Item` and explicit `DONE`, `BUSINESS`, or `APPLICATION` states.
+
+## Files And Attachments
+
+Work item payloads are JSON, and files are attachments. Local file-adapter inputs usually look like:
+
+```json
+[
+  {
+    "payload": {"order_id": "1001"},
+    "files": {"invoice.pdf": "devdata/files/invoice.pdf"}
+  }
+]
+```
+
+Use `outputs.create(payload=..., files=[...])` when a downstream task needs artifacts immediately. For staged output items, create with `save=False`, call `add_file(...)`, then call `save()`. `add_file` changes are staged until the item is saved. When reading attachments, pass an explicit destination such as `Path("output") / filename`; `get_file(name)` defaults to the robot root/current directory, which can scatter artifacts during local tests.
+
+## Legacy RPA Framework Keywords
+
+Legacy Robot Framework flows commonly map to these operations:
+
+```robotframework
+Create Output Work Item
+Set Work Item Variable    status    processed
+Add Work Item File        output/result.json
+Save Work Item
+Release Input Work Item   DONE
+```
+
+Use `BUSINESS` for non-retryable data problems and `APPLICATION` for retryable technical failures. Modern Python code should prefer `BusinessException` and `ApplicationException`; keep the Robot Framework keywords only when maintaining `RPA.Robocorp.WorkItems` robots.
+
+## Operational Recovery
+
+Add `devTasks` for queue operations:
+
+```bash
+rcc run -r robot.yaml --dev -t CheckSQLiteDB --silent
+rcc run -r robot.yaml --dev -t RecoverOrphanedItems --silent
+rcc run -r robot.yaml --dev -t DiagnoseReporter --silent
+```
+
+Use recovery scripts when items are stuck in `reserved` after an interrupted worker. Use reporter diagnostics when downstream payloads do not match the reporter's expected schema.
 
 ## Validation Commands
 

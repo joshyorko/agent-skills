@@ -5,7 +5,7 @@ description: RCC robot/runtime specialist. Use for RCC CLI commands, Robocorp ro
 
 # RCC Robots
 
-Use this skill for RCC-backed robot projects and runtime/environment work.
+Use this skill for RCC-backed robot projects and runtime/environment work after the task is clearly about a robot. Use `$rcc-core` for RCC source, installation, endpoint, holotree/cache, or template catalog work before a robot task starts.
 
 ## First Inspection
 
@@ -17,6 +17,7 @@ Use this skill for RCC-backed robot projects and runtime/environment work.
 ## Operating Rules
 
 - Run or request `rcc ht vars -r robot.yaml` first when startup fails; it separates RCC/holotree resolution from Python/task failures.
+- For host/RCC health before a robot exists, prefer `rcc diagnostics --quick --json` and `$rcc-core`.
 - Prefer `environmentConfigs` with platform freeze fallbacks for reproducible robots. Use single `condaConfigFile` only for simple local work.
 - Use RCC environment commands for Python checks, not host Python.
 - Use `ROBOT_ROOT` and `ROBOT_ARTIFACTS` for raw path resolution; in `robocorp.tasks`, prefer `get_output_dir()` and `get_current_task()`.
@@ -29,6 +30,7 @@ Use this skill for RCC-backed robot projects and runtime/environment work.
 - `references/troubleshooting-validation.md`: environment, dependency, runtime, work item, Action Server, and repo validation playbooks.
 - `references/hooks.md`: optional Claude Code hook assets and command guardrails for RCC projects.
 - `../rcc/references/source-map.md`: source evidence for current recipes.
+- `../rcc-core/references/rcc-source-recipes.md`: RCC CLI/source, holotree/cache, endpoint, template, and remote-cache orientation.
 
 ## Assets And Scripts
 

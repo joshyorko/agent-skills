@@ -130,7 +130,9 @@ def validate_robot_yaml(path: Path, result: ValidationResult) -> Dict[str, Any]:
             result.warn("No environmentConfigs files found")
 
     if not conda_file and "condaConfigFile" not in data:
-        result.error("No 'condaConfigFile' or 'environmentConfigs' defined")
+        result.warn(
+            "No 'condaConfigFile' or 'environmentConfigs' defined; valid only when the runtime environment is preset"
+        )
 
     # Check artifacts directory
     if "artifactsDir" in data:

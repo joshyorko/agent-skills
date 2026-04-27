@@ -139,6 +139,7 @@ Primary docs:
 The `plugins/rcc/` distribution is split into focused RCC-family skills.
 
 - [`rcc`](plugins/rcc/skills/rcc/SKILL.md) — router for choosing the right RCC specialist.
+- [`rcc-core`](plugins/rcc/skills/rcc-core/SKILL.md) — RCC itself: CLI/source orientation, holotree/cache internals, endpoints, templates, bundles, and remote cache/client behavior.
 - [`rcc-robots`](plugins/rcc/skills/rcc-robots/SKILL.md) — RCC CLI, `robot.yaml`, `conda.yaml`, holotree, templates, freezes, bundles, and environment validation.
 - [`rcc-workitems`](plugins/rcc/skills/rcc-workitems/SKILL.md) — classic `robocorp.workitems`, `actions-work-items`, producer/consumer/reporter flows, local queues, and custom adapters.
 - [`action-server`](plugins/rcc/skills/action-server/SKILL.md) — ordinary Action Server packages, Josh's `actions` community branch, `package.yaml` v2, `sema4ai-actions`, `sema4ai-mcp`, secrets, dev tasks, and OpenAPI/MCP checks.
