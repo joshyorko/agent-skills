@@ -6,7 +6,7 @@ channels:
 
 dependencies:
   - python=3.12.11
-  - uv=0.9.28  # Fast package installer, available for future hook deps
+  - uv=0.11.8  # Fast package installer, available for future hook deps
   - pip:
       # Core for hooks (currently using stdlib only, but ready for more)
       # - pydantic>=2.0  # Uncomment when hooks need validation

@@ -8,12 +8,12 @@ channels:
 dependencies:
   - python=3.12.11
   - nodejs=18.17.1 # Required for Playwright/Browser library
-  - uv=0.9.28 # Fast package installer
+  - uv=0.11.8 # Fast package installer
 
   - pip:
       - robotframework==7.1.1
       - robotframework-browser==18.9.1
-      - rpaframework==28.6.1
+      - rpaframework==31.2.0
 
 # Initialize browser after environment creation
 rccPostInstall:
