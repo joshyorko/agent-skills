@@ -1,11 +1,11 @@
 ---
-name: sema4ai-action-server
-description: Sema4AI Action Server action-package specialist. Use for ordinary Action Server packages, package.yaml v2, sema4ai-actions, sema4ai-mcp, typed action responses, secrets, dev-tasks, tests, and local OpenAPI/MCP endpoint validation.
+name: action-server
+description: Action Server action-package specialist. Use for ordinary Action Server packages, Josh's actions community branch, package.yaml v2, sema4ai-actions, sema4ai-mcp, typed action responses, secrets, dev-tasks, tests, and local OpenAPI/MCP endpoint validation.
 ---
 
-# Sema4AI Action Server
+# Action Server
 
-Use this skill for normal Sema4AI Action Server package authoring and debugging.
+Use this skill for normal Action Server package authoring and debugging across Josh's `actions` community branch and Sema4AI-compatible package APIs.
 
 ## Scope
 
@@ -17,7 +17,7 @@ Use this skill for normal Sema4AI Action Server package authoring and debugging.
 
 - Do not prototype an agent-skills marketplace server.
 - Do not create a new MCP server, action server, daemon, web service, or marketplace runtime product for this repo.
-- Do not make plugin distribution sound hosted; this skill is for ordinary Sema4AI action packages.
+- Do not make plugin distribution sound hosted; this skill is for ordinary Action Server action packages.
 
 ## First Inspection
 
@@ -28,7 +28,7 @@ Use this skill for normal Sema4AI Action Server package authoring and debugging.
 
 ## References
 
-- `references/action-server-sema4ai-recipes.md`: package v2 patterns, actions, MCP decorators, secrets, dev tasks, endpoint validation, and work-item-in-actions examples.
+- `references/action-server-recipes.md`: package v2 patterns, actions, MCP decorators, secrets, dev tasks, endpoint validation, and work-item-in-actions examples.
 - `../rcc-workitems/references/workitems-adapters.md`: queue/adapters details when action packages use `actions-work-items`.
 - `../rcc-robots/references/troubleshooting-validation.md`: shared failure triage and validation commands.
 - `../rcc-robots/assets/templates/package.yaml`: starter package template.

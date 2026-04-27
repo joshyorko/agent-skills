@@ -1,6 +1,6 @@
-# Action Server And Sema4AI Recipes
+# Action Server Recipes
 
-Use this guide for Sema4AI Action Server packages, MCP tools, secrets, and Josh's `actions` community fork.
+Use this guide for Action Server packages, MCP tools, secrets, Sema4AI-compatible package APIs, and Josh's `actions` community fork.
 
 ## Source Build From Josh's Fork
 
@@ -48,7 +48,7 @@ dev-tasks:
   lint: ruff check src tests
 ```
 
-`package.yaml` v2 is the documented package format shown in the official Sema4AI Action Server docs fetched for this refresh.
+`package.yaml` v2 is the documented package format shown in the official Action Server docs fetched for this refresh.
 
 ## Run And Inspect
 

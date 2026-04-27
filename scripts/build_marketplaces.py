@@ -35,9 +35,15 @@ def write_if_changed(path: Path, content: str, check: bool) -> bool:
 def build_codex_marketplace(catalog: dict) -> dict:
     plugins = []
     for plugin in catalog["plugins"]:
+        plugin_root = ROOT / "plugins" / plugin["name"]
+        codex_manifest = load_json(plugin_root / ".codex-plugin" / "plugin.json")
+        interface = codex_manifest.get("interface", {})
         plugins.append(
             {
                 "name": plugin["name"],
+                "description": plugin["description"],
+                "tags": plugin.get("tags", []),
+                "interface": interface,
                 "source": {
                     "source": "local",
                     "path": f"./plugins/{plugin['name']}",

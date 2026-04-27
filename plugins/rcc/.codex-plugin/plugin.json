@@ -1,7 +1,7 @@
 {
   "name": "rcc",
   "version": "0.1.0",
-  "description": "Focused RCC-family skills for robots, holotree environments, work items, Sema4AI action packages, and CI maintenance workflows.",
+  "description": "Focused RCC-family skills for robots, holotree environments, work items, Action Server packages, and CI maintenance workflows.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -17,14 +17,16 @@
     "automation",
     "holotree",
     "workitems",
-    "sema4ai",
+    "action-server",
+    "actions",
+    "mcp",
     "ci"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "RCC Automation",
     "shortDescription": "Focused RCC skills for robots, work items, action packages, and CI maintenance.",
-    "longDescription": "RCC-family workflows split into focused skills for robot scaffolding and holotree environments, work item adapters, ordinary Sema4AI Action Server packages, and RCC-powered CI maintenance.",
+    "longDescription": "RCC-family workflows split into focused skills for robot scaffolding and holotree environments, work item adapters, ordinary Action Server packages, and RCC-powered CI maintenance.",
     "developerName": "Josh Yorko",
     "category": "Developer Tools",
     "capabilities": [
@@ -38,7 +40,7 @@
       "Choose the right RCC specialist skill for this task.",
       "Debug this robot.yaml or conda.yaml setup.",
       "Design a local work item queue or adapter flow.",
-      "Validate a Sema4AI Action Server package.",
+      "Validate an Action Server package.",
       "Set up RCC-powered CI maintenance safely."
     ],
     "brandColor": "#1D4ED8"

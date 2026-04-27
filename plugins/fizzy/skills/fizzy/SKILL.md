@@ -61,7 +61,7 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 **MUST follow these rules:**
 
 1. **Cards use NUMBER, not ID** — `fizzy card show 42` uses the card number. Other resources use their `id` field.
-2. **Prefer the clean built-in human output first** — use plain output, `--markdown`, or `--styled` when they already answer the question. Use built-in `--jq` only when you need to reduce a large payload or extract specific fields. Never pipe to external jq — use `--jq` instead when filtering is actually needed.
+2. **Use built-in `--jq` for filtering** to reduce token output — `fizzy card list --jq '[.data[] | {number, title}]'`. Never pipe to external jq — use `--jq` instead. `--jq` implies `--json`, no need to pass both.
 3. **Check breadcrumbs** in responses for available next actions with pre-filled values.
 4. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards.
 5. **Use `fizzy doctor` for setup/config/auth issues** before guessing — it is the primary read-only health check and includes remediation hints.
@@ -384,7 +384,7 @@ fizzy card list --board BOARD_ID --indexed-by not_now --all
 
 ## Built-in jq Filtering
 
-Use the default output, `--markdown`, or `--styled` when the CLI already renders the answer clearly. Reach for `--jq` when you need filtering or extraction. `--jq` implies `--json` (or filters raw data with `--quiet` / `--agent`) — no need to pass both. Never pipe to external jq — use `--jq` instead. `--jq` is for machine-readable JSON output and cannot be combined with `--styled`, `--markdown`, `--ids-only`, or `--count`.
+Use `--jq` for filtering and extracting data. `--jq` implies `--json` (or filters raw data with `--quiet` / `--agent`) — no need to pass both. Never pipe to external jq — use `--jq` instead. `--jq` is for machine-readable JSON output and cannot be combined with `--styled`, `--markdown`, `--ids-only`, or `--count`.
 
 ### Reducing Output
 

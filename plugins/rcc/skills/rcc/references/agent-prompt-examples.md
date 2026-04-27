@@ -23,7 +23,7 @@ Use $rcc-workitems. Add a consumer task that uses the project's existing work it
 ## Create An Action Package
 
 ```text
-Use $sema4ai-action-server. Create or update a Sema4AI Action Server package with package.yaml spec-version v2, typed sema4ai.actions responses, Secret/OAuth2Secret for sensitive inputs, and dev-tasks for tests/lint. Validate action-server start and OpenAPI/MCP endpoints when the dependency is available.
+Use $action-server. Create or update an Action Server package with package.yaml spec-version v2, typed sema4ai.actions responses, Secret/OAuth2Secret for sensitive inputs, and dev-tasks for tests/lint. Validate action-server start and OpenAPI/MCP endpoints when the dependency is available.
 ```
 
 ## Review Template Pins
