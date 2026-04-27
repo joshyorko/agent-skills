@@ -35,6 +35,11 @@ This file records the sources inspected for the 2026-04-27 RCC skill refresh and
   - Optional probe result: available during this run.
   - Supports historical Robocorp/Action Server 0.4.1 source orientation only; do not use it for current-version claims.
 
+- `https://github.com/joshyorko/room-of-requirement.git`
+  - Research checkout: `/tmp/agent-skills-room-of-requirement`
+  - Branch/commit inspected: `main` / `a7e00e632865e0af434c78b7da809f2c07420fe7`
+  - Supports RCC maintenance robot structure, scheduled GitHub Actions pattern, pinned RCC install, `ROBOCORP_HOME` cache key, telemetry disable, no-cache commit guard, allowlist strategy, and maintenance report artifact behavior.
+
 ## Optional Repository Probe
 
 - No optional Josh repositories were private/unavailable during this run. Probe status is recorded in `/tmp/agent-skills-rcc-research/OPTIONAL-UNAVAILABLE.txt`.

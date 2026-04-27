@@ -1,7 +1,7 @@
 {
   "name": "rcc",
   "version": "0.1.0",
-  "description": "RCC automation workflows for robot scaffolding, isolated environments, holotree operations, and repeatable Python automation.",
+  "description": "Focused RCC-family skills for robots, holotree environments, work items, Sema4AI action packages, and CI maintenance workflows.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -15,6 +15,9 @@
     "robocorp",
     "robot-framework",
     "automation",
-    "holotree"
+    "holotree",
+    "workitems",
+    "sema4ai",
+    "ci"
   ]
 }
