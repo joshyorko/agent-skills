@@ -93,16 +93,32 @@ jobs:
             throw "state file missing after install"
           }
 
-      - name: Remote entrypoint help
-        shell: pwsh
+      - name: Remote entrypoint help from Windows PowerShell
+        shell: powershell
         run: |
-          pwsh -File install.ps1 -Help | Out-Null
+          & .\install.ps1 -Help | Out-Null
 
-      - name: Remote entrypoint install from existing checkout
-        shell: pwsh
+      - name: Remote entrypoint install from existing checkout without pwsh on PATH
+        shell: powershell
         run: |
           $tmpCodex = Join-Path $env:RUNNER_TEMP "codex-remote"
-          pwsh -File install.ps1 `
+          $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
+          if ($pwsh) {
+            $pwshDir = ([IO.Path]::GetFullPath((Split-Path $pwsh.Source -Parent))).TrimEnd('\', '/').ToLowerInvariant()
+            $env:PATH = (($env:PATH -split ';') | Where-Object {
+              if (-not $_) {
+                return $false
+              }
+
+              try {
+                return ([IO.Path]::GetFullPath($_).TrimEnd('\', '/').ToLowerInvariant()) -ne $pwshDir
+              }
+              catch {
+                return $true
+              }
+            }) -join ';'
+          }
+          & .\install.ps1 `
             -RepoPath $PWD `
             -CodexHome $tmpCodex `
             -InstallMethod git `

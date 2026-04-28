@@ -84,6 +84,32 @@ function Choose-InstallMethod {
   return "archive"
 }
 
+function Invoke-PowerShellFile {
+  param([string[]]$Args)
+
+  $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
+  if ($pwshCmd) {
+    & $pwshCmd.Source -NoLogo -NoProfile @Args
+    return
+  }
+
+  $powershellCmd = Get-Command powershell -ErrorAction SilentlyContinue
+  if ($powershellCmd) {
+    & $powershellCmd.Source -NoLogo -NoProfile -ExecutionPolicy Bypass @Args
+    return
+  }
+
+  $targetDescription = "run the installer"
+  $fileArgIndex = [Array]::IndexOf($Args, "-File")
+  if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
+    $scriptPath = [string]$Args[$fileArgIndex + 1]
+    if (-not [string]::IsNullOrWhiteSpace($scriptPath)) {
+      $targetDescription = "run $scriptPath"
+    }
+  }
+  throw "Unable to find a PowerShell host to $targetDescription. Install PowerShell and try again."
+}
+
 function Install-FromGit {
   $gitCmd = Get-Command git -ErrorAction SilentlyContinue
   if (-not $gitCmd) {
@@ -151,7 +177,7 @@ function Install-FromGit {
     "-SkipRepoSync"
   )
   if ($Force) { $args += "-Force" }
-  & pwsh @args
+  Invoke-PowerShellFile -Args $args
 }
 
 function Install-FromArchive {
@@ -212,7 +238,7 @@ function Install-FromArchive {
       "-SkipRepoSync"
     )
     if ($Force) { $args += "-Force" }
-    & pwsh @args
+    Invoke-PowerShellFile -Args $args
   }
   finally {
     Remove-Item -LiteralPath $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue

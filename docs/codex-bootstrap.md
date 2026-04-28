@@ -48,7 +48,7 @@ if [ ! -d ~/src/agent-skills/.git ]; then git clone https://github.com/joshyorko
 ```
 
 ```powershell
-if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; pwsh -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
+if (-not (Test-Path "$HOME/src/agent-skills/.git")) { git clone https://github.com/joshyorko/agent-skills.git "$HOME/src/agent-skills" } ; powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File "$HOME/src/agent-skills/scripts/install-codex-assets.ps1" -RepoPath "$HOME/src/agent-skills"
 ```
 
 What it does:
