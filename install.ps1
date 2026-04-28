@@ -89,7 +89,7 @@ function Invoke-PowerShellFile {
 
   $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
   if ($pwshCmd) {
-    & $pwshCmd.Source @Args
+    & $pwshCmd.Source -NoLogo -NoProfile @Args
     return
   }
 
@@ -99,7 +99,8 @@ function Invoke-PowerShellFile {
     return
   }
 
-  throw "Unable to find a PowerShell host to run $($Args[1]). Install PowerShell or rerun from Windows PowerShell."
+  $scriptPath = if ($Args.Count -gt 1) { $Args[1] } else { "the requested installer script" }
+  throw "Unable to find a PowerShell host to run $scriptPath. Install PowerShell or rerun from Windows PowerShell."
 }
 
 function Install-FromGit {
