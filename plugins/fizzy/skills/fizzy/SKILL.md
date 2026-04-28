@@ -805,6 +805,81 @@ fizzy upload file PATH
 
 ## Common Workflows
 
+### Fizzy Popper Board Bootstrap
+
+Use this when a user wants to prepare an existing Fizzy board for `fizzy-popper`. This is an agent-skill helper for board setup through the `fizzy` CLI; it is not `fizzy-popper setup`, does not write `.fizzy-popper/config.yml`, and does not configure the daemon.
+
+The board contract is golden-ticket first:
+
+- A column is agent-enabled by a card in that column tagged `#agent-instructions`.
+- The column name is not the signal.
+- Keep one golden-ticket card per agent column.
+- The golden-ticket description is the agent prompt.
+- The golden-ticket checklist becomes agent steps.
+- Backend and completion behavior come from golden-ticket tags.
+- `WORKFLOW.md` is optional repo policy context; the board/golden-ticket contract is primary.
+
+Before changing a board, run read-only checks:
+
+```bash
+fizzy doctor
+fizzy board list --markdown
+```
+
+Ask the user:
+
+- Which board should be prepared?
+- Which backend tag should the golden ticket use? Default: `#codex`.
+- What should the agent column be named? Default: `Ready for Agents`.
+- What should happen on completion? Default: move to `Done`.
+- Should a smoke-test work card be created? Default: no.
+- Should the default golden-ticket prompt be used? Default: yes.
+
+Run the helper from this repo on the Bluefin host or inside a Linux/devcontainer shell where the `fizzy` CLI is installed and authenticated:
+
+```bash
+bash plugins/fizzy/skills/fizzy/scripts/bootstrap-fizzy-popper-board.sh \
+  --board BOARD_ID \
+  --backend codex \
+  --agent-column "Ready for Agents" \
+  --completion move-to-done
+```
+
+Supported options:
+
+```bash
+--board BOARD_ID                 # required existing board ID
+--backend codex|claude|opencode|anthropic|openai|command
+--agent-column "Ready for Agents"
+--completion move-to-done
+--completion "move-to:Ready for Review"
+--completion close-on-complete
+--done-column "Done"             # alias for --completion move-to:Done
+--title "Repo Agent"
+--prompt "Prompt text"
+--prompt-file PATH
+--smoke-card
+--smoke-title "Smoke test the agent loop"
+--smoke-description "Inspect this repository and post a short summary of what it is."
+--api-url URL
+--profile NAME
+--dry-run
+--force-tags
+```
+
+The helper reuses exact-name columns, creates missing columns, creates or reuses one golden ticket in the agent column, adds missing tags and default steps, and only creates a smoke-test work card when `--smoke-card` is passed. Because `fizzy card tag` toggles tags, the helper checks existing tags before changing them. If an existing golden ticket has a conflicting backend or completion tag, it stops unless `--force-tags` is passed.
+
+Default golden-ticket checklist:
+
+```text
+Inspect the repository and the card request
+Make the smallest safe change that satisfies the request
+Run the appropriate local checks
+Summarize what changed and any follow-up needed
+```
+
+After running it, summarize the board ID/name, agent column ID/name, completion behavior, golden-ticket card number/title, whether a smoke-test card was created, and the next command: `fizzy-popper start`.
+
 ### Create Card with Steps
 
 ```bash
