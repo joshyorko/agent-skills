@@ -104,8 +104,19 @@ jobs:
           $tmpCodex = Join-Path $env:RUNNER_TEMP "codex-remote"
           $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
           if ($pwsh) {
-            $pwshDir = Split-Path $pwsh.Source -Parent
-            $env:PATH = (($env:PATH -split ';') | Where-Object { $_ -ne $pwshDir }) -join ';'
+            $pwshDir = ([IO.Path]::GetFullPath((Split-Path $pwsh.Source -Parent))).TrimEnd('\').ToLowerInvariant()
+            $env:PATH = (($env:PATH -split ';') | Where-Object {
+              if (-not $_) {
+                return $false
+              }
+
+              try {
+                return ([IO.Path]::GetFullPath($_).TrimEnd('\').ToLowerInvariant()) -ne $pwshDir
+              }
+              catch {
+                return $true
+              }
+            }) -join ';'
           }
           & .\install.ps1 `
             -RepoPath $PWD `

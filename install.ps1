@@ -99,7 +99,11 @@ function Invoke-PowerShellFile {
     return
   }
 
-  $scriptPath = if ($Args.Count -gt 1) { $Args[1] } else { "the requested installer script" }
+  $scriptPath = "the requested installer script"
+  $fileArgIndex = [Array]::IndexOf($Args, "-File")
+  if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
+    $scriptPath = $Args[$fileArgIndex + 1]
+  }
   throw "Unable to find a PowerShell host to run $scriptPath. Install PowerShell or rerun from Windows PowerShell."
 }
 
