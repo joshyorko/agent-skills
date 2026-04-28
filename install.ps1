@@ -104,7 +104,7 @@ function Invoke-PowerShellFile {
   if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
     $scriptPath = $Args[$fileArgIndex + 1]
   }
-  throw "Unable to find a PowerShell host to run $scriptPath. Install PowerShell or rerun from Windows PowerShell."
+  throw "Unable to find a PowerShell host to run $scriptPath. Install PowerShell and try again."
 }
 
 function Install-FromGit {
