@@ -104,14 +104,14 @@ jobs:
           $tmpCodex = Join-Path $env:RUNNER_TEMP "codex-remote"
           $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
           if ($pwsh) {
-            $pwshDir = ([IO.Path]::GetFullPath((Split-Path $pwsh.Source -Parent))).TrimEnd('\').ToLowerInvariant()
+            $pwshDir = ([IO.Path]::GetFullPath((Split-Path $pwsh.Source -Parent))).TrimEnd('\', '/').ToLowerInvariant()
             $env:PATH = (($env:PATH -split ';') | Where-Object {
               if (-not $_) {
                 return $false
               }
 
               try {
-                return ([IO.Path]::GetFullPath($_).TrimEnd('\').ToLowerInvariant()) -ne $pwshDir
+                return ([IO.Path]::GetFullPath($_).TrimEnd('\', '/').ToLowerInvariant()) -ne $pwshDir
               }
               catch {
                 return $true

@@ -102,7 +102,10 @@ function Invoke-PowerShellFile {
   $targetDescription = "run the installer"
   $fileArgIndex = [Array]::IndexOf($Args, "-File")
   if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
-    $targetDescription = "run $($Args[$fileArgIndex + 1])"
+    $scriptPath = [string]$Args[$fileArgIndex + 1]
+    if (-not [string]::IsNullOrWhiteSpace($scriptPath)) {
+      $targetDescription = "run $scriptPath"
+    }
   }
   throw "Unable to find a PowerShell host to $targetDescription. Install PowerShell and try again."
 }
