@@ -99,12 +99,12 @@ function Invoke-PowerShellFile {
     return
   }
 
-  $scriptPath = "the requested installer script"
+  $targetDescription = "run the installer"
   $fileArgIndex = [Array]::IndexOf($Args, "-File")
   if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
-    $scriptPath = $Args[$fileArgIndex + 1]
+    $targetDescription = "run $($Args[$fileArgIndex + 1])"
   }
-  throw "Unable to find a PowerShell host to run $scriptPath. Install PowerShell and try again."
+  throw "Unable to find a PowerShell host to $targetDescription. Install PowerShell and try again."
 }
 
 function Install-FromGit {
