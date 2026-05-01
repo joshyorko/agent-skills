@@ -2,6 +2,8 @@
 
 Use this guide when creating or reviewing RCC-managed contained automation projects from Josh's RCC and template repos. Keep `robot.yaml`, `conda.yaml`, and literal `robocorp.*` package names when they are the real interfaces in use; here, `robot` is RCC's packaging convention, not the architectural identity of the stack.
 
+For cross-source Python library evidence, current example gaps, and refresh commands, see `../../rcc/references/python-library-audit.md`.
+
 ## Josh Template Index
 
 The inspected `joshyorko/robot-templates` repo contains:

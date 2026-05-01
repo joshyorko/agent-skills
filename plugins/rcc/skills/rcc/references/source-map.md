@@ -4,6 +4,39 @@ This file records the sources inspected for the 2026-04-27 RCC skill refresh and
 
 Treat Josh-owned RCC sources as the primary evidence path for current stack behavior. Use upstream Robocorp/Sema4.ai repositories and docs as dependency/interface-history evidence unless a task explicitly targets those packages, APIs, or hosted services. Preserve literal package/API names like `robocorp.tasks`, `robocorp.workitems`, `robocorp-browser`, and `ROBOCORP_HOME` when they are the real interfaces in use.
 
+## 2026-05-01 Python Library Audit
+
+See `python-library-audit.md` for the current cross-source Python library map, example gaps, source refresh commands, and repo scan notes.
+
+Additional sources inspected for that audit:
+
+- `https://github.com/Sema4AI/actions`
+  - Research checkout: `/tmp/agent-skills-python-library-audit-20260501/sema4ai-actions`
+  - Branch/commit inspected: `master` / `9d9479e`
+  - Supports `sema4ai.actions`, `sema4ai.mcp`, `package.yaml` v2, data access query templates, `Request`, `Table`, `ActionError`, `SecretSpec`, and MCP tool annotation hints.
+
+- `https://github.com/joshyorko/actions`
+  - Research checkout: `/tmp/agent-skills-python-library-audit-20260501/joshyorko-actions-community`
+  - Branch/commit inspected: `community` / `7e63577`
+  - Supports the community-only `workflow-producer-consumer` template, `actions-work-items` recipes, and Action Server RCC utility orientation.
+
+- `https://github.com/joshyorko/rcc`
+  - Research checkout: `/tmp/agent-skills-python-library-audit-20260501/joshyorko-rcc`
+  - Branch/commit inspected: `main` / `2e0e309`
+  - Supports current RCC docs for isolated Python automation packages, dependency export/freeze, `rcc task script`, endpoint overrides, uv-native mode, and holotree cache behavior.
+
+- `https://github.com/robocorp/robocorp`
+  - Research checkout: `/tmp/agent-skills-python-library-audit-20260501/robocorp`
+  - Branch/commit inspected: `master` / `64cc9a3`
+  - Supports `robocorp.tasks`, `robocorp.browser`, `robocorp.workitems`, `robocorp.vault`, `robocorp.storage`, and `robocorp.log` examples.
+
+- `https://github.com/Sema4AI/gallery`
+  - Research checkout: `/tmp/agent-skills-python-library-audit-20260501/sema4ai-gallery`
+  - Branch/commit inspected: `main` / `d6afd61`
+  - Supports real action package shapes, auth/model patterns, and `package.yaml` examples across prebuilt actions.
+
+Org-level `gh repo list` scans were also run for `Sema4AI`, `robocorp`, and `joshyorko` to identify missed example repositories before updating the audit.
+
 ## Josh Repositories
 
 - `https://github.com/joshyorko/agent-skills`

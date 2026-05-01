@@ -25,6 +25,7 @@ Use this skill for work item queues, adapters, and producer/consumer/reporter au
 ## References
 
 - `references/workitems-adapters.md`: classic Robocorp work items, `actions-work-items`, adapter contracts, local queues, and validation commands.
+- `../rcc/references/python-library-audit.md`: cross-source Python library map, work item example gaps, and source refresh workflow.
 - `../rcc-robots/references/troubleshooting-validation.md`: work item failure triage and repo validation.
 - `../rcc-robots/assets/templates/conda-workitems.yaml`: work item environment template.
 - `../rcc-robots/assets/templates/hitl-assistant/`: starter robot with Assistant/work item structure.

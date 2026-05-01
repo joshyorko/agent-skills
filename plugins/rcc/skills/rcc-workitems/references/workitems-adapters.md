@@ -2,6 +2,8 @@
 
 Use this guide for producer/consumer queues, classic Robocorp work items, `actions-work-items`, and custom adapters.
 
+For cross-source Python library evidence, work item example gaps, and refresh commands, see `../../rcc/references/python-library-audit.md`.
+
 ## Classic robocorp.workitems
 
 ```python

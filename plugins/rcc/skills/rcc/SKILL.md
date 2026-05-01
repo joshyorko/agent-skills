@@ -26,5 +26,6 @@ Treat RCC as the center of gravity for this stack. Frame the domain as RCC-manag
 
 ## Shared References
 
+- `references/python-library-audit.md`: cross-source Python library evidence, example gaps, and refresh commands for RCC-family recipes.
 - `references/source-map.md`: source evidence for RCC plugin refreshes.
 - `references/agent-prompt-examples.md`: short prompts that point future agents at the right specialist skill.

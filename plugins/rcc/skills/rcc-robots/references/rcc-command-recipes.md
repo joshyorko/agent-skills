@@ -4,6 +4,8 @@ Use this guide for RCC command selection, robot configuration, environment prebu
 
 For RCC source, endpoint, holotree internals, or cache behavior not tied to a specific robot, switch to `$rcc-core`.
 
+For cross-source Python library evidence, current example gaps, and package/source refresh commands, see `../../rcc/references/python-library-audit.md`.
+
 ## Create Or Locate A Robot
 
 ```bash

@@ -30,6 +30,7 @@ Use this skill for RCC-backed automation projects and runtime/environment work o
 - `references/robot-project-recipes.md`: Josh automation-project templates, Python/browser/work item/UV-native patterns, and template release behavior.
 - `references/troubleshooting-validation.md`: environment, dependency, runtime, work item, Action Server, and repo validation playbooks.
 - `references/hooks.md`: optional Claude Code hook assets and command guardrails for RCC projects.
+- `../rcc/references/python-library-audit.md`: cross-source Python library map, examples, and source refresh workflow.
 - `../rcc/references/source-map.md`: source evidence for current recipes.
 - `../rcc-core/references/rcc-source-recipes.md`: RCC CLI/source, holotree/cache, endpoint, template, and remote-cache orientation.
 
