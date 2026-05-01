@@ -85,29 +85,47 @@ function Choose-InstallMethod {
 }
 
 function Invoke-PowerShellFile {
-  param([string[]]$Args)
+  param([string[]]$ArgumentList)
 
   $pwshCmd = Get-Command pwsh -ErrorAction SilentlyContinue
   if ($pwshCmd) {
-    & $pwshCmd.Source -NoLogo -NoProfile @Args
+    & $pwshCmd.Source -NoLogo -NoProfile @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+      throw "PowerShell host $($pwshCmd.Source) exited with code $LASTEXITCODE"
+    }
     return
   }
 
   $powershellCmd = Get-Command powershell -ErrorAction SilentlyContinue
   if ($powershellCmd) {
-    & $powershellCmd.Source -NoLogo -NoProfile -ExecutionPolicy Bypass @Args
+    & $powershellCmd.Source -NoLogo -NoProfile -ExecutionPolicy Bypass @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+      throw "PowerShell host $($powershellCmd.Source) exited with code $LASTEXITCODE"
+    }
     return
   }
 
   $targetDescription = "run the installer"
-  $fileArgIndex = [Array]::IndexOf($Args, "-File")
-  if ($fileArgIndex -ge 0 -and $Args.Count -gt ($fileArgIndex + 1)) {
-    $scriptPath = [string]$Args[$fileArgIndex + 1]
+  $fileArgIndex = [Array]::IndexOf($ArgumentList, "-File")
+  if ($fileArgIndex -ge 0 -and $ArgumentList.Count -gt ($fileArgIndex + 1)) {
+    $scriptPath = [string]$ArgumentList[$fileArgIndex + 1]
     if (-not [string]::IsNullOrWhiteSpace($scriptPath)) {
       $targetDescription = "run $scriptPath"
     }
   }
   throw "Unable to find a PowerShell host to $targetDescription. Install PowerShell and try again."
+}
+
+function Invoke-NativeCommand {
+  param(
+    [string]$Description,
+    [scriptblock]$Command
+  )
+
+  & $Command
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Description failed with exit code $LASTEXITCODE"
+  }
 }
 
 function Install-FromGit {
@@ -118,7 +136,7 @@ function Install-FromGit {
 
   if (Test-Path -LiteralPath (Join-Path $RepoPath ".git")) {
     Log "Updating existing git checkout at $RepoPath"
-    & git -C $RepoPath fetch --tags --prune | Out-Null
+    Invoke-NativeCommand "git fetch" { & git -C $RepoPath fetch --tags --prune | Out-Null }
   }
   elseif (Test-Path -LiteralPath $RepoPath) {
     throw "Target path $RepoPath exists but is not a git checkout. Use -InstallMethod archive or remove it first."
@@ -126,18 +144,18 @@ function Install-FromGit {
   else {
     Ensure-Directory (Split-Path -Parent $RepoPath)
     Log "Cloning $RepoUrl into $RepoPath"
-    & git clone $RepoUrl $RepoPath | Out-Null
+    Invoke-NativeCommand "git clone" { & git clone $RepoUrl $RepoPath | Out-Null }
   }
 
   if ($Ref) {
     & git -C $RepoPath rev-parse --verify --quiet "$Ref^{commit}" | Out-Null
     if ($LASTEXITCODE -eq 0) {
-      & git -C $RepoPath checkout --force $Ref | Out-Null
+      Invoke-NativeCommand "git checkout $Ref" { & git -C $RepoPath checkout --force $Ref | Out-Null }
     }
     else {
       & git -C $RepoPath fetch origin $Ref --depth=1 | Out-Null
       if ($LASTEXITCODE -eq 0) {
-        & git -C $RepoPath checkout --force FETCH_HEAD | Out-Null
+        Invoke-NativeCommand "git checkout FETCH_HEAD" { & git -C $RepoPath checkout --force FETCH_HEAD | Out-Null }
       }
       else {
         throw "Unable to resolve ref $Ref"
@@ -145,7 +163,7 @@ function Install-FromGit {
     }
   }
   else {
-    & git -C $RepoPath pull --ff-only | Out-Null
+    Invoke-NativeCommand "git pull --ff-only" { & git -C $RepoPath pull --ff-only | Out-Null }
   }
 
   $resolvedRef = $Ref
@@ -166,7 +184,7 @@ function Install-FromGit {
     }
   }
 
-  $args = @(
+  $installerArgs = @(
     "-File", (Join-Path $RepoPath "scripts/install-codex-assets.ps1"),
     "-RepoPath", $RepoPath,
     "-CodexHome", $CodexHome,
@@ -176,8 +194,8 @@ function Install-FromGit {
     "-ResolvedRef", $resolvedRef,
     "-SkipRepoSync"
   )
-  if ($Force) { $args += "-Force" }
-  Invoke-PowerShellFile -Args $args
+  if ($Force) { $installerArgs += "-Force" }
+  Invoke-PowerShellFile -ArgumentList $installerArgs
 }
 
 function Install-FromArchive {
@@ -227,7 +245,7 @@ function Install-FromArchive {
     Ensure-Directory (Split-Path -Parent $RepoPath)
     Move-Item -LiteralPath $sourceRoot.FullName -Destination $RepoPath
 
-    $args = @(
+    $installerArgs = @(
       "-File", (Join-Path $RepoPath "scripts/install-codex-assets.ps1"),
       "-RepoPath", $RepoPath,
       "-CodexHome", $CodexHome,
@@ -237,8 +255,8 @@ function Install-FromArchive {
       "-ResolvedRef", $resolvedRef,
       "-SkipRepoSync"
     )
-    if ($Force) { $args += "-Force" }
-    Invoke-PowerShellFile -Args $args
+    if ($Force) { $installerArgs += "-Force" }
+    Invoke-PowerShellFile -ArgumentList $installerArgs
   }
   finally {
     Remove-Item -LiteralPath $tmpRoot -Recurse -Force -ErrorAction SilentlyContinue
