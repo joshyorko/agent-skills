@@ -1,3 +1,5 @@
+[![Bootstrap Smoke](https://github.com/joshyorko/agent-skills/actions/workflows/bootstrap-smoke.yml/badge.svg)](https://github.com/joshyorko/agent-skills/actions/workflows/bootstrap-smoke.yml)
+
 # Agent Skills
 
 A plugin-first skill repo for four jobs:
