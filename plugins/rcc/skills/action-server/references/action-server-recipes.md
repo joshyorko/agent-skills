@@ -2,6 +2,8 @@
 
 Use this guide for Action Server packages, MCP tools, secrets, Sema4AI-compatible package APIs, and Josh's `actions` community fork.
 
+For cross-source Python library evidence, current example gaps, and refresh commands, see `../../rcc/references/python-library-audit.md`.
+
 ## Source Build From Josh's Fork
 
 The inspected `joshyorko/actions` checkout is on branch `community`. It keeps Sema4AI action/MCP packages and adds a community `actions-work-items` package.

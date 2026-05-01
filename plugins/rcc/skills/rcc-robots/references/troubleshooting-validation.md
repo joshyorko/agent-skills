@@ -4,6 +4,8 @@ Use this guide when RCC, Python dependencies, Action Server, or work item flows 
 
 If the failure is in RCC install, source, endpoint configuration, or holotree/cache behavior before a project is involved, use `$rcc-core`.
 
+For cross-source Python library evidence and package/example refresh commands, see `../../rcc/references/python-library-audit.md`.
+
 ## Split The Failure
 
 Run these in order:

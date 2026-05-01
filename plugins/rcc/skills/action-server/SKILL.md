@@ -29,6 +29,7 @@ Use this skill for normal Action Server package authoring and debugging across J
 ## References
 
 - `references/action-server-recipes.md`: package v2 patterns, actions, MCP decorators, secrets, dev tasks, endpoint validation, and work-item-in-actions examples.
+- `../rcc/references/python-library-audit.md`: cross-source Python library map, action/MCP example gaps, and source refresh workflow.
 - `../rcc-workitems/references/workitems-adapters.md`: queue/adapters details when action packages use `actions-work-items`.
 - `../rcc-robots/references/troubleshooting-validation.md`: shared failure triage and validation commands.
 - `../rcc-robots/assets/templates/package.yaml`: starter package template.
