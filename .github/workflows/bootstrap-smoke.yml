@@ -139,17 +139,17 @@ jobs:
           $stubCmd = Join-Path $stubDir "codex.cmd"
           New-Item -ItemType Directory -Force -Path $stubDir | Out-Null
           @'
-          param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args)
-          Add-Content -LiteralPath $env:CODEX_STUB_LOG -Value ($Args -join ' ')
-          if ($Args.Count -ge 3 -and $Args[0] -eq 'plugin' -and $Args[1] -eq 'marketplace' -and $Args[2] -eq 'add') {
-            exit 0
-          }
-          if ($Args.Count -ge 2 -and $Args[0] -eq 'marketplace' -and $Args[1] -eq 'add') {
-            Write-Error 'legacy marketplace command should not be used'
-            exit 2
-          }
-          exit 1
-          '@ | Set-Content -LiteralPath $stubScript
+param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Args)
+Add-Content -LiteralPath $env:CODEX_STUB_LOG -Value ($Args -join ' ')
+if ($Args.Count -ge 3 -and $Args[0] -eq 'plugin' -and $Args[1] -eq 'marketplace' -and $Args[2] -eq 'add') {
+  exit 0
+}
+if ($Args.Count -ge 2 -and $Args[0] -eq 'marketplace' -and $Args[1] -eq 'add') {
+  Write-Error 'legacy marketplace command should not be used'
+  exit 2
+}
+exit 1
+'@ | Set-Content -LiteralPath $stubScript
           "@echo off`r`npwsh -NoLogo -NoProfile -File `"$stubScript`" %*`r`n" | Set-Content -LiteralPath $stubCmd
           $env:PATH = "$stubDir;$env:PATH"
           $env:CODEX_STUB_LOG = $logPath
