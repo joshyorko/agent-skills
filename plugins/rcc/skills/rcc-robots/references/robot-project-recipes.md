@@ -1,6 +1,6 @@
-# Robot Project Recipes
+# RCC Automation Project Recipes
 
-Use this guide when creating or reviewing Robocorp robot projects from Josh's RCC and robot template repos.
+Use this guide when creating or reviewing RCC-managed contained automation projects from Josh's RCC and template repos. Keep `robot.yaml`, `conda.yaml`, and literal `robocorp.*` package names when they are the real interfaces in use; here, `robot` is RCC's packaging convention, not the architectural identity of the stack.
 
 ## Josh Template Index
 
@@ -16,7 +16,7 @@ The inspected `joshyorko/robot-templates` repo contains:
 
 Prefer these names when prompting RCC or future agents. If a template has freeze files, keep `environmentConfigs` ordering intact.
 
-## Minimal Python Robot
+## Minimal Python Automation Project
 
 `robot.yaml`:
 
@@ -54,9 +54,9 @@ dependencies:
       - robocorp-browser==2.4.0
 ```
 
-## Browser Robot
+## Browser Automation Project
 
-Browser projects usually need:
+Browser automation projects usually need:
 
 - `robocorp-browser` for modern Python robots. It is separate from the base `robocorp` package.
 - `browser.configure(...)` before browser APIs when changing screenshot, headless, or timeout behavior.
@@ -75,9 +75,9 @@ rcc run -r robot.yaml -t BrowserExample --silent
 
 If browser install fails, treat it as environment/post-install first, not a selector or task-code bug.
 
-## Assistant / HITL Robot
+## Assistant / HITL Automation Project
 
-Assistant UI robots use `rpaframework-assistant`, not the base `rpaframework` package. They are desktop/HITL flows and should not be treated as headless CI smoke tests.
+Assistant UI automation projects use `rpaframework-assistant`, not the base `rpaframework` package. They are desktop/HITL flows and should not be treated as headless CI smoke tests.
 
 ```yaml
 dependencies:
@@ -107,7 +107,7 @@ def ask_user() -> None:
 
 Keep producer/consumer/reporter task functions real `@task` entrypoints even when an Assistant task is present. Do not call `workitems.outputs.create(...)` from a HITL starter unless a seed/current input item is reserved.
 
-## Work Item Robot
+## Work Item Automation Project
 
 Use explicit producer/consumer/reporter tasks:
 
@@ -139,7 +139,7 @@ Keep work item files and SQLite databases under `devdata/` or `output/`; commit 
 
 ## Diagnostic Dev Tasks
 
-Production robots should expose diagnostics as `devTasks`, not just business tasks. Useful patterns from `fizzy-symphony`, `fetch-repos-bot`, and maintenance robots:
+Production automation projects should expose diagnostics as `devTasks`, not just business tasks. Useful patterns from `fizzy-symphony`, `fetch-repos-bot`, and maintenance automation:
 
 ```yaml
 tasks:
@@ -193,7 +193,7 @@ rcc run -r robot.yaml --dev -t CheckSQLiteDB --silent
 
 When consumers run in shards or matrix jobs, put shard ids in output filenames and result payloads so retries do not overwrite artifacts.
 
-## Maintenance Robot
+## Maintenance Automation
 
 The `robot-templates` and `room-of-requirement` maintenance robots are a good pattern for repo automation:
 

@@ -2,6 +2,8 @@
 
 This file records the sources inspected for the 2026-04-27 RCC skill refresh and what each source supports. Recheck sources before making new "latest" or version-current claims.
 
+Treat Josh-owned RCC sources as the primary evidence path for current stack behavior. Use upstream Robocorp/Sema4.ai repositories and docs as dependency/interface-history evidence unless a task explicitly targets those packages, APIs, or hosted services. Preserve literal package/API names like `robocorp.tasks`, `robocorp.workitems`, `robocorp-browser`, and `ROBOCORP_HOME` when they are the real interfaces in use.
+
 ## Josh Repositories
 
 - `https://github.com/joshyorko/agent-skills`
@@ -125,19 +127,19 @@ This file records the sources inspected for the 2026-04-27 RCC skill refresh and
   - Local branch/commit inspected: `main` / `3b9d509`
   - Supports Electron-hosted RCC usage, bundled RCC binary versioning, and UI exposure of run/holotree/tasks operations.
 
-## Robocorp / Sema4AI Source
+## Upstream Dependency / Interface History
 
 - `https://github.com/robocorp/rcc`
   - Branch/commit inspected: `master` / `f70394b`
-  - Supports upstream RCC docs, command behavior orientation, holotree/cache terminology, robot templates, dependency freeze flow, diagnostics, and troubleshooting commands. The current checkout is docs-focused; use Josh's `joshyorko/rcc` fork for source-tree internals.
+  - Supports upstream RCC docs, command behavior orientation, holotree/cache terminology, `robot.yaml` template history, dependency freeze flow, diagnostics, and troubleshooting commands. The current checkout is docs-focused; use Josh's `joshyorko/rcc` fork for source-tree internals and current behavior assumptions in this stack.
 
 - `https://github.com/Sema4AI/actions`
   - Branch/commit inspected: `master` / `9d9479e`
-  - Supports current Action Server 3.2.0, `package.yaml` v2, dev tasks, external endpoints, OAuth2, `SecretSpec`, MCP endpoint behavior, `Response[T]`, and deployment commands.
+  - Supports current Action Server 3.2.0, `package.yaml` v2, dev tasks, external endpoints, OAuth2, `SecretSpec`, MCP endpoint behavior, `Response[T]`, and deployment commands when the task explicitly targets those interfaces.
 
 - `https://github.com/robocorp/robocorp`
   - Branch/commit inspected: `master` / `64cc9a3`
-  - Supports `robocorp.tasks`, `robocorp.workitems`, and `robocorp.browser` package behavior.
+  - Supports literal `robocorp.tasks`, `robocorp.workitems`, and `robocorp.browser` package behavior.
 
 - `https://github.com/robocorp/rpaframework`
   - Branch/commit inspected: `master` / `74d554d`
@@ -145,27 +147,27 @@ This file records the sources inspected for the 2026-04-27 RCC skill refresh and
 
 - `https://github.com/robocorp/template-python`
   - Branch/commit inspected: `master` / `294d020`
-  - Supports minimal modern Python robot structure.
+  - Supports historical minimal modern Python `robot.yaml` project structure.
 
 - `https://github.com/robocorp/template-python-browser`
   - Branch/commit inspected: `master` / `f33eb62`
-  - Supports browser robot structure with `robocorp.browser`.
+  - Supports historical browser `robot.yaml` structure with `robocorp.browser`.
 
 - `https://github.com/robocorp/template-python-workitems`
   - Branch/commit inspected: `master` / `fb0942c`
-  - Supports modern Python work item producer/consumer local dev env files.
+  - Supports historical Python work item producer/consumer local dev env files.
 
 - `https://github.com/robocorp/example-advanced-python-template`
   - Branch/commit inspected: `main` / `b17d743`
-  - Supports advanced producer/consumer/reporter Python flow and CI examples.
+  - Supports historical advanced producer/consumer/reporter Python flow and CI examples.
 
 - `https://github.com/robocorp/template-producer-consumer`
   - Branch/commit inspected: `master` / `655360f`
-  - Supports Robot Framework producer/consumer work item flow.
+  - Supports historical Robot Framework producer/consumer work item flow.
 
 - `https://github.com/robocorp/template-extended-producer-consumer`
   - Branch/commit inspected: `master` / `96df1e0`
-  - Supports Robot Framework producer/consumer/reporter flow, `preRunScripts`, and local devdata.
+  - Supports historical Robot Framework producer/consumer/reporter flow, `preRunScripts`, and local devdata.
 
 - `https://github.com/robocorp/example-python-workitem-files`
   - Branch/commit inspected: `master` / `8e8ea40`

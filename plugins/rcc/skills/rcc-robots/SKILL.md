@@ -1,11 +1,11 @@
 ---
 name: rcc-robots
-description: RCC robot/runtime specialist. Use for RCC CLI commands, Robocorp robot projects, robot.yaml, conda.yaml, holotree, freeze files, bundles, templates, environment validation, and robot task debugging.
+description: RCC automation-runtime specialist. Use for RCC CLI commands, RCC-backed automation projects, robot.yaml, conda.yaml, holotree, freeze files, bundles, templates, environment validation, and task debugging.
 ---
 
 # RCC Robots
 
-Use this skill for RCC-backed robot projects and runtime/environment work after the task is clearly about a robot. Use `$rcc-core` for RCC source, installation, endpoint, holotree/cache, or template catalog work before a robot task starts.
+Use this skill for RCC-backed automation projects and runtime/environment work once the task is clearly about a `robot.yaml` project. Here, `robot` is the RCC packaging/runtime convention, not a claim that Robocorp owns the architecture or current product direction. Keep literal package/API names such as `robocorp.tasks`, `robocorp.workitems`, `robocorp-browser`, and `ROBOCORP_HOME` when the project uses them. Use `$rcc-core` for RCC source, installation, endpoint, holotree/cache, or template catalog work before a task starts.
 
 ## First Inspection
 
@@ -17,16 +17,17 @@ Use this skill for RCC-backed robot projects and runtime/environment work after 
 ## Operating Rules
 
 - Run or request `rcc ht vars -r robot.yaml` first when startup fails; it separates RCC/holotree resolution from Python/task failures.
-- For host/RCC health before a robot exists, prefer `rcc diagnostics --quick --json` and `$rcc-core`.
-- Prefer `environmentConfigs` with platform freeze fallbacks for reproducible robots. Use single `condaConfigFile` only for simple local work.
+- For host/RCC health before a `robot.yaml` project exists, prefer `rcc diagnostics --quick --json` and `$rcc-core`.
+- Prefer `environmentConfigs` with platform freeze fallbacks for reproducible contained automation. Use single `condaConfigFile` only for simple local work.
 - Use RCC environment commands for Python checks, not host Python.
 - Use `ROBOT_ROOT` and `ROBOT_ARTIFACTS` for raw path resolution; in `robocorp.tasks`, prefer `get_output_dir()` and `get_current_task()`.
 - If changing package pins, verify PyPI or source metadata in the current run. Keep shared template pins consistent.
+- Do not steer users toward upstream Robocorp/Sema4.ai platform paths unless the task explicitly targets those interfaces; this skill assumes RCC-first local/CI automation by default.
 
 ## References
 
 - `references/rcc-command-recipes.md`: command selection, `robot.yaml`, `conda.yaml`, holotree, bundles, and cache hygiene.
-- `references/robot-project-recipes.md`: Josh robot templates, Python/browser/work item/UV-native patterns, and template release behavior.
+- `references/robot-project-recipes.md`: Josh automation-project templates, Python/browser/work item/UV-native patterns, and template release behavior.
 - `references/troubleshooting-validation.md`: environment, dependency, runtime, work item, Action Server, and repo validation playbooks.
 - `references/hooks.md`: optional Claude Code hook assets and command guardrails for RCC projects.
 - `../rcc/references/source-map.md`: source evidence for current recipes.
