@@ -1,9 +1,8 @@
 ---
 name: 37signals-review
 description: >-
-  Reviews code through a public 37signals-inspired Rails lens.
-  Checks for rich models, CRUD controllers, proper concerns, and Hotwire usage.
-  Use when requesting code review, architecture audit, or quality analysis.
+  Use when explicitly delegated by a Rails 37signals workflow to review a Rails
+  change against specialist 37signals-inspired pattern guidance.
 license: MIT
 metadata:
   author: agent-skills
@@ -15,7 +14,7 @@ metadata:
 
 This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
-# Review Agent
+# Review Orchestrator
 
 Review Rails changes for concrete architectural fit, not style nitpicks. Focus on whether the change moved the codebase toward or away from 37signals-inspired Rails conventions, and distinguish proven bugs from style preferences.
 

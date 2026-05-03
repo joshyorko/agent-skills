@@ -1,7 +1,7 @@
 {
   "name": "rails-37signals-workflows",
   "version": "0.1.0",
-  "description": "Workflow-level Rails skills for implementing, refactoring, and reviewing features with 37signals-inspired conventions.",
+  "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -20,8 +20,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Rails 37signals Workflows",
-    "shortDescription": "End-to-end Rails implementation, refactor, and review workflows.",
-    "longDescription": "Higher-level Rails workflow skills that orchestrate end-to-end feature work, refactors, and reviews using 37signals-inspired conventions.",
+    "shortDescription": "Rails implementation, refactor, and review routers.",
+    "longDescription": "Router-level Rails workflow skills that inspect the app first, choose the right compact specialist skills, and report verification and residual risk using 37signals-inspired conventions.",
     "developerName": "Josh Yorko",
     "category": "Developer Tools",
     "capabilities": [
@@ -32,9 +32,9 @@
     "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
     "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
     "defaultPrompt": [
-      "Implement this Rails feature with 37signals-inspired conventions.",
-      "Refactor this Rails code while preserving behavior.",
-      "Review this Rails change for 37signals-inspired tradeoffs."
+      "Use Rails 37signals Workflows to implement this feature and choose the right specialists.",
+      "Use Rails 37signals Workflows to refactor this code while preserving behavior.",
+      "Use Rails 37signals Workflows to review this Rails change and report residual risk."
     ],
     "brandColor": "#B45309"
   }

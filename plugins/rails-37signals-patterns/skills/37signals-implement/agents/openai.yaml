@@ -1,7 +1,7 @@
 interface:
   display_name: "37signals Implement"
-  short_description: "Orchestrates implementation of complete Rails features across models, controllers, views, and tests following 37signals-inspired conventions."
-  default_prompt: "Use $37signals-implement when implementing a full feature end-to-end or when user mentions feature implementation, full-stack, or orchestration."
+  short_description: "Coordinate specialist Rails 37signals pattern skills when explicitly delegated"
+  default_prompt: "Use $37signals-implement after a workflow skill chooses this pattern-level orchestration path."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

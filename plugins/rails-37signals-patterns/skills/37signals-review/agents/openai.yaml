@@ -1,7 +1,7 @@
 interface:
   display_name: "37signals Review"
-  short_description: "Reviews code through a public 37signals-inspired Rails lens: rich models, CRUD controllers, focused concerns, and Hotwire fit."
-  default_prompt: "Use $37signals-review when requesting code review, architecture audit, or quality analysis."
+  short_description: "Review Rails changes against specialist 37signals-inspired pattern guidance when explicitly delegated"
+  default_prompt: "Use $37signals-review after a workflow skill chooses this pattern-level review path."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

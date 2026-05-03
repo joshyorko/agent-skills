@@ -1,7 +1,7 @@
 {
   "name": "rails-37signals-patterns",
   "version": "0.1.0",
-  "description": "Focused Rails skills inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related architecture patterns.",
+  "description": "Compact Rails specialist skills inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal, jobs, testing, and tenancy.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -21,8 +21,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Rails 37signals Patterns",
-    "shortDescription": "Focused Rails pattern skills inspired by 37signals.",
-    "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, with Basecamp-owned sources called out where applicable.",
+    "shortDescription": "Compact Rails specialists inspired by public 37signals practice.",
+    "longDescription": "Compact Rails specialist skills for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, source-grounded, and intended to be delegated from the workflow router.",
     "developerName": "Josh Yorko",
     "category": "Developer Tools",
     "capabilities": [
@@ -33,10 +33,9 @@
     "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
     "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
     "defaultPrompt": [
-      "Implement this Rails model using 37signals-inspired patterns.",
-      "Refactor this controller toward RESTful Rails conventions.",
-      "Review this Hotwire feature for 37signals-inspired tradeoffs.",
-      "Set up or fix Kamal deployment for this Rails app."
+      "Use the relevant Rails 37signals specialist skill for this focused Rails change.",
+      "Review this focused Rails area against 37signals-inspired pattern guidance.",
+      "Use the Kamal specialist to inspect this deploy/runtime change."
     ],
     "brandColor": "#9A3412"
   }

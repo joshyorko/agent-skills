@@ -1,6 +1,6 @@
 ---
 name: rails-37signals-refactor
-description: Use when incrementally refactoring a Rails codebase toward 37signals-inspired conventions, such as moving service-object logic into models, replacing boolean state with state records, slimming controllers, aligning queues or tests with the surrounding app, or tightening multi-tenant scoping without a risky rewrite.
+description: Use when incrementally refactoring Rails code toward 37signals-inspired conventions without a risky rewrite.
 license: MIT
 metadata:
   author: agent-skills
@@ -32,6 +32,10 @@ Use this skill when the goal is not a brand-new feature, but a safer path from a
 - Use feature flags or staged migrations for sensitive auth, API, or data changes.
 - Remove old code only after the replacement is proven.
 
+## High-Impact Gate
+
+Ask before destructive migrations, auth/session rewrites, tenant isolation changes, public API changes, queue adapter changes, or production data operations.
+
 ## Default Refactoring Targets
 
 - Service objects to model methods or concerns.
@@ -58,6 +62,10 @@ Use this skill when the goal is not a brand-new feature, but a safer path from a
 
 - Run the narrowest relevant tests after each meaningful change.
 - Watch for scope leaks, renamed interfaces, and stale fixtures.
+
+## Output Contract
+
+Report behavior locked down, each refactor step, tests run after each step, compatibility path, and residual risk.
 
 ## Reference
 

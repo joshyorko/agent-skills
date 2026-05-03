@@ -57,9 +57,11 @@ The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused R
 
 **Architecture and workflow**
 
-- [`37signals-implement`](plugins/rails-37signals-patterns/skills/37signals-implement/SKILL.md) — orchestrates complete Rails feature work across the specialist skills.
-- [`37signals-refactoring`](plugins/rails-37signals-patterns/skills/37signals-refactoring/SKILL.md) — orchestrates incremental refactors toward 37signals-inspired Rails patterns.
-- [`37signals-review`](plugins/rails-37signals-patterns/skills/37signals-review/SKILL.md) — reviews Rails code for convention alignment, CRUD shape, model design, and Hotwire fit.
+The primary user-facing workflow entrypoints live in `plugins/rails-37signals-workflows/`. These pattern-level orchestrators are explicit/delegated helpers so they do not compete with the workflow router during implicit skill selection.
+
+- [`37signals-implement`](plugins/rails-37signals-patterns/skills/37signals-implement/SKILL.md) — delegated coordination across specialist pattern skills.
+- [`37signals-refactoring`](plugins/rails-37signals-patterns/skills/37signals-refactoring/SKILL.md) — delegated coordination for incremental pattern refactors.
+- [`37signals-review`](plugins/rails-37signals-patterns/skills/37signals-review/SKILL.md) — delegated review through specialist pattern guidance.
 
 **Domain, data, and tenancy**
 

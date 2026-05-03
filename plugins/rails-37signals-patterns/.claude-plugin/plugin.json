@@ -1,7 +1,7 @@
 {
   "name": "rails-37signals-patterns",
   "version": "0.1.0",
-  "description": "Focused Rails skills inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related architecture patterns.",
+  "description": "Compact Rails specialist skills inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal, jobs, testing, and tenancy.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",

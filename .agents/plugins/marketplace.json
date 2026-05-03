@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "rails-37signals-patterns",
-      "description": "Focused Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
+      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
       "tags": [
         "rails",
         "37signals",
@@ -17,8 +17,8 @@
       ],
       "interface": {
         "displayName": "Rails 37signals Patterns",
-        "shortDescription": "Focused Rails pattern skills inspired by 37signals.",
-        "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, with Basecamp-owned sources called out where applicable.",
+        "shortDescription": "Compact Rails specialists inspired by public 37signals practice.",
+        "longDescription": "Compact Rails specialist skills for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, source-grounded, and intended to be delegated from the workflow router.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -29,10 +29,9 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Implement this Rails model using 37signals-inspired patterns.",
-          "Refactor this controller toward RESTful Rails conventions.",
-          "Review this Hotwire feature for 37signals-inspired tradeoffs.",
-          "Set up or fix Kamal deployment for this Rails app."
+          "Use the relevant Rails 37signals specialist skill for this focused Rails change.",
+          "Review this focused Rails area against 37signals-inspired pattern guidance.",
+          "Use the Kamal specialist to inspect this deploy/runtime change."
         ],
         "brandColor": "#9A3412"
       },
@@ -48,7 +47,7 @@
     },
     {
       "name": "rails-37signals-workflows",
-      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
+      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
       "tags": [
         "rails",
         "37signals",
@@ -58,8 +57,8 @@
       ],
       "interface": {
         "displayName": "Rails 37signals Workflows",
-        "shortDescription": "End-to-end Rails implementation, refactor, and review workflows.",
-        "longDescription": "Higher-level Rails workflow skills that orchestrate end-to-end feature work, refactors, and reviews using 37signals-inspired conventions.",
+        "shortDescription": "Rails implementation, refactor, and review routers.",
+        "longDescription": "Router-level Rails workflow skills that inspect the app first, choose the right compact specialist skills, and report verification and residual risk using 37signals-inspired conventions.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -70,9 +69,9 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Implement this Rails feature with 37signals-inspired conventions.",
-          "Refactor this Rails code while preserving behavior.",
-          "Review this Rails change for 37signals-inspired tradeoffs."
+          "Use Rails 37signals Workflows to implement this feature and choose the right specialists.",
+          "Use Rails 37signals Workflows to refactor this code while preserving behavior.",
+          "Use Rails 37signals Workflows to review this Rails change and report residual risk."
         ],
         "brandColor": "#B45309"
       },

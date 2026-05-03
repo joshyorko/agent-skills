@@ -1,7 +1,7 @@
 interface:
   display_name: "37signals Refactoring"
-  short_description: "Orchestrates refactoring of Rails codebases toward 37signals-inspired Rails patterns and modern conventions."
-  default_prompt: "Use $37signals-refactoring when refactoring existing code, improving architecture, migrating to modern Rails patterns, or when user mentions refactoring, code improvement, or technical debt."
+  short_description: "Coordinate specialist Rails 37signals refactor skills when explicitly delegated"
+  default_prompt: "Use $37signals-refactoring after a workflow skill chooses this pattern-level refactor path."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

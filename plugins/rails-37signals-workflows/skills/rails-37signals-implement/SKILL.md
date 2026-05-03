@@ -1,6 +1,6 @@
 ---
 name: rails-37signals-implement
-description: Use when implementing or extending a Rails feature in a 37signals-inspired codebase, especially when the user wants rich models, CRUD-first controllers, Hotwire, Solid Queue, Minitest with fixtures, and explicit account scoping instead of service-object-heavy Rails patterns.
+description: Use when implementing or extending a Rails feature in a codebase that wants 37signals-inspired Rails conventions.
 license: MIT
 metadata:
   author: agent-skills
@@ -34,6 +34,10 @@ Use this skill for end-to-end feature work in a Rails app that follows 37signals
 - Prefer Minitest with fixtures when the codebase follows that stack.
 - Include deploy/runtime work when the feature changes startup, workers, dependencies, or secrets.
 
+## High-Impact Gate
+
+Ask before production deploys, destructive migrations, auth/session rewrites, tenant isolation changes, worker topology changes, or production data operations.
+
 ## Implementation Workflow
 
 ### 1. Frame the change
@@ -59,6 +63,10 @@ Use this skill for end-to-end feature work in a Rails app that follows 37signals
 
 - Run targeted tests first, then broader verification only if needed.
 - Check naming, tenancy consistency, fixture references, Turbo response behavior, and deploy/runtime impact.
+
+## Output Contract
+
+Report inspected files, chosen specialist skills, implementation order, commands run, and residual risk or unverified production assumptions.
 
 ## Reference
 

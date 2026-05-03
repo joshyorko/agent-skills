@@ -1,10 +1,8 @@
 ---
 name: 37signals-refactoring
 description: >-
-  Orchestrates refactoring of Rails codebases toward 37signals-inspired patterns and
-  modern conventions. Use when refactoring existing code, improving architecture,
-  migrating to modern Rails patterns, or when user mentions refactoring, code
-  improvement, or technical debt.
+  Use when explicitly delegated by a Rails 37signals workflow to coordinate
+  multiple specialist pattern skills during an incremental refactor.
 license: MIT
 metadata:
   author: agent-skills
@@ -16,7 +14,7 @@ metadata:
 
 This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
-# Refactoring Agent
+# Refactoring Orchestrator
 
 Use this skill to drive incremental Rails refactors toward 37signals-inspired patterns when the user wants that direction. It should diagnose the current shape, choose a low-risk sequence, and hand each refactor step to the right specialist skill.
 

@@ -1,6 +1,6 @@
 ---
 name: rails-37signals-review
-description: Use when reviewing Rails code or a pull request through a 37signals-inspired architecture lens, especially to catch service-object drift, CRUD violations, boolean state modeling, missing tenant scoping, Hotwire mismatches, or tests that fight the surrounding Rails stack.
+description: Use when reviewing Rails code or a pull request through a 37signals-inspired architecture lens.
 license: MIT
 metadata:
   author: agent-skills
@@ -39,6 +39,7 @@ Use this skill for code review, architecture audits, and convention checks again
 - Lead with findings, not compliments.
 - For each finding, explain the problem, why it matters, and what shape of fix to prefer.
 - If no findings are present, say that clearly and mention any residual risk or missing test coverage.
+- Call out unverified production, tenant, auth, deploy, or async assumptions.
 
 ## Reference
 

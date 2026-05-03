@@ -40,6 +40,8 @@ Use this source order when skill advice conflicts:
 
 ## Writing Rules For Skills
 
+- Keep frontmatter descriptions trigger-only: start with "Use when" and avoid
+  summarizing the workflow body.
 - Say "prefer", "reach for first", and "ask before" for style defaults.
 - Reserve "never" for security, data-loss, or correctness hazards.
 - Mark inferred deployment guidance as inference when no public Basecamp source

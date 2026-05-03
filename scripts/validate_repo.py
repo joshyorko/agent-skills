@@ -10,6 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "marketplaces" / "catalog.json"
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+RAILS_37SIGNALS_PLUGINS = {"rails-37signals-patterns", "rails-37signals-workflows"}
+RAILS_37SIGNALS_MAX_WORDS = 650
 
 
 def fail(message: str) -> None:
@@ -94,6 +96,39 @@ def validate_skill_frontmatter(skill_dir: Path) -> None:
         fail(f"skill description exceeds 1024 characters in {path}")
 
 
+def validate_rails_37signals_skill(skill_dir: Path) -> None:
+    path = skill_dir / "SKILL.md"
+    data = parse_skill_frontmatter(path)
+    description = data.get("description", "").strip()
+    if not description.startswith("Use when"):
+        fail(f"Rails 37signals skill description must start with 'Use when': {path}")
+
+    text = path.read_text()
+    word_count = len(re.findall(r"\S+", text))
+    if word_count > RAILS_37SIGNALS_MAX_WORDS:
+        fail(
+            f"Rails 37signals skill exceeds {RAILS_37SIGNALS_MAX_WORDS} words "
+            f"({word_count}): {path}"
+        )
+
+    references_dir = skill_dir / "references"
+    if references_dir.exists():
+        fail(f"Rails 37signals per-skill references are not allowed: {references_dir}")
+
+    stale_patterns = [
+        "ThibautBaissac",
+        "rails_ai_agents",
+        "Historical community",
+        "references/full-guide",
+        "rails_style_guide",
+        "original Claude",
+        "Claude-oriented",
+    ]
+    for stale_pattern in stale_patterns:
+        if stale_pattern in text:
+            fail(f"stale Rails 37signals context '{stale_pattern}' found in {path}")
+
+
 def main() -> int:
     catalog = load_json(CATALOG_PATH)
     plugins = catalog["plugins"]
@@ -127,6 +162,8 @@ def main() -> int:
             if not (skill_dir / "SKILL.md").exists():
                 fail(f"missing SKILL.md in {skill_dir}")
             validate_skill_frontmatter(skill_dir)
+            if plugin["name"] in RAILS_37SIGNALS_PLUGINS:
+                validate_rails_37signals_skill(skill_dir)
 
     for name, target in expected_agent_entries.items():
         link_path = ROOT / ".agents" / "skills" / name

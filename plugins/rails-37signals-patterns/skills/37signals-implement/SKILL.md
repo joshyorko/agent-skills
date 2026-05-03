@@ -1,10 +1,8 @@
 ---
 name: 37signals-implement
 description: >-
-  Orchestrates implementation of complete Rails features across models,
-  controllers, views, and tests following public 37signals-inspired conventions. Use when
-  implementing a full feature end-to-end or when user mentions feature
-  implementation, full-stack, or orchestration.
+  Use when explicitly delegated by a Rails 37signals workflow to coordinate
+  multiple specialist pattern skills for one feature.
 license: MIT
 metadata:
   author: agent-skills
@@ -16,7 +14,7 @@ metadata:
 
 This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
-# Implement Agent
+# Implement Orchestrator
 
 Use this skill as the orchestrator for end-to-end Rails work. It should break a feature into the right 37signals specialist skills, sequence them in dependency order, and keep the final implementation coherent.
 

@@ -14,7 +14,7 @@
       "name": "rails-37signals-patterns",
       "category": "Developer Tools",
       "claude_category": "development",
-      "description": "Focused Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
+      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
       "tags": [
         "rails",
         "37signals",
@@ -28,7 +28,7 @@
       "name": "rails-37signals-workflows",
       "category": "Developer Tools",
       "claude_category": "development",
-      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
+      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
       "tags": [
         "rails",
         "37signals",

@@ -10,7 +10,7 @@
     {
       "name": "rails-37signals-patterns",
       "source": "./plugins/rails-37signals-patterns",
-      "description": "Focused Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
+      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
       "category": "development",
       "tags": [
         "rails",
@@ -24,7 +24,7 @@
     {
       "name": "rails-37signals-workflows",
       "source": "./plugins/rails-37signals-workflows",
-      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
+      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
       "category": "development",
       "tags": [
         "rails",
