@@ -1,7 +1,7 @@
 interface:
   display_name: "Rails 37signals Review"
-  short_description: "Review Rails code the 37signals way"
-  default_prompt: "Use $rails-37signals-review to review this Rails change for 37signals-style conventions."
+  short_description: "Review Rails code with 37signals-inspired defaults"
+  default_prompt: "Use $rails-37signals-review to review this Rails change for 37signals-inspired conventions."
 
 policy:
   allow_implicit_invocation: true

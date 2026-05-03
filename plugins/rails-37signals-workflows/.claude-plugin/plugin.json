@@ -1,7 +1,7 @@
 {
   "name": "rails-37signals-workflows",
   "version": "0.1.0",
-  "description": "Workflow-level Rails skills for implementing, refactoring, and reviewing features with 37signals-style conventions.",
+  "description": "Workflow-level Rails skills for implementing, refactoring, and reviewing features with 37signals-inspired conventions.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",

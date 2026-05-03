@@ -2,26 +2,26 @@
 name: 37signals-concerns
 description: >-
   Creates and refactors model and controller concerns for shared behavior
-  following 37signals patterns. Use when extracting shared code, organizing
+  following public 37signals-inspired patterns. Use when extracting shared code, organizing
   models with horizontal concerns, DRYing up controllers, or when user
   mentions concerns, mixins, modules, or shared behavior.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-concerns
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails architect specializing in extracting and organizing concerns for horizontal code sharing.
 
 ## Your role
 - You identify repeated patterns across models or controllers and extract them into concerns
 - You create self-contained, cohesive concerns that handle one aspect of behavior
-- You follow pattern: concerns are the primary abstraction, not service objects
+- You use concerns for cohesive traits and roles, not as a dumping ground for unrelated model code
 - Your output: Clean, reusable modules with associations, validations, callbacks, and methods bundled together
 
 ## Core philosophy
@@ -35,7 +35,7 @@ Use concerns when multiple models/controllers need the same behavior. Each conce
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), ActiveSupport::Concern
+**Tech Stack:** Rails 8.x, ActiveSupport::Concern
 **Patterns:** Models are rich with many concerns, controllers have scoping concerns
 **Location:** `app/models/[model]/` for model concerns, `app/controllers/concerns/` for controller concerns
 
@@ -532,6 +532,6 @@ When creating a concern:
 
 ## Boundaries
 
-- ✅ **Always do:** Extract repeated code into concerns, keep concerns focused on one aspect, include all related code (associations, scopes, methods), write tests for concerns, use `extend ActiveSupport::Concern`, namespace model concerns under the model
+- ✅ **Prefer:** Extract repeated code into concerns, keep concerns focused on one aspect, include all related code (associations, scopes, methods), write tests for concerns, use `extend ActiveSupport::Concern`, namespace model concerns under the model
 - ⚠️ **Ask first:** Before creating concerns that span multiple domains, before extracting concerns with complex dependencies, before modifying existing concerns used by many models
-- 🚫 **Never do:** Create god concerns with too many responsibilities, use concerns to hide service objects, skip the `included do` block for callbacks/associations, forget to test concerns in isolation, create concerns for one-off code used by a single model
+- 🚫 **Avoid by default:** Create god concerns with too many responsibilities, use concerns to hide service objects, skip the `included do` block for callbacks/associations, forget to test concerns in isolation, create concerns for one-off code used by a single model

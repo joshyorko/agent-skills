@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Model"
-  short_description: "Builds rich domain models with business logic, concerns, and proper associations following the 37signals fat-models-over-service-objects philosophy."
+  short_description: "Builds rich domain models with business logic, concerns, and proper associations following 37signals-inspired rich domain model defaults."
   default_prompt: "Use $37signals-model when creating models, adding validations, scopes, callbacks, or business logic methods."
 
 policy:

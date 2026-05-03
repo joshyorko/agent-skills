@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Concerns"
-  short_description: "Creates and refactors model and controller concerns for shared behavior following 37signals patterns."
+  short_description: "Creates and refactors model and controller concerns for shared behavior following 37signals-inspired patterns."
   default_prompt: "Use $37signals-concerns when extracting shared code, organizing models with horizontal concerns, DRYing up controllers, or when user mentions concerns, mixins, modules, or shared behavior."
 
 policy:

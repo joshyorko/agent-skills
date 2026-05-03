@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Refactoring"
-  short_description: "Orchestrates refactoring of Rails codebases toward 37signals patterns and modern conventions."
+  short_description: "Orchestrates refactoring of Rails codebases toward 37signals-inspired Rails patterns and modern conventions."
   default_prompt: "Use $37signals-refactoring when refactoring existing code, improving architecture, migrating to modern Rails patterns, or when user mentions refactoring, code improvement, or technical debt."
 
 policy:

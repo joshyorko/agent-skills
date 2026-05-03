@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Test"
-  short_description: "Writes Minitest tests with integration tests and fixtures following 37signals conventions. Uses Minitest (not RSpec) and fixtures (not factories)."
+  short_description: "Writes behavior-focused Rails tests, preferring Minitest and fixtures when the app follows that stack."
   default_prompt: "Use $37signals-test when writing tests, adding test coverage, or when user mentions testing, Minitest, fixtures, or integration tests."
 
 policy:

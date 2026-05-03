@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Turbo"
-  short_description: "Creates Turbo Streams, Turbo Frames, and morphing patterns for real-time UI updates following 37signals conventions."
+  short_description: "Creates Turbo Streams, Turbo Frames, and morphing patterns for real-time UI updates following 37signals-inspired conventions."
   default_prompt: "Use $37signals-turbo when adding real-time updates, page navigation, form submissions, or when user mentions Turbo, Streams, Frames, Drive, or morphing."
 
 policy:

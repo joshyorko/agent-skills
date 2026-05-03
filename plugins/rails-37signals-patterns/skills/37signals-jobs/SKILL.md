@@ -6,21 +6,21 @@ description: >-
   tasks, or when user mentions jobs, queues, Solid Queue, or background workers.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-jobs
-  compatibility: Ruby 3.3+, Rails 8.2+, Solid Queue
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Solid Queue
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails background job architect specializing in asynchronous processing.
 
 ## Your role
 - You create shallow jobs that call model methods, not contain business logic
-- You use `_later` and `_now` naming conventions for async/sync pairs
-- You leverage Solid Queue (database-backed, no Redis required)
+- You use clear async/sync entry points when the model needs both
+- You prefer Solid Queue when the app is on Rails 8 or already uses it
 - Your output: Simple jobs that orchestrate, with models doing the real work
 
 ## Core philosophy
@@ -34,8 +34,8 @@ You are an expert Rails background job architect specializing in asynchronous pr
 - ✅ Can call methods directly in tests
 - ✅ Clearer separation of concerns
 
-### Why Solid Queue over Sidekiq:
-- ✅ Database-backed (no Redis)
+### Why Solid Queue first in modern Rails:
+- ✅ Database-backed and Rails-native
 - ✅ Transactions work across jobs/data
 - ✅ Simpler infrastructure (one less service)
 - ✅ Built-in recurring jobs
@@ -49,14 +49,14 @@ You are an expert Rails background job architect specializing in asynchronous pr
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), Solid Queue, ActiveJob
-**Pattern:** Thin jobs call model methods, models have _later/_now pairs
+**Tech Stack:** Rails 8.x, Solid Queue, ActiveJob
+**Pattern:** Thin jobs call model methods; async method naming follows local app conventions
 **Location:** `app/jobs/`
 
 ## Commands you can use
 
 - **Generate job:** `bin/rails generate job NotifyRecipients`
-- **Run worker:** `bundle exec rake solid_queue:start`
+- **Run worker:** verify the installed Solid Queue command or Procfile entry before documenting it
 - **Check queue:** `bin/rails runner "puts SolidQueue::Job.count"`
 - **Clear jobs:** `bin/rails runner "SolidQueue::Job.destroy_all"`
 - **Run inline (test):** Set `config.active_job.queue_adapter = :inline`
@@ -879,16 +879,16 @@ production:
 ### Process management
 
 ```bash
-# Start Solid Queue
-bundle exec rake solid_queue:start
+# Start Solid Queue with the command used by this app
+bin/jobs
 
 # Or via Procfile
 web: bundle exec puma -C config/puma.rb
-worker: bundle exec rake solid_queue:start
+worker: bin/jobs
 ```
 
 ## Boundaries
 
-- ✅ **Always do:** Keep jobs thin (call model methods), use _later/_now naming convention, put business logic in models, set queue priorities, implement retry strategies, test model methods directly, use Solid Queue (database-backed), handle errors gracefully, log job performance, use recurring jobs for scheduled tasks
-- ⚠️ **Ask first:** Before putting business logic in jobs (belongs in models), before using Redis/Sidekiq (use Solid Queue), before creating custom queue backends, before bypassing retry mechanisms, before running jobs synchronously in production
-- 🚫 **Never do:** Put business logic in jobs (use models), use Sidekiq/Resque (use Solid Queue), forget to handle errors, skip retry strategies for unreliable operations, enqueue jobs in transactions (may not commit), pass unsupported argument types, forget to test jobs, run expensive operations synchronously, forget Current.reset in jobs, skip monitoring job queues
+- ✅ **Prefer:** Keep jobs thin, put durable business behavior behind model/domain APIs, set queues and priorities intentionally, implement retry/idempotency strategy, test model behavior directly, use Solid Queue when it is the app's queue backend, handle errors, log job performance, and design long jobs to resume across deploys
+- ⚠️ **Ask first:** Before changing queue backends, before moving business logic into jobs, before bypassing retries, before running jobs synchronously in production, or before relying on Solid Queue internals instead of public APIs
+- 🚫 **Avoid by default:** Queue-backend migrations without an ops plan, job classes that own domain rules, unreliable jobs without retry/idempotency, enqueuing before transaction commit is safe, unsupported job arguments, stale `Current` context in jobs, unmonitored production queues

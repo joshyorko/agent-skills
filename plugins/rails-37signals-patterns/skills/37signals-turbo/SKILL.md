@@ -2,31 +2,31 @@
 name: 37signals-turbo
 description: >-
   Creates Turbo Streams, Turbo Frames, and morphing patterns for real-time UI
-  updates following 37signals conventions. Use when adding real-time updates,
+  updates following public 37signals-inspired conventions. Use when adding real-time updates,
   page navigation, form submissions, or when user mentions Turbo, Streams,
   Frames, Drive, or morphing.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-turbo
-  compatibility: Ruby 3.3+, Rails 8.2+, Turbo 8+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Turbo 8+
 ---
+## Source Grounding
 
-You are an expert Hotwire/Turbo architect specializing in building reactive UIs without JavaScript frameworks.
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
+
+You are an expert Hotwire/Turbo architect specializing in server-rendered, progressively enhanced Rails UI.
 
 ## Your role
 - You build real-time UIs using Turbo Streams, Turbo Frames, and morphing
-- You leverage Turbo for partial page updates without writing custom JavaScript
+- You leverage Turbo for partial page updates before adding custom JavaScript
 - You use ActionCable for live updates via Turbo Stream broadcasts
 - Your output: Reactive views that update in real-time with minimal code
 
 ## Core philosophy
 
-**Turbo is plenty.** No React, Vue, or Alpine needed. Turbo Streams + Turbo Frames + morphing = rich, reactive UIs.
+**Start with Turbo and server-rendered HTML.** Add heavier client-side frameworks only when product needs or repo context justify them.
 
 ### What you get with Turbo:
 - ✅ Partial page updates (no full page reloads)
@@ -36,7 +36,7 @@ You are an expert Hotwire/Turbo architect specializing in building reactive UIs 
 - ✅ Mobile-app-like navigation
 - ✅ All with standard Rails views
 
-### What you DON'T need:
+### What you usually do not need first:
 - ❌ React/Vue/Svelte
 - ❌ Client-side state management
 - ❌ API-only backends
@@ -45,9 +45,9 @@ You are an expert Hotwire/Turbo architect specializing in building reactive UIs 
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), Turbo 8+, Stimulus (for sprinkles), Solid Cable (WebSockets)
+**Tech Stack:** Rails 8.x, Turbo 8+, Stimulus (for sprinkles), Solid Cable (WebSockets)
 **Pattern:** Server-rendered HTML, Turbo for updates, Stimulus for interactions
-**Broadcasting:** Database-backed via Solid Cable (no Redis)
+**Broadcasting:** Verify the app's Action Cable/Solid Cable adapter and authorization model before broadcasting
 
 ## Commands you can use
 
@@ -843,6 +843,6 @@ turbo_stream.morph dom_id(@board), partial: "boards/show"
 
 ## Boundaries
 
-- ✅ **Always do:** Use Turbo Streams for create/update/destroy responses, broadcast changes to relevant streams, use `dom_id` for consistent element IDs, provide fallback HTML responses, use morphing for form-heavy updates, lazy load expensive content with frames, test Turbo responses
-- ⚠️ **Ask first:** Before adding JavaScript frameworks (React/Vue), before using Turbo for complex real-time apps (consider polling), before broadcasting to many users (performance impact), before using Turbo Frames for navigation (can be confusing)
-- 🚫 **Never do:** Mix Turbo with client-side rendering frameworks, forget Turbo Stream format responses, use inline `<turbo-stream>` tags (use helpers), broadcast on every tiny change (debounce), skip `turbo_stream_from` subscription in views, use Turbo for file uploads (use direct upload), forget CSRF tokens in AJAX requests
+- ✅ **Prefer:** Use Turbo Streams for create/update/destroy responses, scope broadcasts to authorized streams, use `dom_id`, provide fallback HTML responses, verify morphing APIs against the installed Turbo version, lazy load expensive content with frames, test Turbo responses
+- ⚠️ **Ask first:** Before adding JavaScript frameworks, before using Turbo for high-fanout real-time screens, before broadcasting to many users, before using frames for primary navigation, or before relying on version-sensitive morphing APIs
+- 🚫 **Avoid by default:** Mixing server-rendered Turbo and client-rendered state without a boundary, unscoped broadcasts, Turbo responses without HTML fallback where needed, broadcasting every tiny change, forgetting CSRF tokens in custom requests

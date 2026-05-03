@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Multi Tenant"
-  short_description: "Implements URL-based multi-tenancy with account scoping following 37signals patterns."
+  short_description: "Implements shared-database multi-tenancy with explicit account scoping and data-isolation checks."
   default_prompt: "Use $37signals-multi-tenant when setting up multi-tenant architecture, account isolation, tenant scoping, or when user mentions multi-tenancy, accounts, or tenant separation."
 
 policy:

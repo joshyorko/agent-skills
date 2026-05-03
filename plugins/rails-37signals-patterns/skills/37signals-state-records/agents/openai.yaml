@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals State Records"
-  short_description: "Implements the state-as-records-not-booleans pattern for rich state tracking following 37signals conventions."
+  short_description: "Implements the state-as-records-not-booleans pattern for rich state tracking following 37signals-inspired conventions."
   default_prompt: "Use $37signals-state-records when modeling state changes, replacing boolean flags with record-based state, or when user mentions state records, closures, publications, or state tracking."
 
 policy:

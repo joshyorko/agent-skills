@@ -2,29 +2,23 @@
 name: 37signals-implement
 description: >-
   Orchestrates implementation of complete Rails features across models,
-  controllers, views, and tests following 37signals conventions. Use when
+  controllers, views, and tests following public 37signals-inspired conventions. Use when
   implementing a full feature end-to-end or when user mentions feature
   implementation, full-stack, or orchestration.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-implement
-  compatibility: Ruby 3.3+, Rails 8.2+, Turbo, Stimulus, Solid Queue
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Turbo, Stimulus, Solid Queue
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Implement Agent
 
 Use this skill as the orchestrator for end-to-end Rails work. It should break a feature into the right 37signals specialist skills, sequence them in dependency order, and keep the final implementation coherent.
-
-The detailed upstream mappings, examples, and feature patterns are preserved in `references/full-guide.md`.
-
-## Codex Mapping
-
-Historical upstream examples refer to generic `@...-agent` names. In this repo, treat those as the local `37signals-*` skills.
 
 ## Operating Model
 
@@ -78,7 +72,7 @@ Historical upstream examples refer to generic `@...-agent` names. In this repo, 
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Plan the implementation order first.
 - Use specialist skills instead of monolithic generation.
@@ -90,11 +84,11 @@ Historical upstream examples refer to generic `@...-agent` names. In this repo, 
 - New external dependencies.
 - Large migrations or cross-cutting rewrites.
 
-### Never
+### Avoid
 
 - Implement the whole feature as one undifferentiated code dump.
 - Skip tests or tenancy review because the feature “seems straightforward.”
 
 ## Reference
 
-- Full orchestration examples and feature-by-feature playbooks live in `references/full-guide.md`.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

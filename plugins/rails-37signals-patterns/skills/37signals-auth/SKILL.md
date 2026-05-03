@@ -6,32 +6,32 @@ description: >-
   user mentions auth, login, passwordless, or sessions.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-auth
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails authentication architect specializing in building auth from scratch.
 
 ## Your role
-- You build custom authentication systems without Devise or other auth gems
+- You build small Rails-native authentication when the app has no established auth framework
 - You implement passwordless magic link authentication
-- You keep auth simple: ~150 lines of code total
+- You keep auth understandable without skipping token, expiry, replay, and rate-limit guardrails
 - Your output: Clean session management, magic links, and Current attributes setup
 
 ## Core philosophy
 
-**Auth is simple. Don't use Devise.** A basic auth system is ~150 lines of code. You get:
+**Prefer small Rails-native auth when the app does not already have an auth framework.** Keep the flow understandable, but do not understate security work. You get:
 - Full control and understanding
 - No bloat or unused features
 - Easier to modify and extend
 - No gem version conflicts
 
-### What Devise gives you (that you don't need):
+### What Devise gives you (that may be unnecessary here):
 - ❌ Password complexity validation
 - ❌ Password recovery flows
 - ❌ Confirmable emails
@@ -49,9 +49,9 @@ You are an expert Rails authentication architect specializing in building auth f
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), BCrypt for passwords (optional), has_secure_token
+**Tech Stack:** Rails 8.x, BCrypt for optional passwords, `SecureRandom`, digest-only token storage
 **Pattern:** Passwordless by default, password optional for APIs
-**Session storage:** Database (not cookies), token-based
+**Session storage:** Database-backed session records with digest-only stored tokens.
 
 ## Commands you can use
 
@@ -66,7 +66,7 @@ You are an expert Rails authentication architect specializing in building auth f
 
 ```ruby
 # Migration
-class CreateIdentities < ActiveRecord::Migration[8.2]
+class CreateIdentities < ActiveRecord::Migration[8.0]
   def change
     create_table :identities, id: :uuid do |t|
       t.string :email_address, null: false
@@ -108,10 +108,12 @@ end
 
 ```ruby
 # Migration
-class CreateSessions < ActiveRecord::Migration[8.2]
+class CreateSessions < ActiveRecord::Migration[8.0]
   def change
     create_table :sessions, id: :uuid do |t|
       t.references :identity, null: false, type: :uuid
+      t.string :token_digest, null: false
+      t.datetime :expires_at, null: false
       t.string :user_agent
       t.string :ip_address
 
@@ -119,22 +121,45 @@ class CreateSessions < ActiveRecord::Migration[8.2]
     end
 
     add_index :sessions, :identity_id
+    add_index :sessions, :token_digest, unique: true
   end
 end
 
 # app/models/session.rb
 class Session < ApplicationRecord
+  TOKEN_BYTES = 32
+
   belongs_to :identity
 
-  has_secure_token length: 36
-
+  attr_reader :raw_token
   before_create :set_request_details
+  before_validation :set_token, on: :create
+  before_validation :set_expiration, on: :create
+
+  scope :active, -> { where("expires_at > ?", Time.current) }
+
+  def self.authenticate(raw_token)
+    active.find_by(token_digest: digest(raw_token))
+  end
 
   def active?
-    created_at > 30.days.ago
+    expires_at.future?
+  end
+
+  def self.digest(raw_token)
+    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.secret_key_base, raw_token)
   end
 
   private
+
+  def set_token
+    @raw_token = SecureRandom.urlsafe_base64(TOKEN_BYTES)
+    self.token_digest = self.class.digest(@raw_token)
+  end
+
+  def set_expiration
+    self.expires_at ||= 30.days.from_now
+  end
 
   def set_request_details
     self.user_agent = Current.user_agent
@@ -147,11 +172,11 @@ end
 
 ```ruby
 # Migration
-class CreateMagicLinks < ActiveRecord::Migration[8.2]
+class CreateMagicLinks < ActiveRecord::Migration[8.0]
   def change
     create_table :magic_links, id: :uuid do |t|
       t.references :identity, null: false, type: :uuid
-      t.string :code, null: false
+      t.string :token_digest, null: false
       t.string :purpose, default: "sign_in"
       t.datetime :expires_at, null: false
       t.datetime :used_at
@@ -159,26 +184,30 @@ class CreateMagicLinks < ActiveRecord::Migration[8.2]
       t.timestamps
     end
 
-    add_index :magic_links, :code, unique: true
+    add_index :magic_links, :token_digest, unique: true
     add_index :magic_links, [:identity_id, :purpose]
   end
 end
 
 # app/models/magic_link.rb
 class MagicLink < ApplicationRecord
-  CODE_LENGTH = 6
+  TOKEN_BYTES = 32
 
   belongs_to :identity
 
-  before_create :set_code
-  before_create :set_expiration
+  attr_reader :raw_token
+  before_validation :set_token, on: :create
+  before_validation :set_expiration, on: :create
 
   scope :unused, -> { where(used_at: nil) }
   scope :active, -> { unused.where("expires_at > ?", Time.current) }
 
-  def self.authenticate(code)
-    active.find_by(code: code.upcase)&.tap do |magic_link|
+  def self.authenticate(raw_token)
+    active.find_by(token_digest: digest(raw_token))&.with_lock do |magic_link|
+      return if magic_link.used? || magic_link.expired?
+
       magic_link.update!(used_at: Time.current)
+      magic_link
     end
   end
 
@@ -196,8 +225,13 @@ class MagicLink < ApplicationRecord
 
   private
 
-  def set_code
-    self.code = SecureRandom.alphanumeric(CODE_LENGTH).upcase
+  def self.digest(raw_token)
+    OpenSSL::HMAC.hexdigest("SHA256", Rails.application.secret_key_base, raw_token)
+  end
+
+  def set_token
+    @raw_token = SecureRandom.urlsafe_base64(TOKEN_BYTES)
+    self.token_digest = self.class.digest(@raw_token)
   end
 
   def set_expiration
@@ -210,7 +244,7 @@ end
 
 ```ruby
 # Migration
-class CreateUsers < ActiveRecord::Migration[8.2]
+class CreateUsers < ActiveRecord::Migration[8.0]
   def change
     create_table :users, id: :uuid do |t|
       t.references :identity, null: false, type: :uuid
@@ -266,7 +300,7 @@ module Authentication
 
   def resume_session
     if session_token = cookies.signed[:session_token]
-      if session_record = Session.find_by(token: session_token)
+      if session_record = Session.authenticate(session_token)
         @current_session = session_record
         @current_identity = session_record.identity
         @current_user = @current_identity.user
@@ -306,7 +340,7 @@ module Authentication
   def start_new_session_for(identity)
     session_record = identity.sessions.create!
     cookies.signed.permanent[:session_token] = {
-      value: session_record.token,
+      value: session_record.raw_token,
       httponly: true,
       same_site: :lax
     }
@@ -325,17 +359,10 @@ module Authentication
     @current_user = nil
   end
 
-  # Optional: API token authentication
+  # Optional: API token authentication.
+  # Prefer a separate API token model with digest storage, scopes, and expiry.
+  # Do not reuse browser session tokens as bearer tokens.
   def authenticate_by_bearer_token
-    if token = request.authorization&.match(/^Bearer (.+)$/)&.[](1)
-      if session_record = Session.find_by(token: token)
-        @current_session = session_record
-        @current_identity = session_record.identity
-        @current_user = session_record.identity.user
-        return true
-      end
-    end
-
     false
   end
 end
@@ -374,10 +401,9 @@ class SessionsController < ApplicationController
   def create
     if identity = Identity.find_by(email_address: params[:email_address])
       identity.send_magic_link
-      redirect_to new_session_path, notice: "Check your email for a sign-in link"
-    else
-      redirect_to new_session_path, alert: "No account found with that email"
     end
+
+    redirect_to new_session_path, notice: "If that address has access, we'll send a sign-in link"
   end
 
   def destroy
@@ -391,7 +417,7 @@ class Sessions::MagicLinksController < ApplicationController
   allow_unauthenticated_access
 
   def show
-    if magic_link = MagicLink.authenticate(params[:code])
+    if magic_link = MagicLink.authenticate(params[:token])
       start_new_session_for(magic_link.identity)
       redirect_to session.delete(:return_to) || root_path, notice: "Signed in successfully"
     else
@@ -426,7 +452,7 @@ class MagicLinkMailer < ApplicationMailer
   def sign_in_instructions(magic_link)
     @magic_link = magic_link
     @identity = magic_link.identity
-    @url = session_magic_link_url(code: magic_link.code)
+    @url = session_magic_link_url(token: magic_link.raw_token)
 
     mail to: @identity.email_address, subject: "Sign in to #{app_name}"
   end
@@ -440,8 +466,6 @@ end
 <p>Click the link below to sign in:</p>
 
 <p><%= link_to "Sign in now", @url %></p>
-
-<p>Or enter this code: <strong><%= @magic_link.code %></strong></p>
 
 <p>This link expires in 15 minutes.</p>
 
@@ -605,11 +629,12 @@ end
 
 # test/models/session_test.rb
 class SessionTest < ActiveSupport::TestCase
-  test "generates secure token on create" do
+  test "generates a raw token and stores only a digest" do
     session = Session.create!(identity: identities(:david))
 
-    assert_present session.token
-    assert_equal 36, session.token.length
+    assert_present session.raw_token
+    assert_present session.token_digest
+    assert_not_equal session.raw_token, session.token_digest
   end
 
   test "is active within 30 days" do
@@ -617,7 +642,7 @@ class SessionTest < ActiveSupport::TestCase
 
     assert session.active?
 
-    session.update!(created_at: 31.days.ago)
+    session.update!(expires_at: 1.minute.ago)
 
     assert_not session.active?
   end
@@ -625,11 +650,12 @@ end
 
 # test/models/magic_link_test.rb
 class MagicLinkTest < ActiveSupport::TestCase
-  test "generates 6-character code" do
+  test "generates a raw token and stores only a digest" do
     magic_link = MagicLink.create!(identity: identities(:david))
 
-    assert_equal 6, magic_link.code.length
-    assert_match /\A[A-Z0-9]+\z/, magic_link.code
+    assert_present magic_link.raw_token
+    assert_present magic_link.token_digest
+    assert_not_equal magic_link.raw_token, magic_link.token_digest
   end
 
   test "expires after 15 minutes" do
@@ -643,20 +669,20 @@ class MagicLinkTest < ActiveSupport::TestCase
     end
   end
 
-  test "authenticates with valid code" do
+  test "authenticates with valid token" do
     magic_link = MagicLink.create!(identity: identities(:david))
 
-    authenticated = MagicLink.authenticate(magic_link.code)
+    authenticated = MagicLink.authenticate(magic_link.raw_token)
 
     assert_equal magic_link, authenticated
     assert authenticated.used?
   end
 
-  test "doesn't authenticate used codes" do
+  test "doesn't authenticate used tokens" do
     magic_link = MagicLink.create!(identity: identities(:david))
-    MagicLink.authenticate(magic_link.code)
+    MagicLink.authenticate(magic_link.raw_token)
 
-    assert_nil MagicLink.authenticate(magic_link.code)
+    assert_nil MagicLink.authenticate(magic_link.raw_token)
   end
 end
 
@@ -670,7 +696,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to new_session_path
-    assert_equal "Check your email for a sign-in link", flash[:notice]
+    assert_equal "If that address has access, we'll send a sign-in link", flash[:notice]
   end
 
   test "destroy terminates session" do
@@ -688,7 +714,7 @@ class Sessions::MagicLinksControllerTest < ActionDispatch::IntegrationTest
   test "authenticates with valid magic link" do
     magic_link = magic_links(:david_sign_in)
 
-    get session_magic_link_path(code: magic_link.code)
+    get session_magic_link_path(token: magic_link.raw_token)
 
     assert_redirected_to root_path
     assert_equal "Signed in successfully", flash[:notice]
@@ -698,7 +724,7 @@ class Sessions::MagicLinksControllerTest < ActionDispatch::IntegrationTest
   test "rejects expired magic link" do
     magic_link = magic_links(:david_expired)
 
-    get session_magic_link_path(code: magic_link.code)
+    get session_magic_link_path(token: magic_link.raw_token)
 
     assert_redirected_to new_session_path
     assert_equal "Invalid or expired link", flash[:alert]
@@ -713,7 +739,7 @@ end
 class ActionDispatch::IntegrationTest
   def sign_in_as(identity)
     session_record = identity.sessions.create!
-    cookies.signed[:session_token] = session_record.token
+    cookies.signed[:session_token] = session_record.raw_token
   end
 
   def sign_out
@@ -726,9 +752,9 @@ end
 
 ### 1. Session tokens
 ```ruby
-# Use signed cookies
+# Store only the digest in the database; put the raw token in an httponly signed cookie.
 cookies.signed.permanent[:session_token] = {
-  value: session_record.token,
+  value: session_record.raw_token,
   httponly: true,      # Prevent JavaScript access
   same_site: :lax,     # CSRF protection
   secure: Rails.env.production?  # HTTPS only in production
@@ -743,9 +769,12 @@ def set_expiration
 end
 
 # One-time use
-def self.authenticate(code)
-  active.find_by(code: code)&.tap do |magic_link|
+def self.authenticate(raw_token)
+  active.find_by(token_digest: digest(raw_token))&.with_lock do |magic_link|
+    return if magic_link.used? || magic_link.expired?
+
     magic_link.update!(used_at: Time.current)
+    magic_link
   end
 end
 ```
@@ -835,10 +864,9 @@ module AccountScoped
   private
 
   def set_current_account
-    if account_id = params[:account_id] || session[:account_id]
+    if account_id = params[:account_id]
       @current_account = current_user.accounts.find(account_id)
       Current.account = @current_account
-      session[:account_id] = @current_account.id
     else
       redirect_to account_selection_path
     end
@@ -848,6 +876,6 @@ end
 
 ## Boundaries
 
-- ✅ **Always do:** Use signed cookies for session tokens, set httponly and same_site flags, expire magic links (15 min), mark magic links as used, normalize email addresses, validate email format, use has_secure_token for sessions, clean up old sessions/magic links
+- ✅ **Prefer:** Store session and magic-link token digests, keep raw tokens in httponly signed cookies or one-time URLs, expire magic links, mark magic links as used, normalize email addresses, validate email format, clean up old sessions/magic links
 - ⚠️ **Ask first:** Before adding password authentication (prefer passwordless), before adding OAuth providers, before implementing 2FA, before adding session tracking (IP, user agent, etc.)
-- 🚫 **Never do:** Use Devise (unless project is already using it), store session tokens in plain cookies, reuse magic links, skip email validation, forget CSRF protection, store passwords in plain text, use short session tokens, skip rate limiting for login attempts
+- 🚫 **Avoid by default:** Migrating away from Devise without a clear request, storing raw session or magic-link tokens in the database, reusing magic links, leaking account existence during login, skipping CSRF protection, storing passwords in plain text, using short tokens, skipping rate limits for login attempts

@@ -1,30 +1,24 @@
 ---
 name: 37signals-refactoring
 description: >-
-  Orchestrates refactoring of Rails codebases toward 37signals patterns and
+  Orchestrates refactoring of Rails codebases toward 37signals-inspired patterns and
   modern conventions. Use when refactoring existing code, improving architecture,
   migrating to modern Rails patterns, or when user mentions refactoring, code
   improvement, or technical debt.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-refactoring
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Refactoring Agent
 
-Use this skill to drive incremental Rails refactors toward 37signals-style patterns. It should diagnose the current anti-patterns, choose a low-risk sequence, and hand each refactor step to the right specialist skill.
-
-The full upstream examples and migration playbooks are preserved in `references/full-guide.md`.
-
-## Codex Mapping
-
-Historical `@...-agent` references map to the local `37signals-*` skills in this repo.
+Use this skill to drive incremental Rails refactors toward 37signals-inspired patterns when the user wants that direction. It should diagnose the current shape, choose a low-risk sequence, and hand each refactor step to the right specialist skill.
 
 ## Default Workflow
 
@@ -73,7 +67,7 @@ Historical `@...-agent` references map to the local `37signals-*` skills in this
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Refactor incrementally.
 - Explain the migration sequence.
@@ -85,11 +79,11 @@ Historical `@...-agent` references map to the local `37signals-*` skills in this
 - Breaking API or schema changes.
 - Migrations that may require downtime or feature flags.
 
-### Never
+### Avoid
 
 - Recommend a rewrite just because the current code is messy.
 - Mix unrelated refactors into one risky change set.
 
 ## Reference
 
-- Detailed anti-pattern conversions, phased plans, and risk mitigation examples live in `references/full-guide.md`.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

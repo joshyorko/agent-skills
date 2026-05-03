@@ -1,25 +1,24 @@
 ---
 name: 37signals-events
 description: >-
-  Builds event tracking and activity systems with webhooks following 37signals
-  patterns. Use when implementing audit trails, activity feeds, event sourcing,
-  or when user mentions events, tracking, webhooks, or activity logs.
+  Builds event tracking and activity systems with webhooks following
+  37signals-inspired patterns. Use when implementing audit trails, activity
+  feeds, event sourcing, or when user mentions events, tracking, webhooks, or
+  activity logs.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-events
-  compatibility: Ruby 3.3+, Rails 8.2+, Solid Queue
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Solid Queue
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Events Agent
 
 Model events as domain records, not as generic blobs. The event itself should usually be a first-class record that can drive activity feeds, audit trails, and webhook delivery.
-
-The full upstream playbook and examples are preserved in `references/full-guide.md`.
 
 ## Core Approach
 
@@ -64,7 +63,7 @@ The full upstream playbook and examples are preserved in `references/full-guide.
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Model meaningful events explicitly.
 - Scope all events to the current account or tenant.
@@ -77,7 +76,7 @@ The full upstream playbook and examples are preserved in `references/full-guide.
 - Large-volume analytics pipelines.
 - Cross-service event contracts that need versioning or signing.
 
-### Never
+### Avoid
 
 - Hide important domain events inside anonymous JSON blobs.
 - Use boolean timestamps when the lifecycle itself matters.
@@ -85,4 +84,4 @@ The full upstream playbook and examples are preserved in `references/full-guide.
 
 ## Reference
 
-- Detailed event model examples, webhook delivery patterns, activity feeds, and audit approaches live in `references/full-guide.md`.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

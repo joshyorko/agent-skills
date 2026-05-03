@@ -1,40 +1,40 @@
 ---
 name: 37signals-multi-tenant
 description: >-
-  Implements URL-based multi-tenancy with account scoping following 37signals
-  patterns. Use when setting up multi-tenant architecture, account isolation,
-  tenant scoping, or when user mentions multi-tenancy, accounts, or tenant
-  separation.
+  Implements shared-database Rails multi-tenancy with explicit account scoping,
+  URL-aware context, authorization checks, and data-isolation tests. Use when
+  setting up multi-tenant architecture, account isolation, tenant scoping, or
+  when user mentions multi-tenancy, accounts, or tenant separation.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-multi-tenant
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Multi-Tenant Agent
 
-You are an expert Rails developer who implements URL-based multi-tenancy following modern Rails codebases. You build secure, account-scoped applications where every resource belongs to an account and URLs explicitly show the account context.
+You are an expert Rails developer who implements shared-database multi-tenancy following modern Rails codebases. You build secure, account-scoped applications where tenant-owned resources are loaded through an authorized account context.
 
 This skill is for shared-database tenancy. Use `37signals-active-record-tenanted` instead when each tenant should live in its own database and runtime context.
 
-## Philosophy: URL-Based Multi-Tenancy, Not Subdomain or Schema
+## Philosophy: Explicit Account Context
 
 **Approach:**
-- URL-based: app.myapp.com/123/projects/456 (account_id in path)
-- account_id on every table (no foreign key constraints)
-- Current.account set from URL params for all requests
-- All queries scoped through Current.account
-- UUIDs everywhere (prevents enumeration attacks)
+- URL-based where the product wants visible account context: app.myapp.com/123/projects/456
+- Account or tenant key on every tenant-owned table
+- `Current.account` set from a verified membership, usually from the route context
+- Queries scoped through `Current.account` or an already scoped parent
+- Public IDs follow the app's ID policy
 - Default scopes avoided (explicit scoping preferred)
 
-**vs. Traditional Approaches:**
+**Other valid approaches, when chosen deliberately:**
 ```ruby
-# ❌ BAD: Subdomain-based multi-tenancy
+# Subdomain-based multi-tenancy can be valid; verify membership and routing.
 # acme.myapp.com vs. globex.myapp.com
 class ApplicationController
   before_action :set_account_from_subdomain
@@ -44,10 +44,12 @@ class ApplicationController
   end
 end
 
-# ❌ BAD: Schema-based multi-tenancy (Apartment gem)
+# Schema/database-per-tenant is a separate architecture; use the tenanted skill
+# when isolation belongs in the database layer.
 Apartment::Tenant.switch!('acme')
 
-# ❌ BAD: Default scopes (implicit, hard to debug)
+# Default scopes are implicit and hard to debug; avoid unless the app has
+# already accepted that tradeoff.
 class Card < ApplicationRecord
   default_scope { where(account_id: Current.account&.id) }
 end
@@ -59,7 +61,7 @@ class ApplicationController
   end
 end
 
-# ❌ BAD: No account_id on tables
+# Missing account_id on tenant-owned tables causes data leaks.
 class Card < ApplicationRecord
   belongs_to :board
   # Missing: belongs_to :account
@@ -108,7 +110,7 @@ class Card < ApplicationRecord
   validates :account_id, presence: true
 end
 
-# ✅ GOOD: UUIDs everywhere
+# Public IDs follow the app policy; UUIDs are common when URLs expose IDs.
 create_table :cards, id: :uuid do |t|
   t.references :board, null: false, type: :uuid
   t.references :account, null: false, type: :uuid
@@ -117,11 +119,11 @@ end
 
 ## Project Knowledge
 
-**Rails Version:** 8.2 (edge)
+**Rails Version:** Rails 8.x
 **Stack:**
 - URL-based multi-tenancy: /accounts/:account_id/...
 - Current attributes for account/user context
-- UUIDs for all primary keys
+- App-selected primary key policy
 - PostgreSQL/MySQL (no schema separation)
 - No Apartment gem, no subdomain routing
 
@@ -132,8 +134,8 @@ end
 
 **Database:**
 - account_id on every table
-- No foreign key constraints (for flexibility)
-- UUIDs prevent enumeration
+- Foreign key constraints follow project policy
+- Public IDs should not reveal sensitive sequencing
 - Single database, single schema
 
 **Related Skills:**
@@ -933,12 +935,11 @@ module AccountIsolation
   private
 
   def validate_account_consistency
-    # Check all belongs_to associations
+    # Check all loaded belongs_to associations
     self.class.reflect_on_all_associations(:belongs_to).each do |assoc|
       next if assoc.name == :account
-      next unless assoc.options[:class_name]
 
-      related = send(assoc.name)
+      related = public_send(assoc.name)
       next unless related
 
       if related.respond_to?(:account_id) && related.account_id != account_id
@@ -1383,14 +1384,14 @@ belongs_to :account, counter_cache: :members_count
 
 ## Boundaries
 
-### Always:
+### Prefer:
 - Include account_id on every tenant-scoped table
-- Use UUIDs for all IDs (prevents enumeration)
+- Use public IDs that do not expose sensitive sequencing
 - Scope all queries through Current.account
-- Set Current.account from URL params (not session or user)
-- Use URL-based routing: /:account_id/boards
+- Set Current.account from a verified account context, commonly URL params plus membership
+- Use URL-based routing when visible account context is the chosen product model
 - Validate account consistency across associations
-- Store last accessed account in session
+- Store last accessed account only as a selection hint, not as an authorization source
 - Use belongs_to :account (not default_scope)
 - Test cross-account access is prevented
 - Index on [account_id, created_at] and [account_id, foreign_key]
@@ -1403,14 +1404,13 @@ belongs_to :account, counter_cache: :members_count
 - Account deletion policies
 - Transfer ownership workflows
 
-### Never:
-- Use subdomain-based multi-tenancy (acme.app.com)
-- Use schema-based multi-tenancy (Apartment gem)
-- Use default_scope for account filtering
-- Add foreign key constraints on account_id
-- Set Current.account from current_user.account (should be from URL)
+### Avoid:
+- Mixing URL, subdomain, schema, and database-per-tenant approaches in one feature without an explicit boundary
+- Use default_scope for account filtering unless the app already chose that tradeoff
+- Changing foreign key policy just because this style guide prefers soft references
+- Set Current.account from current_user.account when users can belong to multiple accounts
 - Allow access to resources without checking account
 - Forget to scope queries through Current.account
 - Trust params[:account_id] without verifying membership
-- Store account_id in session (URL is source of truth)
+- Trust session[:account_id] as an authorization source
 - Allow cross-account queries without explicit authorization

@@ -4,18 +4,22 @@ description: >-
   Implements separate-database multi-tenancy with Active Record Tenanted using
   tenant-aware Rails conventions, resolver configuration, and safety guardrails.
   Use when adding activerecord-tenanted, isolating each tenant in its own
-  database, or adapting 37signals-style Rails apps to database-per-tenant
+  database, or adapting Rails apps to database-per-tenant
   architecture.
 license: MIT
 metadata:
-  author: 37signals
+  author: Mike Dalessio / 37signals
   version: "1.0"
   source: activerecord-tenanted
   source_repo: basecamp/activerecord-tenanted
-  source_ref: main
+  source_ref: main checked 2026-05-03
+  source_note: Basecamp-owned source. Verify installed version and current docs before applying.
   source_path: README.md, GUIDE.md
-  compatibility: Ruby 3.3+, Rails 8.2+, sqlite3
+  compatibility: Ruby 3.3+, Rails 8.x, sqlite3
 ---
+## Source Grounding
+
+This skill is grounded in a Basecamp-owned project, but the target app's version and deployment context still win. Read `../../references/basecamp-style.md`, then verify current upstream docs before copying commands or APIs.
 
 # 37signals Active Record Tenanted
 
@@ -71,6 +75,7 @@ Hybrid apps are possible, but the boundary must be explicit:
 - The gem is built on Rails horizontal sharding APIs.
 - Access without a tenant context should raise `ActiveRecord::Tenanted::NoTenantError`.
 - The upstream GUIDE is still a work in progress, so some framework integrations should be treated as provisional and verified against the gem version in use.
+- Public research did not find a primary source tying this gem to ECS or Litestream as official 37signals guidance. Treat those as deployment inferences when a project chooses them.
 
 ## Baseline setup
 
@@ -214,7 +219,7 @@ Also cover:
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Keep tenant resolution in one place.
 - Require an explicit tenant context before touching tenanted models.
@@ -228,7 +233,7 @@ Also cover:
 - Hybrid designs where some models are shared and some are tenanted.
 - Custom connection management beyond the gem defaults.
 
-### Never
+### Avoid
 
 - Fall back silently to a default tenant in normal app flow.
 - Rebuild tenant isolation with ad hoc `where(account_id: ...)` filters everywhere.

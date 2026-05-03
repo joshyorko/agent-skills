@@ -3,7 +3,7 @@ name: 37signals-kamal
 description: >-
   Deploys Rails applications with Kamal using roles, accessories, hooks,
   secrets, and deploy-safe operational patterns aligned with modern Rails and
-  37signals-style infrastructure choices. Use when setting up Kamal, editing
+  37signals-inspired infrastructure choices. Use when setting up Kamal, editing
   deploy config, shipping Rails changes, or debugging deploy/runtime issues.
 license: MIT
 metadata:
@@ -11,16 +11,20 @@ metadata:
   version: "1.0"
   source: Kamal docs
   source_repo: basecamp/kamal
-  source_ref: main
+  source_ref: main checked 2026-05-03
+  source_note: Basecamp-owned source. Verify installed version and current docs before applying.
   source_path: kamal-deploy.org/docs
   compatibility: Ruby 3.3+, Rails 8.x, Kamal 2
 ---
+## Source Grounding
+
+This skill is grounded in a Basecamp-owned project, but the target app's version and deployment context still win. Read `../../references/basecamp-style.md`, then verify current upstream docs before copying commands or APIs.
 
 # 37signals Kamal
 
 Use this skill for Rails deployment and runtime operations with Kamal.
 
-Kamal is the concrete deployment layer missing from the rest of the Rails / 37signals skill set. Keep application architecture in the other skills; use this one for `config/deploy.yml`, `.kamal/secrets`, roles, accessories, hooks, builders, healthchecks, and deploy-safe operational changes.
+Kamal is the concrete deployment layer for Dockerized apps on VMs or bare metal. Keep application architecture in the other skills; use this one for `config/deploy.yml`, `.kamal/secrets`, roles, accessories, hooks, builders, healthchecks, and deploy-safe operational changes.
 
 ## Core approach
 
@@ -134,7 +138,7 @@ bin/kamal app logs
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Keep deploy config repo-owned and reviewable.
 - Use explicit roles, healthchecks, and secrets wiring.
@@ -147,7 +151,7 @@ bin/kamal app logs
 - Unusual builder or registry topology.
 - Hook logic that mutates application state.
 
-### Never
+### Avoid
 
 - Smuggle secrets into committed files.
 - Hide critical deploy behavior in undocumented shell one-liners.

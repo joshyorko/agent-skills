@@ -44,7 +44,7 @@ This local reference file exists to satisfy the historical `rails_style_guide.md
 
 ## Testing Approach
 
-- Prefer Minitest with fixtures in this 37signals-style stack.
+- Prefer Minitest with fixtures in this 37signals-inspired stack when the project already follows that stack.
 - Test behavior and user workflows, not private implementation details.
 - Add characterization coverage before risky refactors.
 

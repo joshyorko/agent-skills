@@ -4,7 +4,7 @@
 
 A plugin-first skill repo for four jobs:
 
-- `plugins/rails-37signals-patterns/` for focused 37signals-style Rails specialists
+- `plugins/rails-37signals-patterns/` for focused Rails specialists inspired by public 37signals/Basecamp practice
 - `plugins/rails-37signals-workflows/` for workflow-level Rails implementation, refactoring, and review
 - `plugins/fizzy/` for self-hosted Fizzy workflows via the upstream CLI
 - `plugins/rcc/` for RCC automation, isolated environments, and robot scaffolding
@@ -53,22 +53,22 @@ agent-skills/
 
 ### Rails 37signals Patterns
 
-The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused Rails patterns and conventions inspired by 37signals-style applications. Across the set, the defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, Kamal-based deployment, explicit tenancy choices, UUID-backed schemas, and Minitest with fixtures.
+The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused Rails patterns inspired by public 37signals/Basecamp practice. Across the set, the defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, Kamal-based deployment, explicit tenancy choices, project-aware schema policy, and Minitest with fixtures where the target app already follows that stack.
 
 **Architecture and workflow**
 
 - [`37signals-implement`](plugins/rails-37signals-patterns/skills/37signals-implement/SKILL.md) — orchestrates complete Rails feature work across the specialist skills.
-- [`37signals-refactoring`](plugins/rails-37signals-patterns/skills/37signals-refactoring/SKILL.md) — orchestrates incremental refactors toward 37signals Rails patterns.
+- [`37signals-refactoring`](plugins/rails-37signals-patterns/skills/37signals-refactoring/SKILL.md) — orchestrates incremental refactors toward 37signals-inspired Rails patterns.
 - [`37signals-review`](plugins/rails-37signals-patterns/skills/37signals-review/SKILL.md) — reviews Rails code for convention alignment, CRUD shape, model design, and Hotwire fit.
 
 **Domain, data, and tenancy**
 
-- [`37signals-auth`](plugins/rails-37signals-patterns/skills/37signals-auth/SKILL.md) — custom passwordless authentication without Devise.
+- [`37signals-auth`](plugins/rails-37signals-patterns/skills/37signals-auth/SKILL.md) — small Rails-native passwordless authentication with digest-only token guidance.
 - [`37signals-active-record-tenanted`](plugins/rails-37signals-patterns/skills/37signals-active-record-tenanted/SKILL.md) — separate-database multi-tenancy with Active Record Tenanted and tenant-aware Rails configuration.
 - [`37signals-concerns`](plugins/rails-37signals-patterns/skills/37signals-concerns/SKILL.md) — shared model and controller behavior via focused concerns.
-- [`37signals-migration`](plugins/rails-37signals-patterns/skills/37signals-migration/SKILL.md) — UUID-first, account-scoped migrations without foreign key constraints.
+- [`37signals-migration`](plugins/rails-37signals-patterns/skills/37signals-migration/SKILL.md) — project-aware migrations with explicit tenant keys, reversible changes, and constraint policy.
 - [`37signals-model`](plugins/rails-37signals-patterns/skills/37signals-model/SKILL.md) — rich domain models with business logic, scopes, validations, and associations.
-- [`37signals-multi-tenant`](plugins/rails-37signals-patterns/skills/37signals-multi-tenant/SKILL.md) — URL-based multi-tenancy and explicit account scoping.
+- [`37signals-multi-tenant`](plugins/rails-37signals-patterns/skills/37signals-multi-tenant/SKILL.md) — shared-database multi-tenancy and explicit account scoping.
 - [`37signals-state-records`](plugins/rails-37signals-patterns/skills/37signals-state-records/SKILL.md) — models business state as records instead of booleans.
 
 **Delivery, UI, and operations**
@@ -84,15 +84,15 @@ The `plugins/rails-37signals-patterns/skills/37signals-*` skills cover focused R
 - [`37signals-test`](plugins/rails-37signals-patterns/skills/37signals-test/SKILL.md) — Minitest and fixtures for fast, readable Rails test coverage.
 - [`37signals-turbo`](plugins/rails-37signals-patterns/skills/37signals-turbo/SKILL.md) — Turbo Streams, Frames, and morphing for real-time UI updates.
 
-These specialist skills preserve source metadata in their frontmatter and were adapted from the broader `rails_ai_agents` 37signals pattern set.
+These specialist skills preserve source metadata in their frontmatter. Most pattern skills are current repo-maintained guidance synthesized from public sources; Basecamp-owned sources such as Kamal and Active Record Tenanted are called out explicitly, and every skill links to a source-grounding reference.
 
 ### Rails 37signals Workflows
 
-The `plugins/rails-37signals-workflows/skills/rails-37signals-*` folders are standalone workflow skills for common Rails jobs, not just aliases. Each one includes an `agents/openai.yaml` file plus a focused `references/` set.
+The `plugins/rails-37signals-workflows/skills/rails-37signals-*` folders are standalone workflow skills for common Rails jobs, not just aliases. Each one includes an `agents/openai.yaml` file and points to the shared source-grounding reference.
 
-- [`rails-37signals-implement`](plugins/rails-37signals-workflows/skills/rails-37signals-implement/SKILL.md) — end-to-end feature implementation in dependency order, including tenancy and deploy/runtime checks. See `references/conventions.md` and `references/implementation-workflow.md`.
-- [`rails-37signals-refactor`](plugins/rails-37signals-workflows/skills/rails-37signals-refactor/SKILL.md) — incremental, behavior-preserving refactors toward 37signals conventions, including tenancy cleanup and runtime alignment. See `references/conventions.md` and `references/refactoring-guide.md`.
-- [`rails-37signals-review`](plugins/rails-37signals-workflows/skills/rails-37signals-review/SKILL.md) — code review and architecture auditing for 37signals-style Rails codebases. See `references/conventions.md` and `references/review-checklist.md`.
+- [`rails-37signals-implement`](plugins/rails-37signals-workflows/skills/rails-37signals-implement/SKILL.md) — end-to-end feature implementation in dependency order, including tenancy and deploy/runtime checks.
+- [`rails-37signals-refactor`](plugins/rails-37signals-workflows/skills/rails-37signals-refactor/SKILL.md) — incremental, behavior-preserving refactors toward 37signals-inspired conventions, including tenancy cleanup and runtime alignment.
+- [`rails-37signals-review`](plugins/rails-37signals-workflows/skills/rails-37signals-review/SKILL.md) — code review and architecture auditing through a 37signals-inspired Rails lens.
 
 ### Fizzy
 

@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Mailer"
-  short_description: "Creates minimal Action Mailer classes with bundled notification patterns following 37signals conventions."
+  short_description: "Creates minimal Action Mailer classes with bundled notification patterns following 37signals-inspired conventions."
   default_prompt: "Use $37signals-mailer when sending emails, creating notification systems, or when user mentions mailers, emails, notifications, or transactional messages."
 
 policy:

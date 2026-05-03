@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "rails-37signals-patterns",
-      "description": "Focused 37signals-style Rails specialists for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
+      "description": "Focused Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, and related application patterns.",
       "tags": [
         "rails",
         "37signals",
@@ -18,7 +18,7 @@
       "interface": {
         "displayName": "Rails 37signals Patterns",
         "shortDescription": "Focused Rails pattern skills inspired by 37signals.",
-        "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-style application design.",
+        "longDescription": "Focused Rails specialists for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, with Basecamp-owned sources called out where applicable.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -29,9 +29,9 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Implement this Rails model using 37signals patterns.",
+          "Implement this Rails model using 37signals-inspired patterns.",
           "Refactor this controller toward RESTful Rails conventions.",
-          "Review this Hotwire feature for 37signals-style tradeoffs.",
+          "Review this Hotwire feature for 37signals-inspired tradeoffs.",
           "Set up or fix Kamal deployment for this Rails app."
         ],
         "brandColor": "#9A3412"
@@ -48,7 +48,7 @@
     },
     {
       "name": "rails-37signals-workflows",
-      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-style conventions.",
+      "description": "Workflow-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
       "tags": [
         "rails",
         "37signals",
@@ -59,7 +59,7 @@
       "interface": {
         "displayName": "Rails 37signals Workflows",
         "shortDescription": "End-to-end Rails implementation, refactor, and review workflows.",
-        "longDescription": "Higher-level Rails workflow skills that orchestrate end-to-end feature work, refactors, and reviews using 37signals-style conventions.",
+        "longDescription": "Higher-level Rails workflow skills that orchestrate end-to-end feature work, refactors, and reviews using 37signals-inspired conventions.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -70,9 +70,9 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Implement this Rails feature with 37signals conventions.",
+          "Implement this Rails feature with 37signals-inspired conventions.",
           "Refactor this Rails code while preserving behavior.",
-          "Review this Rails change for 37signals-style tradeoffs."
+          "Review this Rails change for 37signals-inspired tradeoffs."
         ],
         "brandColor": "#B45309"
       },

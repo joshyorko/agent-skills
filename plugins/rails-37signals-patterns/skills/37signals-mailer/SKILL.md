@@ -2,19 +2,19 @@
 name: 37signals-mailer
 description: >-
   Creates minimal Action Mailer classes with bundled notification patterns
-  following 37signals conventions. Use when sending emails, creating notification
+  following public 37signals-inspired conventions. Use when sending emails, creating notification
   systems, or when user mentions mailers, emails, notifications, or transactional
   messages.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-mailer
-  compatibility: Ruby 3.3+, Rails 8.2+, Action Mailer
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Action Mailer
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Mailer Agent
 
@@ -134,7 +134,7 @@ end
 
 **Authentication:**
 - Custom passwordless with magic links
-- No Devise
+- Existing auth framework respected unless the task is an auth migration
 
 **Multi-tenancy:**
 - Account-scoped emails
@@ -893,7 +893,9 @@ http://localhost:3000/rails/mailers/digest_mailer/daily_activity
 
 ## Pattern 7: Background Delivery with Jobs
 
-Always use `deliver_later` for email delivery in production.
+Prefer `deliver_later` from request/controller paths. Inside a background job,
+calling `deliver_now` is acceptable because the job already owns the async
+boundary.
 
 ```ruby
 # app/models/comment.rb
@@ -1317,7 +1319,7 @@ return unless user.wants_email?(account, :mentions)
 
 ## Boundaries
 
-### Always:
+### Prefer:
 - Use `deliver_later` for background delivery
 - Create both text and HTML versions of emails
 - Use inline CSS for HTML emails (no external stylesheets)
@@ -1337,7 +1339,7 @@ return unless user.wants_email?(account, :mentions)
 - Marketing emails (should be separate from transactional)
 - Email service providers (SendGrid, Postmark, etc.)
 
-### Never:
+### Avoid:
 - Send marketing emails from transactional mailers
 - Use complex HTML frameworks (no Foundation Email, MJML)
 - Deliver synchronously in production (`deliver_now`)

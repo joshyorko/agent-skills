@@ -1,32 +1,31 @@
 ---
 name: 37signals-test
 description: >-
-  Writes Minitest tests with integration tests and fixtures following 37signals
-  conventions. Uses Minitest (not RSpec) and fixtures (not factories). Use when
-  writing tests, adding test coverage, or when user mentions testing, Minitest,
-  fixtures, or integration tests.
+  Writes behavior-focused Rails tests, preferring Minitest and fixtures when
+  the app follows that stack. Use when writing tests, adding test coverage, or
+  when user mentions testing, Minitest, fixtures, or integration tests.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-test
-  compatibility: Ruby 3.3+, Rails 8.2+, Minitest
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Minitest
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails testing architect specializing in testing with Minitest.
 
 ## Your role
-- You write tests using Minitest, never RSpec
-- You use fixtures for test data, never factories (FactoryBot)
+- You prefer Minitest where the app follows Rails defaults and preserve RSpec where the app already depends on it
+- You prefer fixtures where the app follows Rails defaults and preserve factories during incremental migrations
 - You write integration tests over unit tests when possible
 - Your output: Fast, readable tests that verify behavior, not implementation
 
 ## Core philosophy
 
-**Minitest is plenty. Fixtures are faster.** Don't overcomplicate testing with RSpec DSL and factory bloat.
+**Minitest and fixtures are the 37signals-flavored default.** Preserve the existing test stack unless the task is an explicit migration.
 
 ### Why Minitest over RSpec:
 - ✅ Plain Ruby (no DSL to learn)
@@ -49,7 +48,7 @@ You are an expert Rails testing architect specializing in testing with Minitest.
 
 ## Project knowledge
 
-**Tech Stack:** Minitest 5.20+, Rails 8.2 (edge), Fixtures in YAML
+**Tech Stack:** Minitest 5.20+, Rails 8.x, Fixtures in YAML
 **Pattern:** Integration tests for features, unit tests for edge cases
 **Location:** `test/models/`, `test/controllers/`, `test/system/`, `test/integration/`
 
@@ -706,8 +705,8 @@ class MagicLinkMailerTest < ActionMailer::TestCase
 
     assert_equal ["david@myapp.com"], email.to
     assert_equal "Sign in to Fizzy", email.subject
-    assert_match magic_link.code, email.body.to_s
-    assert_match session_magic_link_url(code: magic_link.code), email.body.to_s
+    assert_match magic_link.raw_token, email.body.to_s
+    assert_match session_magic_link_url(token: magic_link.raw_token), email.body.to_s
   end
 end
 ```
@@ -721,7 +720,7 @@ end
 class ActionDispatch::IntegrationTest
   def sign_in_as(user)
     session_record = user.identity.sessions.create!
-    cookies.signed[:session_token] = session_record.token
+    cookies.signed[:session_token] = session_record.raw_token
 
     Current.user = user
     Current.identity = user.identity
@@ -981,13 +980,13 @@ logo:
 
 ## Testing anti-patterns to avoid
 
-### ❌ Don't use factories
+### Preserve or migrate factories deliberately
 
 ```ruby
-# BAD - Don't do this
+# Existing factories are valid during migration; do not mix stacks casually.
 let(:card) { FactoryBot.create(:card) }
 
-# GOOD - Use fixtures
+# Preferred in Rails-default apps - use fixtures
 setup do
   @card = cards(:logo)
 end
@@ -1076,6 +1075,6 @@ jobs:
 
 ## Boundaries
 
-- ✅ **Always do:** Use Minitest (never RSpec), use fixtures (never factories), test behavior not implementation, write integration tests for features, test happy path and edge cases, use descriptive test names, clean up in teardown, run tests before committing
+- ✅ **Prefer:** Use Minitest and fixtures when the app follows Rails defaults, test behavior not implementation, write integration tests for features, test happy path and meaningful edge cases, use descriptive test names, clean up in teardown, run tests before committing
 - ⚠️ **Ask first:** Before testing private methods (test public interface instead), before testing Rails functionality (already tested), before creating test data in setup (use fixtures), before using mocks/stubs (prefer real objects)
-- 🚫 **Never do:** Use RSpec, use FactoryBot or other factories, skip writing tests, test implementation details, create unnecessary test data, leave failing tests, skip system tests for critical features, test every edge case (diminishing returns), forget to test error cases
+- 🚫 **Avoid by default:** Migrating away from RSpec or factories without an explicit request, skipping tests for changed behavior, testing implementation details, creating unnecessary test data, leaving failing tests, overbuilding brittle system tests, forgetting important error cases

@@ -1,21 +1,28 @@
 ---
 name: rails-37signals-implement
-description: Use when implementing or extending a Rails feature in a 37signals-style codebase, especially when the user wants rich models, CRUD-only controllers, Hotwire, Solid Queue, Minitest with fixtures, and explicit account scoping instead of service-object-heavy Rails patterns.
+description: Use when implementing or extending a Rails feature in a 37signals-inspired codebase, especially when the user wants rich models, CRUD-first controllers, Hotwire, Solid Queue, Minitest with fixtures, and explicit account scoping instead of service-object-heavy Rails patterns.
+license: MIT
+metadata:
+  author: agent-skills
+  version: "1.0"
+  source: public-basecamp-style-synthesis
 ---
+## Source Grounding
+
+This workflow is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and user intent win when they conflict.
 
 # Rails 37signals Implement
 
 ## Overview
 
-Use this skill for end-to-end feature work in a Rails app that follows 37signals-style conventions. It translates the original Claude-oriented 37signals agent into a Codex-native workflow.
+Use this skill for end-to-end feature work in a Rails app that follows 37signals-inspired conventions. It is a source-grounded workflow for sequencing schema, domain, UI, async, deploy, and test changes.
 
 ## Quick Start
 
 1. Confirm the feature shape: data changes, domain rules, UI flow, async work, and tests.
-2. Read `references/conventions.md` for the default architecture and style assumptions.
-3. Read `references/implementation-workflow.md` before substantial feature work or when the request spans multiple layers.
-4. Implement in dependency order: database, models, controllers, views, jobs or mailers, then tests.
-5. Verify with the smallest relevant Rails test commands before finishing.
+2. Read `../../references/basecamp-style.md` for the source-grounded defaults and boundaries.
+3. Implement in dependency order: database, models, controllers, views, jobs or mailers, then tests.
+4. Verify with the smallest relevant Rails test commands before finishing.
 
 ## Core Defaults
 
@@ -53,7 +60,6 @@ Use this skill for end-to-end feature work in a Rails app that follows 37signals
 - Run targeted tests first, then broader verification only if needed.
 - Check naming, tenancy consistency, fixture references, Turbo response behavior, and deploy/runtime impact.
 
-## Load These References When Needed
+## Reference
 
-- `references/conventions.md`: baseline 37signals Rails conventions and tradeoffs.
-- `references/implementation-workflow.md`: dependency order, heuristics, and implementation checkpoints.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

@@ -1,7 +1,7 @@
 interface:
   display_name: "Rails 37signals Refactor"
-  short_description: "Refactor Rails code toward 37signals"
-  default_prompt: "Use $rails-37signals-refactor to refactor this Rails code toward 37signals-style conventions."
+  short_description: "Refactor Rails code toward 37signals-inspired Rails"
+  default_prompt: "Use $rails-37signals-refactor to refactor this Rails code toward 37signals-inspired conventions."
 
 policy:
   allow_implicit_invocation: true

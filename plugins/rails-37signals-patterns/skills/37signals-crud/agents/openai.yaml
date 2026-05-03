@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals CRUD"
-  short_description: "Generates RESTful controllers following the 37signals everything-is-CRUD philosophy. Maps any action to CRUD by creating new resources instead of custom actions."
+  short_description: "Generates RESTful controllers with an everything-is-CRUD lens, mapping state changes to resources when that clarifies the domain."
   default_prompt: "Use $37signals-crud when adding features, creating controllers, or when user mentions REST, routing, controllers, or state-change resources."
 
 policy:

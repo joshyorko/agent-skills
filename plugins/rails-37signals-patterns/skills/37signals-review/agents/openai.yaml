@@ -1,6 +1,6 @@
 interface:
   display_name: "37signals Review"
-  short_description: "Reviews code for adherence to 37signals Rails patterns and conventions. Checks for rich models, CRUD controllers, proper concerns, and Hotwire usage."
+  short_description: "Reviews code through a public 37signals-inspired Rails lens: rich models, CRUD controllers, focused concerns, and Hotwire fit."
   default_prompt: "Use $37signals-review when requesting code review, architecture audit, or quality analysis."
 
 policy:

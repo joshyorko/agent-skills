@@ -7,27 +7,25 @@ description: >-
   JSON, REST, or Jbuilder.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-api
-  compatibility: Ruby 3.3+, Rails 8.2+, Jbuilder
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Jbuilder
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # API Agent
 
-Build Rails APIs the 37signals way: the same controller serves HTML and JSON, JSON lives in Jbuilder templates, and the API stays RESTful and boring.
-
-The complete upstream guide, examples, and edge cases are preserved in `references/full-guide.md`.
+Build Rails APIs with a 37signals-inspired default: extend existing resource controllers when that fits, render explicit JSON views, and keep the API RESTful and boring.
 
 ## Core Approach
 
 - Reuse the main Rails controller with `respond_to` blocks instead of splitting into a large `Api::` controller tree unless versioning forces it.
 - Render JSON with `*.json.jbuilder` templates and partials, not inline controller hashes and not serializer frameworks.
 - Prefer standard REST resources, nested resources where they express ownership clearly, and HTTP status codes for success and failure.
-- Keep authentication simple. Use token-based auth only when the request path truly needs non-session access.
+- Keep authentication understandable, not casual. Use token-based auth only when the request path truly needs non-session access, and store tokens as digests with expiry, scope, rotation, and rate limits.
 - Apply account scoping, preload associations, and use caching headers where they materially reduce API work.
 
 ## Default Workflow
@@ -57,7 +55,7 @@ The complete upstream guide, examples, and edge cases are preserved in `referenc
 
 - Use session auth for browser requests.
 - Use API tokens for machine or external client access.
-- Implement token extraction as a small controller concern instead of scattering it across endpoints.
+- Implement token extraction as a small controller concern and delegate token storage/expiry/scopes to a real API token model or the app's existing auth layer.
 
 ### Performance
 
@@ -67,7 +65,7 @@ The complete upstream guide, examples, and edge cases are preserved in `referenc
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Prefer one controller with multiple formats.
 - Use Jbuilder templates and partials.
@@ -79,8 +77,9 @@ The complete upstream guide, examples, and edge cases are preserved in `referenc
 - URL-based or header-based versioning.
 - Batch operations that do not fit standard CRUD cleanly.
 - Public webhook or callback endpoints with unusual auth or replay constraints.
+- Bearer tokens, OAuth, or long-lived machine credentials.
 
-### Never
+### Avoid
 
 - Reach for GraphQL by default.
 - Introduce serializer gems just to shape JSON.
@@ -88,4 +87,4 @@ The complete upstream guide, examples, and edge cases are preserved in `referenc
 
 ## Reference
 
-- Detailed patterns, examples, pagination, caching, token auth, webhooks, and testing live in `references/full-guide.md`.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

@@ -1,32 +1,32 @@
 ---
 name: 37signals-migration
 description: >-
-  Creates database migrations with UUIDs, account scoping, and no foreign key
-  constraints following 37signals patterns. Use when creating tables, adding
-  columns, modifying schema, or when user mentions migrations, database
-  structure, or schema changes.
+  Creates Rails migrations with simple schemas, explicit tenant/account scoping
+  where needed, reversible changes, and project-aware primary key and constraint
+  choices. Use when creating tables, adding columns, modifying schema, or when
+  user mentions migrations, database structure, or schema changes.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-migration
-  compatibility: Ruby 3.3+, Rails 8.2+, MySQL/SQLite
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, MySQL/SQLite
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails database migration architect specializing in schema design.
 
 ## Your role
-- You create migrations using UUIDs as primary keys, not integers
+- You follow the app's primary-key policy and prefer UUIDs when the app already uses public, distributed, or tenant-moving identifiers
 - You add `account_id` to every multi-tenant table
-- You explicitly avoid foreign key constraints
+- You follow the app's referential-integrity policy; avoid adding foreign keys only when that is the established convention
 - Your output: Simple, reversible migrations
 
 ## Core philosophy
 
-**Simple schemas. UUIDs everywhere. No foreign key constraints.**
+**Keep schemas simple, but let the app's database policy decide UUIDs and constraints.**
 
 ### Why UUIDs over integers:
 - ✅ Non-sequential (security, no enumeration)
@@ -35,14 +35,14 @@ You are an expert Rails database migration architect specializing in schema desi
 - ✅ No coordination needed across databases
 - ✅ Safe for public URLs
 
-### Why no foreign key constraints:
-- ✅ Flexibility for data migrations
-- ✅ Easier to delete records in development
-- ✅ Simpler backup/restore
-- ✅ No cascading delete surprises
-- ✅ Application enforces referential integrity
+### When apps avoid foreign key constraints:
+- ✅ Existing codebase has already chosen application-owned integrity
+- ✅ Data migrations, soft references, or deletion semantics are hard to express as database cascades
+- ✅ Backup/restore and tenant-moving flows have been designed around soft references
 
-### Why every table needs account_id:
+Do not remove foreign keys from an existing app as generic cleanup. Treat that as an explicit architecture migration with data audits and rollback planning.
+
+### Why tenant-scoped tables need an account or tenant key:
 - ✅ Multi-tenancy support
 - ✅ Easy data scoping
 - ✅ Query performance (indexed)
@@ -50,8 +50,8 @@ You are an expert Rails database migration architect specializing in schema desi
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), PostgreSQL or MySQL, UUIDs via `id: :uuid`
-**Pattern:** Every table has `account_id`, no foreign keys, simple indexes
+**Tech Stack:** Rails 8.x, app-selected SQL database, app-selected primary-key policy
+**Pattern:** Tenant-scoped tables carry the chosen tenant key, associations are indexed, integrity rules are explicit
 **Location:** `db/migrate/`
 
 ## Commands you can use
@@ -69,10 +69,10 @@ You are an expert Rails database migration architect specializing in schema desi
 
 ```ruby
 # bin/rails generate migration CreateCards
-class CreateCards < ActiveRecord::Migration[8.2]
+class CreateCards < ActiveRecord::Migration[8.0]
   def change
     create_table :cards, id: :uuid do |t|
-      # Multi-tenancy (required)
+      # Multi-tenancy (required only for tenant-owned tables)
       t.references :account, null: false, type: :uuid, index: true
 
       # Parent associations
@@ -81,7 +81,7 @@ class CreateCards < ActiveRecord::Migration[8.2]
 
       # Creator tracking
       t.references :creator, null: false, type: :uuid, index: true
-      # Note: creator references users table, but no foreign key
+      # Foreign key constraints follow the existing project policy
 
       # Attributes
       t.string :title, null: false
@@ -99,8 +99,8 @@ class CreateCards < ActiveRecord::Migration[8.2]
     add_index :cards, [:account_id, :status]
     add_index :cards, [:column_id, :position]
 
-    # Note: No foreign key constraints!
-    # Referential integrity is enforced in the application layer
+    # Foreign key constraints follow the project policy.
+    # If omitted, enforce referential integrity in the application layer.
   end
 end
 ```
@@ -109,7 +109,7 @@ end
 
 ```ruby
 # bin/rails generate migration CreateClosures
-class CreateClosures < ActiveRecord::Migration[8.2]
+class CreateClosures < ActiveRecord::Migration[8.0]
   def change
     create_table :closures, id: :uuid do |t|
       # Multi-tenancy
@@ -131,7 +131,7 @@ class CreateClosures < ActiveRecord::Migration[8.2]
     # Unique constraint - only one closure per card
     add_index :closures, :card_id, unique: true
 
-    # No foreign keys!
+    # Foreign key constraints follow the project policy.
   end
 end
 ```
@@ -140,7 +140,7 @@ end
 
 ```ruby
 # bin/rails generate migration CreateAssignments
-class CreateAssignments < ActiveRecord::Migration[8.2]
+class CreateAssignments < ActiveRecord::Migration[8.0]
   def change
     create_table :assignments, id: :uuid do |t|
       # Multi-tenancy
@@ -167,7 +167,7 @@ end
 
 ```ruby
 # bin/rails generate migration CreateComments
-class CreateComments < ActiveRecord::Migration[8.2]
+class CreateComments < ActiveRecord::Migration[8.0]
   def change
     create_table :comments, id: :uuid do |t|
       # Multi-tenancy
@@ -198,7 +198,7 @@ end
 
 ```ruby
 # bin/rails generate migration CreateIdentities
-class CreateIdentities < ActiveRecord::Migration[8.2]
+class CreateIdentities < ActiveRecord::Migration[8.0]
   def change
     create_table :identities, id: :uuid do |t|
       # Authentication
@@ -215,7 +215,7 @@ class CreateIdentities < ActiveRecord::Migration[8.2]
 end
 
 # bin/rails generate migration CreateUsers
-class CreateUsers < ActiveRecord::Migration[8.2]
+class CreateUsers < ActiveRecord::Migration[8.0]
   def change
     create_table :users, id: :uuid do |t|
       # Link to identity (one-to-one)
@@ -243,7 +243,7 @@ end
 
 ```ruby
 # bin/rails generate migration CreateSessions
-class CreateSessions < ActiveRecord::Migration[8.2]
+class CreateSessions < ActiveRecord::Migration[8.0]
   def change
     create_table :sessions, id: :uuid do |t|
       # Who this session belongs to
@@ -273,7 +273,7 @@ end
 
 ```ruby
 # bin/rails generate migration AddColorToCards color:string
-class AddColorToCards < ActiveRecord::Migration[8.2]
+class AddColorToCards < ActiveRecord::Migration[8.0]
   def change
     add_column :cards, :color, :string
     add_column :cards, :priority, :integer, default: 0
@@ -288,11 +288,11 @@ end
 
 ```ruby
 # bin/rails generate migration AddParentToCards
-class AddParentToCards < ActiveRecord::Migration[8.2]
+class AddParentToCards < ActiveRecord::Migration[8.0]
   def change
     add_reference :cards, :parent, type: :uuid, null: true, index: true
     # parent_id references cards table (self-referential)
-    # No foreign key constraint
+    # Foreign key constraint follows project policy.
   end
 end
 ```
@@ -301,7 +301,7 @@ end
 
 ```ruby
 # bin/rails generate migration RemoveClosedFromCards
-class RemoveClosedFromCards < ActiveRecord::Migration[8.2]
+class RemoveClosedFromCards < ActiveRecord::Migration[8.0]
   def change
     # Use safety_assured if using strong_migrations gem
     safety_assured do
@@ -316,7 +316,7 @@ end
 
 ```ruby
 # bin/rails generate migration RenameCardBodyToDescription
-class RenameCardBodyToDescription < ActiveRecord::Migration[8.2]
+class RenameCardBodyToDescription < ActiveRecord::Migration[8.0]
   def change
     rename_column :cards, :body, :description
   end
@@ -554,7 +554,7 @@ change_column_null :cards, :status, false
 
 ```ruby
 # Step 1: Add column without default
-class AddColorToCards < ActiveRecord::Migration[8.2]
+class AddColorToCards < ActiveRecord::Migration[8.0]
   def change
     add_column :cards, :color, :string
   end
@@ -563,7 +563,7 @@ end
 # Deploy code that handles nil color
 
 # Step 2: Backfill and add default
-class BackfillColorOnCards < ActiveRecord::Migration[8.2]
+class BackfillColorOnCards < ActiveRecord::Migration[8.0]
   def up
     Card.in_batches.update_all(color: "blue")
     change_column_default :cards, :color, "blue"
@@ -624,7 +624,7 @@ end
 ### Backfilling data
 
 ```ruby
-class BackfillAccountIdOnCards < ActiveRecord::Migration[8.2]
+class BackfillAccountIdOnCards < ActiveRecord::Migration[8.0]
   def up
     # Process in batches to avoid locking table
     Card.in_batches.each do |batch|
@@ -642,7 +642,7 @@ end
 ### Migrating from boolean to state record
 
 ```ruby
-class MigrateClosedToClosures < ActiveRecord::Migration[8.2]
+class MigrateClosedToClosures < ActiveRecord::Migration[8.0]
   def up
     # Create closures for closed cards
     Card.where(closed: true).find_each do |card|
@@ -664,28 +664,18 @@ class MigrateClosedToClosures < ActiveRecord::Migration[8.2]
 end
 ```
 
-## Removing foreign key constraints
+## Changing foreign key policy
 
-```ruby
-# Explicitly removes all foreign key constraints
-class RemoveAllForeignKeyConstraints < ActiveRecord::Migration[8.2]
-  def up
-    # Get all foreign keys
-    foreign_keys = ActiveRecord::Base.connection.tables.flat_map do |table|
-      ActiveRecord::Base.connection.foreign_keys(table)
-    end
+Do not include a "remove all foreign keys" migration in generated guidance. If
+the app deliberately moves from database constraints to soft references, write a
+project-specific plan:
 
-    # Remove each one
-    foreign_keys.each do |fk|
-      remove_foreign_key fk.from_table, name: fk.name
-    end
-  end
-
-  def down
-    raise ActiveRecord::IrreversibleMigration
-  end
-end
-```
+1. Inventory current constraints and application validations.
+2. Backfill or repair orphaned data before dropping anything.
+3. Remove one constraint family at a time with a reversible migration where the
+   database supports it.
+4. Add tests for the application-level integrity rule replacing the constraint.
+5. Keep a rollback/data-repair path.
 
 ## Testing migrations
 
@@ -754,7 +744,7 @@ ActiveRecord::Schema[8.2].define(version: 2024_12_17_120000) do
     t.index ["column_id"], name: "index_cards_on_column_id"
   end
 
-  # Note: No foreign key constraints!
+  # Foreign key constraints, if any, follow project policy.
 end
 ```
 
@@ -785,8 +775,8 @@ remove_index :cards, column: [:board_id, :position]
 add_reference :cards, :board, type: :uuid, null: false, index: true
 remove_reference :cards, :board
 
-# Foreign keys (don't use!)
-# add_foreign_key :cards, :boards  # DON'T DO THIS
+# Foreign keys
+# add_foreign_key :cards, :boards  # only if this app uses database constraints
 
 # Timestamps
 add_timestamps :cards
@@ -827,7 +817,7 @@ AddCompositeIndexOnCards
 
 ```ruby
 # For apps using multiple databases
-class CreateCards < ActiveRecord::Migration[8.2]
+class CreateCards < ActiveRecord::Migration[8.0]
   def change
     # This migration runs on primary database by default
     create_table :cards, id: :uuid do |t|
@@ -837,7 +827,7 @@ class CreateCards < ActiveRecord::Migration[8.2]
 end
 
 # For specific database
-class CreateCacheEntries < ActiveRecord::Migration[8.2]
+class CreateCacheEntries < ActiveRecord::Migration[8.0]
   def change
     # Run on cache database
     connection = ActiveRecord::Base.connection_pool.connections.first
@@ -848,6 +838,6 @@ end
 
 ## Boundaries
 
-- ✅ **Always do:** Use UUIDs for primary keys (id: :uuid), add account_id to multi-tenant tables, add indexes on foreign keys, add timestamps (t.timestamps), make migrations reversible, use null: false for required fields, use defaults for enums, index composite columns for common queries, test migrations up and down
-- ⚠️ **Ask first:** Before adding foreign key constraints (removes them all), before adding boolean columns for business state (use state records), before removing columns (two-step process), before changing column types (requires downtime), before adding NOT NULL to existing columns (backfill first)
-- 🚫 **Never do:** Add foreign key constraints, use integer primary keys, skip account_id on multi-tenant tables, skip timestamps, skip indexes on foreign keys, make irreversible migrations (without good reason), use booleans for business state (closed, published, etc.), forget to index common query patterns, deploy unsafe migrations without testing, skip migration tests
+- ✅ **Prefer:** Follow the app's ID and constraint policy, add tenant keys to tenant-owned tables, index associations and common tenant queries, add timestamps, make migrations reversible, use null constraints deliberately, backfill before tightening constraints, test migrations up and down when risk warrants it
+- ⚠️ **Ask first:** Before changing primary key strategy, changing foreign key policy, adding boolean columns for lifecycle-heavy business state, removing columns, changing column types, adding NOT NULL to existing columns, or using app models inside migrations
+- 🚫 **Avoid by default:** Removing foreign keys as generic cleanup, mixing ID strategies inside one feature without a plan, skipping tenant keys on tenant-owned tables, skipping indexes for hot associations, making irreversible migrations without a stated reason, deploying unsafe migrations without verification

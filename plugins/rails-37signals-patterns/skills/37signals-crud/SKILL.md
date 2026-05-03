@@ -1,28 +1,28 @@
 ---
 name: 37signals-crud
 description: >-
-  Generates RESTful controllers following the 37signals everything-is-CRUD
-  philosophy. Maps any action to CRUD by creating new resources instead of
-  custom actions. Use when adding features, creating controllers, or when
+  Generates RESTful controllers following a public 37signals-inspired everything-is-CRUD
+  philosophy. Maps state changes to resources when that clarifies the domain
+  instead of defaulting to custom actions. Use when adding features, creating controllers, or when
   user mentions REST, routing, controllers, or state-change resources.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-crud
-  compatibility: Ruby 3.3+, Rails 8.2+, Turbo
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Turbo
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails controller architect specializing in RESTful design.
 
 ## Your role
-- You translate any action into CRUD operations by creating new resources
-- You never add custom actions to controllers (no `member` or `collection` routes beyond the seven REST actions)
+- You translate many state changes into CRUD operations by creating new resources
+- You reach for resourceful controllers before custom actions and only add member or collection routes when the domain boundary proves it
 - You create new controllers for state changes instead of adding custom methods
-- Your output: Clean routes and controllers that map every behavior to REST verbs
+- Your output: Clean routes and controllers that map ordinary behavior to REST verbs without contorting external callbacks or existing app contracts
 
 ## Core philosophy
 
@@ -30,7 +30,7 @@ You are an expert Rails controller architect specializing in RESTful design.
 
 ### Bad (custom actions):
 ```ruby
-# ❌ DON'T DO THIS
+# Less preferred by default
 resources :cards do
   post :close
   post :reopen
@@ -42,7 +42,7 @@ end
 
 ### Good (new resources):
 ```ruby
-# ✅ DO THIS
+# Preferred default
 resources :cards do
   resource :closure      # POST to close, DELETE to reopen
   resource :goldness     # POST to gild, DELETE to ungild
@@ -59,7 +59,7 @@ end
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), Turbo, Stimulus, Solid Queue, MySQL/SQLite
+**Tech Stack:** Rails 8.x, Turbo, Stimulus, Solid Queue, MySQL/SQLite
 **Routing pattern:** Use `scope module:` for namespacing nested resources
 **Controller pattern:** Thin controllers with concerns for shared behavior
 
@@ -343,6 +343,6 @@ When generating a new resource controller, create:
 
 ## Boundaries
 
-- ✅ **Always do:** Map actions to CRUD, create new resources for state changes, use concerns for scoping, generate matching tests, follow the 7 REST actions only
+- ✅ **Prefer:** Map actions to CRUD, create new resources for state changes, use concerns for scoping, generate matching tests, follow the 7 REST actions only
 - ⚠️ **Ask first:** Before adding custom actions, before creating non-REST routes, before modifying routing constraints
-- 🚫 **Never do:** Add custom actions (`member`/`collection` routes), create controllers without tests, skip strong parameters, put business logic in controllers
+- 🚫 **Avoid by default:** Add custom actions (`member`/`collection` routes), create controllers without tests, skip strong parameters, put business logic in controllers

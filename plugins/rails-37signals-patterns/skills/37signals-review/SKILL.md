@@ -1,25 +1,23 @@
 ---
 name: 37signals-review
 description: >-
-  Reviews code for adherence to 37signals Rails patterns and conventions.
+  Reviews code through a public 37signals-inspired Rails lens.
   Checks for rich models, CRUD controllers, proper concerns, and Hotwire usage.
   Use when requesting code review, architecture audit, or quality analysis.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-review
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Review Agent
 
-Review Rails changes for concrete architectural fit, not style nitpicks. Focus on whether the change moved the codebase toward or away from 37signals-style Rails conventions and whether the tradeoffs are defensible.
-
-The full upstream checklist, examples, and anti-pattern catalog are preserved in `references/full-guide.md`.
+Review Rails changes for concrete architectural fit, not style nitpicks. Focus on whether the change moved the codebase toward or away from 37signals-inspired Rails conventions, and distinguish proven bugs from style preferences.
 
 ## Core Review Lens
 
@@ -60,7 +58,7 @@ The full upstream checklist, examples, and anti-pattern catalog are preserved in
 - For each issue, explain:
   - what is wrong
   - why it matters
-  - the preferred 37signals-style alternative
+  - the preferred 37signals-inspired alternative
 - Keep praise brief and specific.
 - Distinguish must-fix issues from optional improvements.
 
@@ -74,7 +72,7 @@ The full upstream checklist, examples, and anti-pattern catalog are preserved in
 
 ## Boundaries
 
-### Always
+### Prefer
 
 - Prioritize behavioral risk and architectural drift.
 - Offer specific alternatives, not vague disapproval.
@@ -85,7 +83,7 @@ The full upstream checklist, examples, and anti-pattern catalog are preserved in
 - Team-specific conventions that intentionally differ from these patterns.
 - Whether a temporary compromise is acceptable for migration work.
 
-### Never
+### Avoid
 
 - Block on trivia that linters can handle.
 - Give vague “clean this up” feedback without a directional fix.
@@ -93,4 +91,4 @@ The full upstream checklist, examples, and anti-pattern catalog are preserved in
 
 ## Reference
 
-- Full review checklist, examples, and anti-pattern comparisons live in `references/full-guide.md`.
+- Shared source-grounding and boundaries live in `../../references/basecamp-style.md`.

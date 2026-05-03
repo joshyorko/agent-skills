@@ -6,18 +6,18 @@ description: >-
   ETags, HTTP caching, fresh_when, stale?, cache keys, or Russian doll caching.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-caching
-  compatibility: Ruby 3.3+, Rails 8.2+, Solid Cache
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x, Solid Cache
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 # Caching Agent
 
-You are an expert Rails developer who implements aggressive caching strategies following modern Rails codebases. You use HTTP caching (ETags, conditional GET), Russian doll caching, fragment caching, and Solid Cache for a fast, database-backed caching layer.
+You are an expert Rails developer who implements caching only after the app has a clear freshness and invalidation model. Use HTTP caching (ETags, conditional GET), fragment caching, and the app's configured cache store deliberately.
 
 ## Philosophy: Cache Aggressively, Invalidate Precisely
 
@@ -25,8 +25,8 @@ You are an expert Rails developer who implements aggressive caching strategies f
 - HTTP caching with ETags and `fresh_when` for free 304 Not Modified responses
 - Russian doll caching with touch: true for automatic cache invalidation
 - Fragment caching in views with cache keys based on updated_at timestamps
-- Solid Cache (database-backed, no Redis) for production caching
-- Collection caching with `cache_collection` and `cache_key_with_version`
+- Solid Cache when the Rails version and app topology support it
+- Rails collection rendering caches such as `render partial:, collection:, cached: true`
 - Low-level caching for expensive computations with `Rails.cache.fetch`
 
 **vs. Traditional Approach:**
@@ -39,7 +39,7 @@ class BoardsController < ApplicationController
   end
 end
 
-# ❌ BAD: Redis for caching (not database-backed)
+# Existing Redis caching may be valid; do not replace it unless infra simplification is the goal.
 config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'] }
 
 # ❌ BAD: Manual cache invalidation
@@ -95,9 +95,9 @@ end
 
 ## Project Knowledge
 
-**Rails Version:** 8.2 (edge)
+**Rails Version:** Rails 8.x
 **Stack:**
-- Solid Cache for caching (database-backed, no Redis)
+- Solid Cache for caching when the app uses Rails 8/database-backed caching
 - Turbo for page refreshes and updates
 - ETags with conditional GET for HTTP caching
 - Fragment caching in ERB views
@@ -105,7 +105,7 @@ end
 
 **Authentication:**
 - Custom passwordless with Current.user
-- No Devise
+- Existing auth framework respected unless the task is an auth migration
 
 **Multi-tenancy:**
 - URL-based: app.myapp.com/123/projects/456
@@ -330,13 +330,13 @@ comment.update!(body: "Updated text")
 
 ## Pattern 3: Collection Caching
 
-Cache collections of records efficiently with cache_collection.
+Cache collections of records efficiently with Rails collection caching.
 
 ```ruby
 # app/views/boards/index.html.erb
 <div class="boards">
   <%# Cache each board individually %>
-  <% cache_collection @boards, partial: "boards/board" %>
+  <%= render partial: "boards/board", collection: @boards, cached: true %>
 </div>
 
 <%# app/views/boards/_board.html.erb %>
@@ -944,7 +944,7 @@ Cache Turbo Frames for partial page updates.
 <%= turbo_frame_tag "board_cards" do %>
   <% cache [@board, "cards"] do %>
     <div class="cards">
-      <% cache_collection @board.cards, partial: "cards/card" %>
+      <%= render partial: "cards/card", collection: @board.cards, cached: true %>
     </div>
   <% end %>
 <% end %>
@@ -1178,7 +1178,7 @@ fresh_when etag: [@board, params[:view]], last_modified: @board.updated_at
 <% end %>
 
 # Collection
-<% cache_collection @boards, partial: "boards/board" %>
+<%= render partial: "boards/board", collection: @boards, cached: true %>
 ```
 
 ### Low-Level Caching
@@ -1243,7 +1243,7 @@ fresh_when @board # Returns 304 if unchanged
 
 6. **Cache Collections:**
 ```ruby
-<% cache_collection @boards, partial: "boards/board" %>
+<%= render partial: "boards/board", collection: @boards, cached: true %>
 ```
 
 7. **Avoid Caching User-Specific Content:**
@@ -1256,15 +1256,15 @@ fresh_when @board # Returns 304 if unchanged
 
 ## Boundaries
 
-### Always:
+### Prefer:
 - Use HTTP caching with `fresh_when` for index and show actions
 - Use `touch: true` on associations for automatic cache invalidation
 - Use Russian doll caching (nested fragment caches)
-- Use Solid Cache in production (database-backed, no Redis)
+- Use Solid Cache in production when the app is on Rails 8 or already configured for database-backed caching
 - Cache keys should include `updated_at` timestamps
 - Use counter caches for counts
 - Eager load associations to prevent N+1 queries
-- Use `cache_collection` for lists
+- Use Rails collection caching for lists after verifying the current API
 - Include `expires_in` for time-based expiration
 - Scope cache keys to account in multi-tenant apps
 
@@ -1276,8 +1276,8 @@ fresh_when @board # Returns 304 if unchanged
 - Custom cache key strategies
 - Cache storage limits and cleanup policies
 
-### Never:
-- Use Redis for caching (use Solid Cache - database-backed)
+### Avoid:
+- Replacing existing Redis caching without an explicit infrastructure goal and migration plan
 - Cache without considering invalidation strategy
 - Forget `touch: true` when using Russian doll caching
 - Cache CSRF tokens or sensitive user data

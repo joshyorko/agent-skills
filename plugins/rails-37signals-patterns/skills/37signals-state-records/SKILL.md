@@ -2,19 +2,19 @@
 name: 37signals-state-records
 description: >-
   Implements the state-as-records-not-booleans pattern for rich state tracking
-  following 37signals conventions. Use when modeling state changes, replacing
+  following public 37signals-inspired conventions. Use when modeling state changes, replacing
   boolean flags with record-based state, or when user mentions state records,
   closures, publications, or state tracking.
 license: MIT
 metadata:
-  author: 37signals
+  author: agent-skills
   version: "1.0"
-  source: 37signals-patterns
-  source_repo: ThibautBaissac/rails_ai_agents
-  source_ref: e063fc8d8f4444178f4bbda96407e03d339e2c75
-  source_path: 37signals_skills/37signals-state-records
-  compatibility: Ruby 3.3+, Rails 8.2+
+  source: public-basecamp-style-synthesis
+  compatibility: Ruby 3.3+, Rails 8.x
 ---
+## Source Grounding
+
+This skill is community-maintained and 37signals-inspired. It is not an official Basecamp style guide. Read `../../references/basecamp-style.md` first; target repo conventions and installed versions win when they conflict.
 
 You are an expert Rails architect specializing in pattern of modeling state as records instead of boolean columns.
 
@@ -46,7 +46,7 @@ State records give you:
 
 ### Bad (boolean column):
 ```ruby
-# ❌ DON'T DO THIS
+# Less preferred by default
 class Card < ApplicationRecord
   # closed: boolean column in cards table
 
@@ -61,7 +61,7 @@ end
 
 ### Good (state record):
 ```ruby
-# ✅ DO THIS
+# Preferred default
 class Closure < ApplicationRecord
   belongs_to :card, touch: true
   belongs_to :user, optional: true
@@ -90,8 +90,8 @@ end
 
 ## Project knowledge
 
-**Tech Stack:** Rails 8.2 (edge), UUIDs everywhere, ActiveRecord associations
-**Pattern:** One state model per boolean you'd normally add
+**Tech Stack:** Rails 8.x, app-selected IDs, ActiveRecord associations
+**Pattern:** Use state records when a state has lifecycle, actor, audit, or query value
 **Naming:** Noun forms (Closure, Publication, Goldness, NotNow, Archival)
 
 ## Commands you can use
@@ -107,7 +107,7 @@ end
 
 ```ruby
 # Migration
-class CreateClosures < ActiveRecord::Migration[8.2]
+class CreateClosures < ActiveRecord::Migration[8.0]
   def change
     create_table :closures, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -190,7 +190,7 @@ end
 
 ```ruby
 # Migration
-class CreateBoardPublications < ActiveRecord::Migration[8.2]
+class CreateBoardPublications < ActiveRecord::Migration[8.0]
   def change
     create_table :board_publications, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -259,7 +259,7 @@ end
 
 ```ruby
 # Migration for "golden" (important) cards
-class CreateCardGoldnesses < ActiveRecord::Migration[8.2]
+class CreateCardGoldnesses < ActiveRecord::Migration[8.0]
   def change
     create_table :card_goldnesses, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -316,7 +316,7 @@ module Card::Golden
 end
 
 # Migration for "postponed" (not now) cards
-class CreateCardNotNows < ActiveRecord::Migration[8.2]
+class CreateCardNotNows < ActiveRecord::Migration[8.0]
   def change
     create_table :card_not_nows, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -378,7 +378,7 @@ end
 
 ```ruby
 # Migration
-class CreateCardArchivals < ActiveRecord::Migration[8.2]
+class CreateCardArchivals < ActiveRecord::Migration[8.0]
   def change
     create_table :card_archivals, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -752,7 +752,7 @@ end
 ### Step 1: Create state record model
 
 ```ruby
-class CreateClosures < ActiveRecord::Migration[8.2]
+class CreateClosures < ActiveRecord::Migration[8.0]
   def change
     create_table :closures, id: :uuid do |t|
       t.references :account, null: false, type: :uuid
@@ -770,7 +770,7 @@ end
 ### Step 2: Backfill existing data
 
 ```ruby
-class BackfillClosuresFromBoolean < ActiveRecord::Migration[8.2]
+class BackfillClosuresFromBoolean < ActiveRecord::Migration[8.0]
   def up
     Card.where(closed: true).find_each do |card|
       Closure.create!(
@@ -803,7 +803,7 @@ end
 ### Step 4: Remove boolean column (after verification)
 
 ```ruby
-class RemoveClosedFromCards < ActiveRecord::Migration[8.2]
+class RemoveClosedFromCards < ActiveRecord::Migration[8.0]
   def change
     remove_column :cards, :closed, :boolean
     remove_column :cards, :closed_at, :datetime
@@ -843,6 +843,6 @@ end
 
 ## Boundaries
 
-- ✅ **Always do:** Create state record for business-meaningful states, track who and when, use `where.missing` for negative scopes, add unique index on parent_id, include account_id for multi-tenancy, touch parent record, write tests for state transitions
+- ✅ **Prefer:** Create state record for business-meaningful states, track who and when, use `where.missing` for negative scopes, add unique index on parent_id, include account_id for multi-tenancy, touch parent record, write tests for state transitions
 - ⚠️ **Ask first:** Before using boolean columns for business state, before creating state records without timestamps, before adding complex metadata to state records (might need separate model)
-- 🚫 **Never do:** Use booleans for important business state, skip who/when tracking, forget to scope states by account, create multiple state records per parent (use `has_one` with unique index), skip event tracking for state changes
+- 🚫 **Avoid by default:** Use booleans for important business state, skip who/when tracking, forget to scope states by account, create multiple state records per parent (use `has_one` with unique index), skip event tracking for state changes
