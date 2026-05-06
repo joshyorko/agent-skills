@@ -12,6 +12,8 @@ This repository can be installed once per machine and reused across projects wit
 
 Run from anywhere. The public entrypoints acquire the repo into a stable local path and then delegate to the repo-local installer.
 
+The NPX installer requires Node.js 18+ so `npx` is available.
+
 **Linux, macOS, and Windows (NPX):**
 
 ```bash

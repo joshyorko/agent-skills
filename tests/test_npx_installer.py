@@ -35,6 +35,27 @@ class NpxInstallerTest(unittest.TestCase):
         self.assertIn("Usage: install.sh [options]", result.stdout)
 
     @unittest.skipUnless(shutil.which("node"), "node is required for the NPX installer")
+    def test_cli_module_exports_helpers(self) -> None:
+        script = """
+          const cli = require('./bin/agent-skills.js');
+          console.log(JSON.stringify(Object.keys(cli).sort()));
+        """
+        result = subprocess.run(
+            ["node", "-e", script],
+            cwd=ROOT,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(
+            json.loads(result.stdout),
+            ["commandForPlatform", "normalizePowerShellArgs", "runInstaller", "scriptForPlatform"],
+        )
+
+    @unittest.skipUnless(shutil.which("node"), "node is required for the NPX installer")
     def test_windows_arguments_are_translated_to_powershell_parameters(self) -> None:
         script = """
           const cli = require('./bin/agent-skills.js');

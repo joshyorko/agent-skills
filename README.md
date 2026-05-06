@@ -155,6 +155,8 @@ The `plugins/rcc/` distribution is split into focused RCC-family skills.
 
 Install this repo once per machine and expose its plugins/skills globally.
 
+Requires Node.js 18+ for `npx`.
+
 Linux, macOS, and Windows:
 
 ```bash
