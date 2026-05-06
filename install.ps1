@@ -25,8 +25,8 @@ Usage: install.ps1 [-RepoPath PATH] [-RepoUrl URL] [-CodexHome PATH] [-Marketpla
 Remote bootstrap for the Agent Skills marketplace.
 
 Examples:
-  npx github:joshyorko/agent-skills
-  npx github:joshyorko/agent-skills --ref v1.2.3
+  irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+  `$env:AGENT_SKILLS_REF='v1.2.3'; irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
 "@
 }
 

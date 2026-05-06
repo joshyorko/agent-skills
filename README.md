@@ -151,25 +151,44 @@ The `plugins/rcc/` distribution is split into focused RCC-family skills.
 
 ## Quick Start
 
+### Standalone Skills
+
+Install the generated standalone skill view in compatible agents with:
+
+```bash
+npx skills add joshyorko/agent-skills
+```
+
 ### Codex Bootstrap
 
 Install this repo once per machine and expose its plugins/skills globally.
 
-Requires Node.js 18+ for `npx`.
-
-Linux, macOS, and Windows:
+macOS/Linux:
 
 ```bash
-npx github:joshyorko/agent-skills
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
 ```
 
-Pinned install:
+Pinned macOS/Linux install:
 
 ```bash
-npx github:joshyorko/agent-skills --ref v1.2.3
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
 ```
 
-The NPX entrypoint delegates to the platform installer, which prefers a git checkout when available and falls back to verified release archives when git is unavailable. See [docs/codex-bootstrap.md](docs/codex-bootstrap.md) for options, manual fallback, uninstall flow, and devcontainer usage.
+Windows (PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+```
+
+Pinned Windows install:
+
+```powershell
+$env:AGENT_SKILLS_REF = "v1.2.3"
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+```
+
+The remote entrypoints prefer a git checkout when available and fall back to verified release archives when git is unavailable. See [docs/codex-bootstrap.md](docs/codex-bootstrap.md) for options, manual fallback, uninstall flow, and devcontainer usage.
 
 ### Build Generated Views
 

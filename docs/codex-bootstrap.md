@@ -12,21 +12,32 @@ This repository can be installed once per machine and reused across projects wit
 
 Run from anywhere. The public entrypoints acquire the repo into a stable local path and then delegate to the repo-local installer.
 
-The NPX installer requires Node.js 18+ so `npx` is available.
-
-**Linux, macOS, and Windows (NPX):**
+**macOS/Linux (bash):**
 
 ```bash
-npx github:joshyorko/agent-skills
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
 ```
 
 Pinned install:
 
 ```bash
-npx github:joshyorko/agent-skills --ref v1.2.3
+curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
 ```
 
-The NPX entrypoint delegates to the platform installer. It prefers git when it is available and falls back to release archives when it is not. On Windows, `SkillMode=auto` will transparently fall back from symlink to copy if symlinks are blocked.
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+```
+
+Pinned install:
+
+```powershell
+$env:AGENT_SKILLS_REF = "v1.2.3"
+irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
+```
+
+The remote entrypoints prefer git when it is available and fall back to release archives when it is not. On Windows, `SkillMode=auto` will transparently fall back from symlink to copy if symlinks are blocked.
 
 ### Manual fallback
 
@@ -74,7 +85,7 @@ To bootstrap automatically inside a devcontainer, add a `postCreateCommand`:
 
 ```jsonc
 {
-  "postCreateCommand": "npx github:joshyorko/agent-skills"
+  "postCreateCommand": "curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash"
 }
 ```
 
