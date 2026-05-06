@@ -36,8 +36,8 @@ Options:
   -h, --help                Show this help message
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
-  curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
+  npx github:joshyorko/agent-skills
+  npx github:joshyorko/agent-skills --ref v1.2.3
 EOF
 }
 

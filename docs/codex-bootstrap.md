@@ -12,32 +12,19 @@ This repository can be installed once per machine and reused across projects wit
 
 Run from anywhere. The public entrypoints acquire the repo into a stable local path and then delegate to the repo-local installer.
 
-**macOS/Linux (bash):**
+**Linux, macOS, and Windows (NPX):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
+npx github:joshyorko/agent-skills
 ```
 
 Pinned install:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
+npx github:joshyorko/agent-skills --ref v1.2.3
 ```
 
-**Windows (PowerShell):**
-
-```powershell
-irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
-```
-
-Pinned install:
-
-```powershell
-$env:AGENT_SKILLS_REF = "v1.2.3"
-irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
-```
-
-The remote entrypoints prefer git when it is available and fall back to release archives when it is not. On Windows, `SkillMode=auto` will transparently fall back from symlink to copy if symlinks are blocked.
+The NPX entrypoint delegates to the platform installer. It prefers git when it is available and falls back to release archives when it is not. On Windows, `SkillMode=auto` will transparently fall back from symlink to copy if symlinks are blocked.
 
 ### Manual fallback
 
@@ -85,7 +72,7 @@ To bootstrap automatically inside a devcontainer, add a `postCreateCommand`:
 
 ```jsonc
 {
-  "postCreateCommand": "curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash"
+  "postCreateCommand": "npx github:joshyorko/agent-skills"
 }
 ```
 

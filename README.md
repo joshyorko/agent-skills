@@ -155,32 +155,19 @@ The `plugins/rcc/` distribution is split into focused RCC-family skills.
 
 Install this repo once per machine and expose its plugins/skills globally.
 
-macOS/Linux:
+Linux, macOS, and Windows:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash
+npx github:joshyorko/agent-skills
 ```
 
-Pinned macOS/Linux install:
+Pinned install:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.sh | bash -s -- --ref v1.2.3
+npx github:joshyorko/agent-skills --ref v1.2.3
 ```
 
-Windows (PowerShell):
-
-```powershell
-irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
-```
-
-Pinned Windows install:
-
-```powershell
-$env:AGENT_SKILLS_REF = "v1.2.3"
-irm https://raw.githubusercontent.com/joshyorko/agent-skills/main/install.ps1 | iex
-```
-
-The remote entrypoints prefer a git checkout when available and fall back to verified release archives when git is unavailable. See [docs/codex-bootstrap.md](docs/codex-bootstrap.md) for options, manual fallback, uninstall flow, and devcontainer usage.
+The NPX entrypoint delegates to the platform installer, which prefers a git checkout when available and falls back to verified release archives when git is unavailable. See [docs/codex-bootstrap.md](docs/codex-bootstrap.md) for options, manual fallback, uninstall flow, and devcontainer usage.
 
 ### Build Generated Views
 
