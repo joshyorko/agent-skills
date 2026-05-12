@@ -2,7 +2,7 @@
 name: fizzy
 description: |
   Interact with Fizzy via the Fizzy CLI or the self-hosted MCP server. Manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action.
+  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Always choose the surface first: prefer the Fizzy MCP tool for supported board/card/account/comment reads and writes when available; use the CLI for setup, troubleshooting, and CLI-only coverage.
 triggers:
   # Direct invocations
   - fizzy
@@ -63,21 +63,29 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 
 **MUST follow these rules:**
 
-1. **Cards use NUMBER, not ID** — `fizzy card show 42` uses the card number. Other resources use their `id` field.
-2. **Use built-in `--jq` for filtering** to reduce token output — `fizzy card list --jq '[.data[] | {number, title}]'`. Never pipe to external jq — use `--jq` instead. `--jq` implies `--json`, no need to pass both.
-3. **Check breadcrumbs** in responses for available next actions with pre-filled values.
-4. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards.
-5. **Use `fizzy doctor` for setup/config/auth issues** before guessing — it is the primary read-only health check and includes remediation hints.
-6. **Rich text fields accept markdown or HTML** — use repeatable `--attach PATH` for simple end-appended inline attachments, or embed `<action-text-attachment>` tags manually when exact placement matters.
-7. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`.
-8. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
+1. **Choose the surface before the first Fizzy action** — if the `fizzy` MCP tool is available and the task fits its supported surface, use MCP first. If you use the CLI instead, state the reason before running it.
+2. **Cards use NUMBER, not ID in the CLI** — `fizzy card show 42` uses the card number. Other CLI resources use their `id` field.
+3. **Use built-in `--jq` for CLI filtering** to reduce token output — `fizzy card list --jq '[.data[] | {number, title}]'`. Never pipe to external jq — use `--jq` instead. `--jq` implies `--json`, no need to pass both.
+4. **Check breadcrumbs** in CLI responses for available next actions with pre-filled values.
+5. **Check for board context** via `.fizzy.yaml` or `--board` flag before listing cards with the CLI.
+6. **Use `fizzy doctor` for CLI setup/config/auth issues** before guessing — it is the primary read-only health check and includes remediation hints.
+7. **Rich text fields accept markdown or HTML in the CLI** — use repeatable `--attach PATH` for simple end-appended inline attachments, or embed `<action-text-attachment>` tags manually when exact placement matters.
+8. **Card description is a string in CLI JSON**, but comment body is a nested object — `.description` vs `.body.plain_text`.
+9. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
 
 ## Interaction Surfaces
 
 Fizzy now has two supported agent surfaces:
 
-- **CLI**: Use `fizzy` for local Codex work, shell automation, full API coverage, attachments, migrations, board bootstrap, and setup/troubleshooting.
-- **MCP**: Use the installed `fizzy` MCP server when the user asks for MCP, ChatGPT, connector, Developer Mode, app/tool behavior, or when MCP tools are already available in the active tool list.
+- **MCP first for supported work**: Use the installed `fizzy` MCP server when the task is a supported board/card/account/comment read or write and the MCP tools are available. This includes simple questions like listing board names.
+- **CLI for CLI-only work**: Use `fizzy` for local shell automation, setup/troubleshooting, attachments, migrations, board bootstrap, commands not exposed through MCP, or when the MCP tools are unavailable.
+
+Preflight before acting:
+
+1. Check whether `fizzy` MCP tools are available in the active tool list.
+2. If available, use MCP for `account_list`, `board_list`, `board_show`, `column_list`, `card_list`, `card_show`, `search`, `fetch`, `comment_list`, `card_create`, `card_update`, and `comment_create`.
+3. If MCP is unavailable or the task is outside that list, use the CLI and say why.
+4. Do not run CLI setup/auth/config diagnostics before trying MCP for a supported MCP task.
 
 Do not fall back to raw HTTP requests, curl, endpoint probing, or HTML scraping. Only inspect OAuth or MCP endpoints directly when the user is debugging the MCP integration itself.
 
