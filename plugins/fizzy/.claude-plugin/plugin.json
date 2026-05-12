@@ -1,7 +1,7 @@
 {
   "name": "fizzy",
   "version": "0.1.0",
-  "description": "CLI-first Fizzy workflows for boards, cards, comments, account setup, and self-hosted management using the upstream fizzy CLI only.",
+  "description": "Fizzy workflows for boards, cards, comments, account setup, self-hosted management, and connector-native MCP access.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -13,6 +13,7 @@
   "keywords": [
     "fizzy",
     "cli",
+    "mcp",
     "project-management",
     "self-hosted",
     "workflow"

@@ -1,8 +1,8 @@
 ---
 name: fizzy
 description: |
-  Interact with Fizzy via the Fizzy CLI. Manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, and account settings. Use for ANY Fizzy question or action.
+  Interact with Fizzy via the Fizzy CLI or the self-hosted MCP server. Manage boards, cards, columns, comments,
+  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action.
 triggers:
   # Direct invocations
   - fizzy
@@ -18,6 +18,9 @@ triggers:
   - fizzy notification
   - fizzy webhook
   - fizzy account
+  - fizzy mcp
+  - fizzy connector
+  - ChatGPT Fizzy
   # Common actions
   - link to fizzy
   - track in fizzy
@@ -54,7 +57,7 @@ argument-hint: "[action] [args...]"
 
 # /fizzy - Fizzy Workflow Command
 
-Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration.
+Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration. MCP coverage is intentionally narrower for connector-native board/card search, fetch, and write tools.
 
 ## Agent Invariants
 
@@ -69,6 +72,41 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 7. **Card description is a string**, but comment body is a nested object — `.description` vs `.body.plain_text`.
 8. **Display the welcome message for new signups** — When `signup complete --name` returns `is_new_user: true`, you MUST immediately display the `welcome_message` field prominently to the user. This is a one-time personal note from the CEO — if you skip it, the user will never see it.
 
+## Interaction Surfaces
+
+Fizzy now has two supported agent surfaces:
+
+- **CLI**: Use `fizzy` for local Codex work, shell automation, full API coverage, attachments, migrations, board bootstrap, and setup/troubleshooting.
+- **MCP**: Use the installed `fizzy` MCP server when the user asks for MCP, ChatGPT, connector, Developer Mode, app/tool behavior, or when MCP tools are already available in the active tool list.
+
+Do not fall back to raw HTTP requests, curl, endpoint probing, or HTML scraping. Only inspect OAuth or MCP endpoints directly when the user is debugging the MCP integration itself.
+
+Default self-hosted MCP endpoint:
+
+```text
+https://fizzy.joshyorko.com/mcp/
+```
+
+The plugin declares this endpoint in `plugins/fizzy/.mcp.json`. This skill is intended to work with Josh's `https://fizzy.joshyorko.com/mcp/` endpoint only; do not retarget the MCP server to another Fizzy host unless the plugin itself is deliberately forked for that host.
+
+MCP transport/auth shape:
+
+- Streamable HTTP / JSON-RPC over HTTP POST at `/mcp`.
+- OAuth bearer tokens through protected-resource metadata, dynamic registration, and PKCE.
+- ChatGPT HTTPS callbacks, native app callbacks, and Codex loopback redirects are supported by the `self-hosted` branch.
+- Read tools require `read`; mutating tools require `read write`.
+
+MCP v1 tool surface:
+
+- Read: `search`, `fetch`, `identity_show`, `account_list`, `board_list`, `board_show`, `column_list`, `card_list`, `card_show`, `comment_list`.
+- Write: `card_create`, `card_update`, `comment_create`.
+
+Important MCP differences from the CLI:
+
+- MCP `card_id` accepts a Fizzy card id or card number; the CLI still prefers card NUMBER for `fizzy card ...`.
+- MCP rich text fields are Action Text HTML. Plain text is accepted, but send HTML for paragraphs, lists, links, bold, or italics. Markdown is not the MCP rich text format.
+- MCP `card_create` and `card_update` can create board-visible agent workflow cards with `tag_titles`, `steps`, and `golden`; use tags like `#agent-instructions`, `#move-to-done`, `#close-on-complete`, or `#move-to-<column>`.
+
 ## Decision Trees
 
 ### Finding Content
@@ -77,7 +115,7 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 Need to find something?
 ├── Know the board? → fizzy card list --board <id>
 ├── Full-text search? → fizzy search "query"
-├── Filter by status? → fizzy card list --indexed-by closed|not_now|golden|stalled
+├── Filter by status? → fizzy card list --indexed-by maybe|closed|not_now|golden|stalled
 ├── Filter by person? → fizzy card list --assignee <id>
 ├── Filter by time? → fizzy card list --created today|thisweek|thismonth
 └── Cross-board? → fizzy search "query" (searches all boards)
@@ -100,18 +138,19 @@ Want to change something?
 | Resource | List | Show | Create | Update | Delete | Other |
 |----------|------|------|--------|--------|--------|-------|
 | account | - | `account show` | - | `account settings-update` | - | `account entropy`, `account export-create`, `account export-show EXPORT_ID`, `account join-code-show`, `account join-code-reset`, `account join-code-update` |
-| board | `board list` | `board show ID` | `board create` | `board update ID` | `board delete ID` | `board publish ID`, `board unpublish ID`, `board entropy ID`, `board closed`, `board postponed`, `board stream`, `board involvement ID`, `migrate board ID` |
+| board | `board list` | `board show ID` | `board create` | `board update ID` | `board delete ID` | `board accesses --board ID`, `board publish ID`, `board unpublish ID`, `board entropy ID`, `board closed`, `board postponed`, `board stream`, `board involvement ID`, `migrate board ID` |
 | card | `card list` | `card show NUMBER` | `card create` | `card update NUMBER` | `card delete NUMBER` | `card move NUMBER`, `card publish NUMBER`, `card mark-read NUMBER`, `card mark-unread NUMBER` |
 | search | `search QUERY` | - | - | - | - | - |
+| activity | `activity list` | - | - | - | - | `activity list --board ID`, `activity list --creator ID` |
 | column | `column list --board ID` | `column show ID --board ID` | `column create` | `column update ID` | `column delete ID` | `column move-left ID`, `column move-right ID` |
 | comment | `comment list --card NUMBER` | `comment show ID --card NUMBER` | `comment create` | `comment update ID` | `comment delete ID` | `comment attachments show --card NUMBER` |
 | step | `step list --card NUMBER` | `step show ID --card NUMBER` | `step create` | `step update ID` | `step delete ID` | - |
 | reaction | `reaction list` | - | `reaction create` | - | `reaction delete ID` | - |
 | tag | `tag list` | - | - | - | - | - |
-| user | `user list` | `user show ID` | - | `user update ID` | - | `user deactivate ID`, `user role ID`, `user avatar-remove ID`, `user push-subscription-create`, `user push-subscription-delete ID` |
+| user | `user list` | `user show ID` | - | `user update ID` | - | `user deactivate ID`, `user role ID`, `user avatar-remove ID`, `user export-create USER_ID`, `user export-show USER_ID EXPORT_ID`, `user email-change-request USER_ID --email user@example.com`, `user email-change-confirm USER_ID TOKEN`, `user push-subscription-create`, `user push-subscription-delete ID` |
 | notification | `notification list` | - | - | - | - | `notification tray`, `notification read-all`, `notification settings-show`, `notification settings-update` |
 | pin | `pin list` | - | - | - | - | `card pin NUMBER`, `card unpin NUMBER` |
-| webhook | `webhook list --board ID` | `webhook show ID --board ID` | `webhook create` | `webhook update ID` | `webhook delete ID` | `webhook reactivate ID` |
+| webhook | `webhook list --board ID`, `webhook deliveries --board ID WEBHOOK_ID` | `webhook show ID --board ID` | `webhook create` | `webhook update ID` | `webhook delete ID` | `webhook reactivate ID` |
 
 ---
 
@@ -162,7 +201,6 @@ Commands supporting `--all` and `--page`:
 - `board postponed`
 - `board stream`
 - `card list`
-- `search`
 - `comment list`
 - `tag list`
 - `user list`
@@ -360,9 +398,9 @@ Cards exist in different states. By default, `fizzy card list` returns **open ca
 You can also use pseudo-columns:
 
 ```bash
-fizzy card list --column done --all     # Same as --indexed-by closed
-fizzy card list --column not-now --all  # Same as --indexed-by not_now
-fizzy card list --column maybe --all    # Cards in triage (no column assigned)
+fizzy card list --column done      # Same as --indexed-by closed
+fizzy card list --column not-now   # Same as --indexed-by not_now
+fizzy card list --column maybe     # Same as --indexed-by maybe
 ```
 
 **Fetching all cards on a board:**
@@ -468,26 +506,33 @@ The `auto_postpone_period_in_days` is the account-level default. Cards are autom
 
 ### Search
 
-Quick text search across cards. Multiple words are treated as separate terms (AND).
+Full-text search across cards. The query is sent as a single string to the
+dedicated search endpoint; if the query exactly matches a card ID, that card
+is returned directly.
 
 ```bash
-fizzy search QUERY [flags]
-  --board ID                           # Filter by board
-  --assignee ID                        # Filter by assignee user ID
-  --tag ID                             # Filter by tag ID
-  --indexed-by LANE                    # Filter: all, closed, not_now, golden
-  --sort ORDER                         # Sort: newest, oldest, or latest (default)
-  --page N                             # Page number
-  --all                                # Fetch all pages
+fizzy search QUERY
 ```
 
 **Examples:**
 ```bash
 fizzy search "bug"                     # Search for "bug"
-fizzy search "login error"             # Search for cards containing both "login" AND "error"
-fizzy search "bug" --board BOARD_ID    # Search within a specific board
-fizzy search "bug" --indexed-by closed # Include closed cards
-fizzy search "feature" --sort newest   # Sort by newest first
+fizzy search "login error"             # Single-string FTS query
+fizzy search 12345                     # Card-ID lookup shortcut
+```
+
+To filter cards by structured criteria (board, tag, assignee, status, sort,
+or AND-of-words term filtering), use `fizzy card list` with `--search` and
+the relevant filter flags:
+
+```bash
+fizzy card list --search "bug" --board BOARD_ID --indexed-by closed --sort newest
+```
+
+### Activities
+
+```bash
+fizzy activity list [--board ID] [--creator ID] [--page N] [--all]
 ```
 
 ### Boards
@@ -501,6 +546,7 @@ fizzy board publish BOARD_ID
 fizzy board unpublish BOARD_ID
 fizzy board delete BOARD_ID
 fizzy board entropy BOARD_ID --auto_postpone_period_in_days N  # N: 3, 7, 11, 30, 90, 365
+fizzy board accesses --board ID [--page N]             # Show board access settings and users
 fizzy board closed --board ID [--page N] [--all]       # List closed cards
 fizzy board postponed --board ID [--page N] [--all]    # List postponed cards
 fizzy board stream --board ID [--page N] [--all]       # List stream cards
@@ -559,7 +605,7 @@ fizzy card list [flags]
   --column ID                          # Filter by column ID or pseudo: not-now, maybe, done
   --assignee ID                        # Filter by assignee user ID
   --tag ID                             # Filter by tag ID
-  --indexed-by LANE                    # Filter: all, closed, not_now, stalled, postponing_soon, golden
+  --indexed-by LANE                    # Filter: all, closed, maybe, not_now, stalled, postponing_soon, golden
   --search "terms"                     # Search by text (space-separated for multiple terms)
   --sort ORDER                         # Sort: newest, oldest, or latest (default)
   --creator ID                         # Filter by creator user ID
@@ -721,6 +767,10 @@ fizzy user update USER_ID --avatar /path.jpg  # Update user avatar
 fizzy user deactivate USER_ID                  # Deactivate user (requires admin/owner)
 fizzy user role USER_ID --role ROLE            # Update user role (requires admin/owner)
 fizzy user avatar-remove USER_ID               # Remove user avatar
+fizzy user export-create USER_ID               # Create user data export
+fizzy user export-show USER_ID EXPORT_ID       # Show user data export status
+fizzy user email-change-request USER_ID --email user@example.com
+fizzy user email-change-confirm USER_ID TOKEN
 fizzy user push-subscription-create --user ID --endpoint URL --p256dh-key KEY --auth-key KEY
 fizzy user push-subscription-delete SUB_ID --user ID
 ```
@@ -750,6 +800,7 @@ Webhooks notify external services when events occur on a board. Requires account
 
 ```bash
 fizzy webhook list --board ID [--page N] [--all]
+fizzy webhook deliveries --board ID WEBHOOK_ID [--page N] [--all]
 fizzy webhook show WEBHOOK_ID --board ID
 fizzy webhook create --board ID --name "Name" --url "https://..." [--actions card_published,card_closed,...]
 fizzy webhook update WEBHOOK_ID --board ID [--name "Name"] [--actions card_closed,...]
@@ -804,81 +855,6 @@ fizzy upload file PATH
 ---
 
 ## Common Workflows
-
-### Fizzy Popper Board Bootstrap
-
-Use this when a user wants to prepare an existing Fizzy board for `fizzy-popper`. This is an agent-skill helper for board setup through the `fizzy` CLI; it is not `fizzy-popper setup`, does not write `.fizzy-popper/config.yml`, and does not configure the daemon.
-
-The board contract is golden-ticket first:
-
-- A column is agent-enabled by a card in that column tagged `#agent-instructions`.
-- The column name is not the signal.
-- Keep one golden-ticket card per agent column.
-- The golden-ticket description is the agent prompt.
-- The golden-ticket checklist becomes agent steps.
-- Backend and completion behavior come from golden-ticket tags.
-- `WORKFLOW.md` is optional repo policy context; the board/golden-ticket contract is primary.
-
-Before changing a board, run read-only checks:
-
-```bash
-fizzy doctor
-fizzy board list --markdown
-```
-
-Ask the user:
-
-- Which board should be prepared?
-- Which backend tag should the golden ticket use? Default: `#codex`.
-- What should the agent column be named? Default: `Ready for Agents`.
-- What should happen on completion? Default: move to `Done`.
-- Should a smoke-test work card be created? Default: no.
-- Should the default golden-ticket prompt be used? Default: yes.
-
-Run the helper from this repo on the Bluefin host or inside a Linux/devcontainer shell where the `fizzy` CLI is installed and authenticated:
-
-```bash
-bash plugins/fizzy/skills/fizzy/scripts/bootstrap-fizzy-popper-board.sh \
-  --board BOARD_ID \
-  --backend codex \
-  --agent-column "Ready for Agents" \
-  --completion move-to-done
-```
-
-Supported options:
-
-```bash
---board BOARD_ID                 # required existing board ID
---backend codex|claude|opencode|anthropic|openai|command
---agent-column "Ready for Agents"
---completion move-to-done
---completion "move-to:Ready for Review"
---completion close-on-complete
---done-column "Done"             # alias for --completion move-to:Done
---title "Repo Agent"
---prompt "Prompt text"
---prompt-file PATH
---smoke-card
---smoke-title "Smoke test the agent loop"
---smoke-description "Inspect this repository and post a short summary of what it is."
---api-url URL
---profile NAME
---dry-run
---force-tags
-```
-
-The helper reuses exact-name columns, creates missing columns, creates or reuses one golden ticket in the agent column, adds missing tags and default steps, and only creates a smoke-test work card when `--smoke-card` is passed. Because `fizzy card tag` toggles tags, the helper checks existing tags before changing them. If an existing golden ticket has a conflicting backend or completion tag, it stops unless `--force-tags` is passed.
-
-Default golden-ticket checklist:
-
-```text
-Inspect the repository and the card request
-Make the smallest safe change that satisfies the request
-Run the appropriate local checks
-Summarize what changed and any follow-up needed
-```
-
-After running it, summarize the board ID/name, agent column ID/name, completion behavior, golden-ticket card number/title, whether a smoke-test card was created, and the next command: `fizzy-popper start`.
 
 ### Create Card with Steps
 
@@ -971,11 +947,11 @@ fizzy card move 579 --to TARGET_BOARD_ID
 ### Search and Filter Cards
 
 ```bash
-# Quick search
+# Full-text search
 fizzy search "bug" --jq '[.data[] | {number, title}]'
 
-# Search with filters
-fizzy search "login" --board BOARD_ID --sort newest
+# Filter cards by criteria (use card list, not search)
+fizzy card list --search "login" --board BOARD_ID --sort newest
 
 # Find recently created cards
 fizzy card list --created today --sort newest

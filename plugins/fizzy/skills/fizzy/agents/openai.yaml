@@ -1,4 +1,13 @@
 interface:
   display_name: "Fizzy"
-  short_description: "Manage Fizzy boards, cards, columns, comments, steps, and more with the upstream fizzy CLI only. Never use curl or direct HTTP requests."
-  default_prompt: "Use $fizzy to manage Fizzy boards, cards, comments, and more from the command line. For self-hosted work, point the CLI at the hosted instance with --api-url or FIZZY_API_URL, and never fall back to curl, raw HTTP requests, endpoint probing, or HTML scraping."
+  short_description: "Manage Fizzy boards, cards, columns, comments, steps, and more with the CLI or self-hosted MCP server. Never use curl or direct HTTP requests."
+  default_prompt: "Use $fizzy to manage Fizzy boards, cards, comments, and more. Prefer the CLI for local shell work and the Fizzy MCP server for connector-native ChatGPT/Codex access when available. For self-hosted CLI work, use --api-url or FIZZY_API_URL; never fall back to curl, raw HTTP requests, endpoint probing, or HTML scraping."
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "fizzy"
+      description: "Josh's Fizzy self-hosted MCP server for OAuth-backed board/card search, fetch, and write tools. This plugin is intended to use only this MCP endpoint."
+      transport: "streamable_http"
+      url: "https://fizzy.joshyorko.com/mcp/"
+policy:
+  allow_implicit_invocation: true

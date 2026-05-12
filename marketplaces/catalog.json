@@ -41,10 +41,12 @@
       "name": "fizzy",
       "category": "Productivity",
       "claude_category": "productivity",
-      "description": "CLI-first Fizzy workflows for boards, cards, comments, setup, and self-hosted management.",
+      "description": "Fizzy workflows for boards, cards, comments, setup, self-hosted management, and MCP connector access.",
       "tags": [
         "fizzy",
         "project-management",
+        "mcp",
+        "connector",
         "cli",
         "productivity"
       ]
