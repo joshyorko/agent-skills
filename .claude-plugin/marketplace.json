@@ -4,34 +4,25 @@
     "name": "Josh Yorko"
   },
   "metadata": {
-    "description": "Plugin-first skill marketplace for Rails, Fizzy, and RCC workflows."
+    "description": "Plugin-first skill marketplace for 37signals, Fizzy, and RCC workflows."
   },
   "plugins": [
     {
-      "name": "rails-37signals-patterns",
-      "source": "./plugins/rails-37signals-patterns",
-      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
+      "name": "37signals",
+      "source": "./plugins/37signals",
+      "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
       "category": "development",
       "tags": [
-        "rails",
         "37signals",
+        "rails",
+        "basecamp",
         "hotwire",
         "kamal",
-        "patterns",
+        "shape-up",
+        "rework",
+        "product-design",
+        "dhh",
         "developer-tools"
-      ]
-    },
-    {
-      "name": "rails-37signals-workflows",
-      "source": "./plugins/rails-37signals-workflows",
-      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
-      "category": "development",
-      "tags": [
-        "rails",
-        "37signals",
-        "workflow",
-        "implementation",
-        "review"
       ]
     },
     {

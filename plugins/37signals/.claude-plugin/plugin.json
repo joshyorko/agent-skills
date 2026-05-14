@@ -1,0 +1,24 @@
+{
+  "name": "37signals",
+  "version": "0.1.0",
+  "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
+  "author": {
+    "name": "Josh Yorko",
+    "email": "joshua.yorko@gmail.com",
+    "url": "https://github.com/joshyorko"
+  },
+  "homepage": "https://github.com/joshyorko/agent-skills",
+  "repository": "https://github.com/joshyorko/agent-skills",
+  "license": "MIT",
+  "keywords": [
+    "37signals",
+    "rails",
+    "basecamp",
+    "hotwire",
+    "kamal",
+    "shape-up",
+    "rework",
+    "product-design",
+    "dhh"
+  ]
+}

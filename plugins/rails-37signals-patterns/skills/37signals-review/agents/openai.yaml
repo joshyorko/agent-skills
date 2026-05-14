@@ -1,7 +1,0 @@
-interface:
-  display_name: "37signals Review"
-  short_description: "Review Rails changes against specialist 37signals-inspired pattern guidance when explicitly delegated"
-  default_prompt: "Use $37signals-review after a workflow skill chooses this pattern-level review path."
-
-policy:
-  allow_implicit_invocation: false

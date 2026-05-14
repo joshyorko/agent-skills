@@ -7,34 +7,25 @@
     "displayName": "Agent Skills"
   },
   "metadata": {
-    "description": "Plugin-first skill marketplace for Rails, Fizzy, and RCC workflows."
+    "description": "Plugin-first skill marketplace for 37signals, Fizzy, and RCC workflows."
   },
   "plugins": [
     {
-      "name": "rails-37signals-patterns",
+      "name": "37signals",
       "category": "Developer Tools",
       "claude_category": "development",
-      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
+      "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
       "tags": [
-        "rails",
         "37signals",
+        "rails",
+        "basecamp",
         "hotwire",
         "kamal",
-        "patterns",
+        "shape-up",
+        "rework",
+        "product-design",
+        "dhh",
         "developer-tools"
-      ]
-    },
-    {
-      "name": "rails-37signals-workflows",
-      "category": "Developer Tools",
-      "claude_category": "development",
-      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
-      "tags": [
-        "rails",
-        "37signals",
-        "workflow",
-        "implementation",
-        "review"
       ]
     },
     {

@@ -1,7 +1,0 @@
-interface:
-  display_name: "37signals Implement"
-  short_description: "Coordinate specialist Rails 37signals pattern skills when explicitly delegated"
-  default_prompt: "Use $37signals-implement after a workflow skill chooses this pattern-level orchestration path."
-
-policy:
-  allow_implicit_invocation: false

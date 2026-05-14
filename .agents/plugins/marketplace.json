@@ -5,20 +5,24 @@
   },
   "plugins": [
     {
-      "name": "rails-37signals-patterns",
-      "description": "Compact Rails specialists inspired by public 37signals/Basecamp practice for models, controllers, Hotwire, Kamal deployment, jobs, testing, tenancy, and related application patterns.",
+      "name": "37signals",
+      "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
       "tags": [
-        "rails",
         "37signals",
+        "rails",
+        "basecamp",
         "hotwire",
         "kamal",
-        "patterns",
+        "shape-up",
+        "rework",
+        "product-design",
+        "dhh",
         "developer-tools"
       ],
       "interface": {
-        "displayName": "Rails 37signals Patterns",
-        "shortDescription": "Compact Rails specialists inspired by public 37signals practice.",
-        "longDescription": "Compact Rails specialist skills for CRUD, models, Hotwire, Kamal deployment, caching, jobs, multi-tenancy, and related 37signals-inspired application design. Community-maintained, source-grounded, and intended to be delegated from the workflow router.",
+        "displayName": "37signals",
+        "shortDescription": "Rails, product, and work judgment inspired by 37signals.",
+        "longDescription": "A single 37signals-inspired skill plugin covering Rails architecture, Hotwire, Kamal, product/interface design, Shape Up style shaping, REWORK-style scope discipline, calm work, and DHH Rails judgment. Community-maintained, source-grounded, and not an official 37signals or Basecamp plugin.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -29,55 +33,15 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Use the relevant Rails 37signals specialist skill for this focused Rails change.",
-          "Review this focused Rails area against 37signals-inspired pattern guidance.",
-          "Use the Kamal specialist to inspect this deploy/runtime change."
+          "Use 37signals skills to implement this Rails feature with source-grounded conventions.",
+          "Use 37signals product design to simplify this interface around the epicenter.",
+          "Use 37signals Shape Up and Rework judgment to prune this idea before implementation."
         ],
         "brandColor": "#9A3412"
       },
       "source": {
         "source": "local",
-        "path": "./plugins/rails-37signals-patterns"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Developer Tools"
-    },
-    {
-      "name": "rails-37signals-workflows",
-      "description": "Router-level Rails skills for implementation, refactoring, and review using 37signals-inspired conventions.",
-      "tags": [
-        "rails",
-        "37signals",
-        "workflow",
-        "implementation",
-        "review"
-      ],
-      "interface": {
-        "displayName": "Rails 37signals Workflows",
-        "shortDescription": "Rails implementation, refactor, and review routers.",
-        "longDescription": "Router-level Rails workflow skills that inspect the app first, choose the right compact specialist skills, and report verification and residual risk using 37signals-inspired conventions.",
-        "developerName": "Josh Yorko",
-        "category": "Developer Tools",
-        "capabilities": [
-          "Read",
-          "Write"
-        ],
-        "websiteURL": "https://github.com/joshyorko/agent-skills",
-        "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
-        "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
-        "defaultPrompt": [
-          "Use Rails 37signals Workflows to implement this feature and choose the right specialists.",
-          "Use Rails 37signals Workflows to refactor this code while preserving behavior.",
-          "Use Rails 37signals Workflows to review this Rails change and report residual risk."
-        ],
-        "brandColor": "#B45309"
-      },
-      "source": {
-        "source": "local",
-        "path": "./plugins/rails-37signals-workflows"
+        "path": "./plugins/37signals"
       },
       "policy": {
         "installation": "AVAILABLE",

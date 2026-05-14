@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Refactor"
+  short_description: "Refactor Rails code incrementally"
+  default_prompt: "Use $37signals-refactor to simplify this Rails code toward 37signals-inspired conventions."

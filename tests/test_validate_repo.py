@@ -75,26 +75,26 @@ class SkillFrontmatterTest(unittest.TestCase):
 
         self.assertIn("missing YAML frontmatter close", str(error.exception))
 
-    def test_rejects_rails_37signals_non_trigger_description(self) -> None:
+    def test_rejects_37signals_non_trigger_description(self) -> None:
         skill_dir = self.make_skill(
-            "rails-skill",
-            "name: rails-skill\n"
+            "37signals-skill",
+            "name: 37signals-skill\n"
             "description: Builds Rails things",
         )
 
         with self.assertRaises(SystemExit) as error:
-            validate_repo.validate_rails_37signals_skill(skill_dir)
+            validate_repo.validate_37signals_skill(skill_dir)
 
         self.assertIn("must start with 'Use when'", str(error.exception))
 
-    def test_rejects_rails_37signals_long_skill_body(self) -> None:
+    def test_rejects_37signals_long_skill_body(self) -> None:
         root = Path(tempfile.mkdtemp())
-        skill_dir = root / "rails-skill"
+        skill_dir = root / "37signals-skill"
         skill_dir.mkdir()
-        long_body = " ".join(["word"] * (validate_repo.RAILS_37SIGNALS_MAX_WORDS + 1))
+        long_body = " ".join(["word"] * (validate_repo.GUIDED_37SIGNALS_MAX_WORDS + 1))
         (skill_dir / "SKILL.md").write_text(
             "---\n"
-            "name: rails-skill\n"
+            "name: 37signals-skill\n"
             "description: Use when testing length\n"
             "---\n"
             f"{long_body}\n",
@@ -102,20 +102,20 @@ class SkillFrontmatterTest(unittest.TestCase):
         )
 
         with self.assertRaises(SystemExit) as error:
-            validate_repo.validate_rails_37signals_skill(skill_dir)
+            validate_repo.validate_37signals_skill(skill_dir)
 
         self.assertIn("exceeds", str(error.exception))
 
-    def test_rejects_rails_37signals_per_skill_references(self) -> None:
+    def test_rejects_37signals_per_skill_references(self) -> None:
         skill_dir = self.make_skill(
-            "rails-skill",
-            "name: rails-skill\n"
+            "37signals-skill",
+            "name: 37signals-skill\n"
             "description: Use when testing references",
         )
         (skill_dir / "references").mkdir()
 
         with self.assertRaises(SystemExit) as error:
-            validate_repo.validate_rails_37signals_skill(skill_dir)
+            validate_repo.validate_37signals_skill(skill_dir)
 
         self.assertIn("per-skill references", str(error.exception))
 
