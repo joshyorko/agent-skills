@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Scope Judgment"
+  short_description: "Scope and overkill review"
+  default_prompt: "Use $37signals-scope-judgment to simplify this plan, product surface, or process through source-grounded 37signals scope judgment."

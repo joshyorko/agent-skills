@@ -6,7 +6,7 @@
   "plugins": [
     {
       "name": "37signals",
-      "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
+      "description": "Compact 37signals-inspired Rails, Hotwire, product, shaping, communication, and DHH judgment skills with source-grounded recipes.",
       "tags": [
         "37signals",
         "rails",
@@ -14,15 +14,16 @@
         "hotwire",
         "kamal",
         "shape-up",
-        "rework",
+        "scope",
+        "communication",
         "product-design",
         "dhh",
         "developer-tools"
       ],
       "interface": {
         "displayName": "37signals",
-        "shortDescription": "Rails, product, and work judgment inspired by 37signals.",
-        "longDescription": "A single 37signals-inspired skill plugin covering Rails architecture, Hotwire, Kamal, product/interface design, Shape Up style shaping, REWORK-style scope discipline, calm work, and DHH Rails judgment. Community-maintained, source-grounded, and not an official 37signals or Basecamp plugin.",
+        "shortDescription": "Rails, product, shaping, and work judgment inspired by 37signals.",
+        "longDescription": "A compact 37signals-inspired skill plugin covering Rails implementation/review/refactoring, Hotwire, product/interface design, Shape Up style shaping, scope discipline, communication, and DHH Rails judgment. Lower-level topics such as auth, tenancy, migrations, jobs, caching, Turbo, Stimulus, Kamal, and tests live as source-grounded recipes. Community-maintained and not an official 37signals or Basecamp plugin.",
         "developerName": "Josh Yorko",
         "category": "Developer Tools",
         "capabilities": [
@@ -33,9 +34,9 @@
         "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
         "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
         "defaultPrompt": [
-          "Use 37signals skills to implement this Rails feature with source-grounded conventions.",
-          "Use 37signals product design to simplify this interface around the epicenter.",
-          "Use 37signals Shape Up and Rework judgment to prune this idea before implementation."
+          "Use $37signals-rails-implement to implement this Rails feature with source-grounded recipes.",
+          "Use $37signals-product-design to simplify this interface around the epicenter.",
+          "Use $37signals-shape-up and $37signals-scope-judgment to narrow this idea before implementation."
         ],
         "brandColor": "#9A3412"
       },

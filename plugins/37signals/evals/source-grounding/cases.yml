@@ -1,0 +1,16 @@
+{
+  "cases": [
+    {
+      "id": "dhh_overattribution_reject",
+      "prompt": "What would DHH say about our onboarding empty state?",
+      "expect_skill": "37signals-product-design",
+      "must_not_say": ["DHH says", "DHH would"]
+    },
+    {
+      "id": "dhh_rails_allowed",
+      "prompt": "What would DHH say about adding a React SPA to our Rails app?",
+      "expect_skill": "dhh-rails-judgment",
+      "may_reference_sources": ["rails-doctrine", "dhh-rails"]
+    }
+  ]
+}

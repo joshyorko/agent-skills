@@ -11,10 +11,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "marketplaces" / "catalog.json"
+ACTIVE_MANIFEST = "skills.active.yml"
 
 
 def load_catalog() -> dict:
     return json.loads(CATALOG_PATH.read_text())
+
+
+def active_skill_dirs(plugin_name: str, skills_root: Path) -> list[Path]:
+    manifest_path = skills_root.parent / ACTIVE_MANIFEST
+    if plugin_name == "37signals" and manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text())
+        return [skills_root / name for name in manifest["skills"]]
+    return sorted(p for p in skills_root.iterdir() if p.is_dir())
 
 
 def remove_path(path: Path) -> None:
@@ -44,9 +53,11 @@ def collect_skills(catalog: dict) -> tuple[dict[str, Path], dict[str, Path]]:
     standalone_entries = {}
     for plugin in catalog["plugins"]:
         skills_root = ROOT / "plugins" / plugin["name"] / "skills"
-        for skill_dir in sorted(p for p in skills_root.iterdir() if p.is_dir()):
+        for skill_dir in active_skill_dirs(plugin["name"], skills_root):
             if skill_dir.name in canonical:
                 raise SystemExit(f"duplicate skill name: {skill_dir.name}")
+            if not (skill_dir / "SKILL.md").exists():
+                raise SystemExit(f"missing SKILL.md in active skill: {skill_dir}")
             canonical[skill_dir.name] = skill_dir
             standalone_entries[skill_dir.name] = skill_dir
     return canonical, standalone_entries

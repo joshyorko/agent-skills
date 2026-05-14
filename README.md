@@ -49,44 +49,23 @@ agent-skills/
 
 ### 37signals
 
-The `plugins/37signals/skills/` skills cover Rails implementation, Rails review/refactoring, product/interface design, Shape Up style shaping, REWORK-style simplification, and DHH-inspired Rails judgment. They are community-maintained, source-grounded, and not official 37signals/Basecamp guidance.
+The `plugins/37signals/` plugin is now one compact active skill suite instead of many recipe-sized skills. The active surface is listed in [`plugins/37signals/skills.active.yml`](plugins/37signals/skills.active.yml); detailed tactics live as recipe references under [`plugins/37signals/references/recipes/`](plugins/37signals/references/recipes/). The skills are community-maintained, source-grounded, and not official 37signals/Basecamp guidance.
 
-Across the set, the Rails defaults lean toward rich models, CRUD resources, Hotwire, Solid Queue, Kamal-based deployment, explicit tenancy choices, project-aware schema policy, and Minitest with fixtures where the target app already follows that stack. The product/work defaults lean toward interface-first design, epicenter design, depth over surface area, shaped appetite, calm communication, and overkill reduction.
+The suite separates durable entrypoints from lower-level implementation recipes. Rails work starts with implement, review, refactor, Hotwire, or DHH Rails judgment. Product work starts with product design, Shape Up, scope judgment, or communication. When a lower-level topic is needed, the active skill loads a recipe such as auth, tenancy, migrations, jobs, caching, tests, Turbo, Stimulus, Kamal, or product copy.
 
-**Primary entrypoints**
+**Active entrypoints**
 
-- [`37signals-implement`](plugins/37signals/skills/37signals-implement/SKILL.md) — end-to-end Rails feature implementation using the focused specialist skills.
-- [`37signals-refactor`](plugins/37signals/skills/37signals-refactor/SKILL.md) — incremental, behavior-preserving Rails refactors toward 37signals-inspired conventions.
-- [`37signals-review`](plugins/37signals/skills/37signals-review/SKILL.md) — Rails code review and architecture auditing through a 37signals-inspired lens.
-- [`37signals-product-design`](plugins/37signals/skills/37signals-product-design/SKILL.md) — interface-first product UI, frontend flow, and product copy design.
-- [`37signals-shape-up`](plugins/37signals/skills/37signals-shape-up/SKILL.md) — shaped pitches with appetite, problem, solution sketch, rabbit holes, and no-gos.
-- [`37signals-rework`](plugins/37signals/skills/37signals-rework/SKILL.md) — product/team/process simplification using REWORK, Getting Real, calm-work, and scope discipline.
-- [`dhh-rails-judgment`](plugins/37signals/skills/dhh-rails-judgment/SKILL.md) — DHH-inspired Rails architecture judgment around monoliths, Hotwire, omakase defaults, and conceptual compression.
+- [`37signals-rails-implement`](plugins/37signals/skills/37signals-rails-implement/SKILL.md) - end-to-end Rails feature implementation with recipe selection for models, controllers, tenancy, jobs, mailers, APIs, tests, and deployment.
+- [`37signals-rails-review`](plugins/37signals/skills/37signals-rails-review/SKILL.md) - Rails code review focused on behavioral risk, missing tests, coupling, tenancy leaks, and convention drift.
+- [`37signals-rails-refactor`](plugins/37signals/skills/37signals-rails-refactor/SKILL.md) - behavior-preserving Rails refactoring toward clearer domain objects, CRUD resources, lifecycle records, and local conventions.
+- [`37signals-hotwire`](plugins/37signals/skills/37signals-hotwire/SKILL.md) - Turbo, Stimulus, server-rendered UI, and SPA-resistance decisions for Rails interfaces.
+- [`37signals-product-design`](plugins/37signals/skills/37signals-product-design/SKILL.md) - interface-first product UI, frontend flows, copy, empty states, onboarding, and working screens.
+- [`37signals-shape-up`](plugins/37signals/skills/37signals-shape-up/SKILL.md) - shaped pitches with appetite, problem, solution sketch, rabbit holes, no-gos, and scope boundaries.
+- [`37signals-scope-judgment`](plugins/37signals/skills/37signals-scope-judgment/SKILL.md) - REWORK, Getting Real, and calm-work simplification for product plans, roadmaps, process, and team communication.
+- [`37signals-communication`](plugins/37signals/skills/37signals-communication/SKILL.md) - concise product/team writing: pitches, decisions, launch notes, status updates, and async explanations.
+- [`dhh-rails-judgment`](plugins/37signals/skills/dhh-rails-judgment/SKILL.md) - DHH-inspired Rails architecture judgment around monoliths, Hotwire, omakase defaults, and conceptual compression.
 
-**Domain, data, and tenancy**
-
-- [`37signals-auth`](plugins/37signals/skills/37signals-auth/SKILL.md) — small Rails-native passwordless authentication with digest-only token guidance.
-- [`37signals-active-record-tenanted`](plugins/37signals/skills/37signals-active-record-tenanted/SKILL.md) — separate-database multi-tenancy with Active Record Tenanted and tenant-aware Rails configuration.
-- [`37signals-concerns`](plugins/37signals/skills/37signals-concerns/SKILL.md) — shared model and controller behavior via focused concerns.
-- [`37signals-migration`](plugins/37signals/skills/37signals-migration/SKILL.md) — project-aware migrations with explicit tenant keys, reversible changes, and constraint policy.
-- [`37signals-model`](plugins/37signals/skills/37signals-model/SKILL.md) — rich domain models with business logic, scopes, validations, and associations.
-- [`37signals-multi-tenant`](plugins/37signals/skills/37signals-multi-tenant/SKILL.md) — shared-database multi-tenancy and explicit account scoping.
-- [`37signals-state-records`](plugins/37signals/skills/37signals-state-records/SKILL.md) — models business state as records instead of booleans.
-
-**Delivery, UI, and operations**
-
-- [`37signals-api`](plugins/37signals/skills/37signals-api/SKILL.md) — REST APIs using `respond_to` blocks with Jbuilder templates.
-- [`37signals-caching`](plugins/37signals/skills/37signals-caching/SKILL.md) — HTTP caching, ETags, `fresh_when`, `stale?`, and fragment caching.
-- [`37signals-crud`](plugins/37signals/skills/37signals-crud/SKILL.md) — RESTful controllers built around the “everything is CRUD” philosophy.
-- [`37signals-events`](plugins/37signals/skills/37signals-events/SKILL.md) — event tracking, activity feeds, and webhook-friendly event models.
-- [`37signals-kamal`](plugins/37signals/skills/37signals-kamal/SKILL.md) — Kamal deployment, roles, hooks, secrets, accessories, and deploy-safe Rails runtime operations.
-- [`37signals-jobs`](plugins/37signals/skills/37signals-jobs/SKILL.md) — shallow background jobs and async workflows using Solid Queue.
-- [`37signals-mailer`](plugins/37signals/skills/37signals-mailer/SKILL.md) — minimal Action Mailer patterns and bundled notifications.
-- [`37signals-stimulus`](plugins/37signals/skills/37signals-stimulus/SKILL.md) — focused Stimulus controllers for progressive enhancement.
-- [`37signals-test`](plugins/37signals/skills/37signals-test/SKILL.md) — Minitest and fixtures for fast, readable Rails test coverage.
-- [`37signals-turbo`](plugins/37signals/skills/37signals-turbo/SKILL.md) — Turbo Streams, Frames, and morphing for real-time UI updates.
-
-The shared source-grounding reference lives at [`plugins/37signals/references/basecamp-style.md`](plugins/37signals/references/basecamp-style.md). It includes Rails, Getting Real, Shape Up, REWORK/calm-work, and DHH/Jason Fried public sources.
+Shared evidence and caveats live in [`plugins/37signals/references/source-index.yml`](plugins/37signals/references/source-index.yml) and [`plugins/37signals/references/caveats.md`](plugins/37signals/references/caveats.md). Regression cases live under [`plugins/37signals/evals/`](plugins/37signals/evals/) and are validated by `bin/check`.
 
 ### Fizzy
 
@@ -192,7 +171,7 @@ The repo emits two generated skill views:
 - `.agents/skills/` for standard in-repo agent discovery
 - `.agents/plugins/marketplace.json` for the repo-local Codex marketplace manifest used by the installer's Codex marketplace registration command
 
-If you're unsure where to start, use `37signals-implement`, `37signals-refactor`, or `37signals-review` for Rails work; use `37signals-product-design`, `37signals-shape-up`, `37signals-rework`, or `dhh-rails-judgment` for product, shaping, work, or architecture judgment.
+If you're unsure where to start, use `37signals-rails-implement`, `37signals-rails-refactor`, or `37signals-rails-review` for Rails work; use `37signals-product-design`, `37signals-shape-up`, `37signals-scope-judgment`, `37signals-communication`, or `dhh-rails-judgment` for product, shaping, communication, work, or architecture judgment.
 
 For Fizzy specifically, install the CLI first with:
 

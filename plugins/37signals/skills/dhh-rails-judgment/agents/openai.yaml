@@ -1,4 +1,4 @@
 interface:
   display_name: "DHH Rails Judgment"
   short_description: "DHH-inspired Rails decisions"
-  default_prompt: "Use $dhh-rails-judgment to evaluate this Rails architecture through DHH-inspired monolith, Hotwire, and omakase principles."
+  default_prompt: "Use $dhh-rails-judgment only for explicit DHH or Rails Doctrine architecture judgment."

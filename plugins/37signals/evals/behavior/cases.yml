@@ -1,0 +1,22 @@
+{
+  "cases": [
+    {
+      "id": "product_design_states",
+      "prompt": "Review this onboarding empty state.",
+      "expect_skill": "37signals-product-design",
+      "must_mention": ["epicenter", "copy", "blank", "error"]
+    },
+    {
+      "id": "hotwire_before_spa",
+      "prompt": "Should this Rails workflow become a React SPA?",
+      "expect_skill": "37signals-hotwire",
+      "must_mention": ["server-rendered", "Turbo", "Stimulus", "accepted complexity"]
+    },
+    {
+      "id": "scope_cutting",
+      "prompt": "This feature has settings, dashboards, alerts, and automation. Make it smaller.",
+      "expect_skill": "37signals-scope-judgment",
+      "must_mention": ["cut", "defer", "decision owner"]
+    }
+  ]
+}

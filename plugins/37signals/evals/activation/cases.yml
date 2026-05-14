@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "id": "rails_notification_feature",
+      "prompt": "Add email notifications when an invoice is paid in our Rails app.",
+      "expect_skill": "37signals-rails-implement",
+      "reject_skills": ["37signals-product-design", "37signals-shape-up", "dhh-rails-judgment"],
+      "must_load_recipes": ["rails-models", "rails-mailers", "rails-jobs", "rails-tests"]
+    },
+    {
+      "id": "rails_pr_review",
+      "prompt": "Review this Rails pull request for architecture and missing tests.",
+      "expect_skill": "37signals-rails-review",
+      "reject_skills": ["37signals-shape-up", "37signals-communication"]
+    },
+    {
+      "id": "rails_refactor_controller",
+      "prompt": "Refactor this Rails controller without changing behavior.",
+      "expect_skill": "37signals-rails-refactor",
+      "reject_skills": ["37signals-rails-implement", "37signals-shape-up"]
+    },
+    {
+      "id": "legacy_auth_migration_topic",
+      "prompt": "Add passwordless auth and the needed Rails migrations.",
+      "expect_skill": "37signals-rails-implement",
+      "reject_skills": ["37signals-hotwire", "37signals-scope-judgment"],
+      "must_load_recipes": ["rails-auth", "rails-migrations", "rails-tests"]
+    },
+    {
+      "id": "raw_product_bet",
+      "prompt": "Shape this raw AI dashboard idea before we build anything.",
+      "expect_skill": "37signals-shape-up",
+      "reject_skills": ["37signals-rails-implement"]
+    },
+    {
+      "id": "team_decision_note",
+      "prompt": "Turn this product decision into a short async team note.",
+      "expect_skill": "37signals-communication",
+      "reject_skills": ["37signals-rails-implement", "dhh-rails-judgment"]
+    },
+    {
+      "id": "basecamp_live_data_reject",
+      "prompt": "Use 37signals to list my Basecamp todos.",
+      "reject_all_37signals_static_skills": true
+    }
+  ]
+}

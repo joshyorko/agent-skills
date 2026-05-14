@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Rails Implement"
+  short_description: "Rails feature implementation"
+  default_prompt: "Use $37signals-rails-implement to implement this Rails feature with source-grounded 37signals-inspired defaults."

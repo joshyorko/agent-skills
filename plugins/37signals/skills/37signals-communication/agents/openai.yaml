@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Communication"
+  short_description: "Async updates and decisions"
+  default_prompt: "Use $37signals-communication to write or review this update, decision memo, or async coordination artifact."

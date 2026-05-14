@@ -1,4 +1,0 @@
-interface:
-  display_name: "37signals Rework"
-  short_description: "Prune scope and work calmly"
-  default_prompt: "Use $37signals-rework to simplify this product, team, or execution plan using 37signals-inspired work principles."

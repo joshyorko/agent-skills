@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Rails Review"
+  short_description: "Rails code review"
+  default_prompt: "Use $37signals-rails-review to review this Rails change through source-grounded 37signals-inspired Rails conventions."

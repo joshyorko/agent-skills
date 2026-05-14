@@ -1,0 +1,37 @@
+{
+  "max_active": 9,
+  "skills": [
+    "37signals-rails-implement",
+    "37signals-rails-review",
+    "37signals-rails-refactor",
+    "37signals-hotwire",
+    "37signals-product-design",
+    "37signals-shape-up",
+    "37signals-scope-judgment",
+    "37signals-communication",
+    "dhh-rails-judgment"
+  ],
+  "recipes": [
+    "activerecord-tenanted",
+    "decision-memo",
+    "hotwire-stimulus",
+    "hotwire-turbo",
+    "product-copy",
+    "product-empty-states",
+    "rails-apis",
+    "rails-auth",
+    "rails-caching",
+    "rails-concerns",
+    "rails-crud",
+    "rails-events",
+    "rails-jobs",
+    "rails-kamal",
+    "rails-mailers",
+    "rails-migrations",
+    "rails-models",
+    "rails-state-records",
+    "rails-tenancy",
+    "rails-tests",
+    "shape-up-pitch"
+  ]
+}

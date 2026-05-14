@@ -12,6 +12,33 @@ CATALOG_PATH = ROOT / "marketplaces" / "catalog.json"
 SKILL_NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 GUIDED_37SIGNALS_PLUGINS = {"37signals"}
 GUIDED_37SIGNALS_MAX_WORDS = 650
+GUIDED_37SIGNALS_MAX_ACTIVE_SKILLS = 9
+GUIDED_37SIGNALS_ACTIVE_MANIFEST = "skills.active.yml"
+GUIDED_37SIGNALS_SOURCE_INDEX = "references/source-index.yml"
+GUIDED_37SIGNALS_EVALS = "evals"
+GENERIC_37SIGNALS_SKILL_NAMES = {
+    "37signals-active-record-tenanted",
+    "37signals-api",
+    "37signals-auth",
+    "37signals-caching",
+    "37signals-concerns",
+    "37signals-crud",
+    "37signals-events",
+    "37signals-implement",
+    "37signals-jobs",
+    "37signals-kamal",
+    "37signals-mailer",
+    "37signals-migration",
+    "37signals-model",
+    "37signals-multi-tenant",
+    "37signals-refactor",
+    "37signals-review",
+    "37signals-rework",
+    "37signals-state-records",
+    "37signals-stimulus",
+    "37signals-test",
+    "37signals-turbo",
+}
 
 
 def fail(message: str) -> None:
@@ -20,6 +47,23 @@ def fail(message: str) -> None:
 
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text())
+
+
+def load_json_manifest(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text())
+    except json.JSONDecodeError as error:
+        fail(f"{path} must be JSON-compatible YAML: {error}")
+
+
+def csv_values(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def require_string_list(value: object, field: str, path: Path) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        fail(f"{field} must be a string list in {path}")
+    return value
 
 
 def parse_skill_frontmatter(path: Path) -> dict[str, str]:
@@ -128,6 +172,149 @@ def validate_37signals_skill(skill_dir: Path) -> None:
         if stale_pattern in text:
             fail(f"stale 37signals context '{stale_pattern}' found in {path}")
 
+    if "DHH says" in text and skill_dir.name != "dhh-rails-judgment":
+        fail(f"DHH-specific claim outside DHH skill: {path}")
+
+    agents_path = skill_dir / "agents" / "openai.yaml"
+    if not agents_path.exists():
+        fail(f"missing 37signals OpenAI agent metadata: {agents_path}")
+    agents_text = agents_path.read_text()
+    if f"${skill_dir.name}" not in agents_text:
+        fail(f"37signals OpenAI default prompt must reference ${skill_dir.name}: {agents_path}")
+
+
+def validate_37signals_plugin(plugin_root: Path, skill_dirs: list[Path]) -> None:
+    manifest_path = plugin_root / GUIDED_37SIGNALS_ACTIVE_MANIFEST
+    if not manifest_path.exists():
+        fail(f"missing 37signals active manifest: {manifest_path}")
+
+    manifest = load_json_manifest(manifest_path)
+    active_skills = manifest.get("skills", [])
+    max_active = manifest.get("max_active")
+    if not isinstance(active_skills, list) or not all(isinstance(name, str) for name in active_skills):
+        fail(f"37signals active skills must be a string list: {manifest_path}")
+    if not isinstance(max_active, int) or max_active < 1:
+        fail(f"37signals max_active must be a positive integer: {manifest_path}")
+    if max_active != GUIDED_37SIGNALS_MAX_ACTIVE_SKILLS:
+        fail(
+            f"37signals max_active must stay {GUIDED_37SIGNALS_MAX_ACTIVE_SKILLS}: "
+            f"{manifest_path}"
+        )
+    if len(active_skills) > GUIDED_37SIGNALS_MAX_ACTIVE_SKILLS:
+        fail(f"37signals active skills exceed max_active {max_active}: {manifest_path}")
+    if len(active_skills) != len(set(active_skills)):
+        fail(f"duplicate 37signals active skill in {manifest_path}")
+    for name in active_skills:
+        if not SKILL_NAME_RE.match(name):
+            fail(f"invalid 37signals active skill name in {manifest_path}: {name}")
+
+    actual_skills = [skill_dir.name for skill_dir in skill_dirs]
+    if set(actual_skills) != set(active_skills):
+        fail(f"37signals active skill directories must match skills.active.yml: {actual_skills} != {active_skills}")
+    for stale_name in GENERIC_37SIGNALS_SKILL_NAMES:
+        if stale_name in actual_skills:
+            fail(f"recipe-like 37signals skill must not be active: {stale_name}")
+
+    source_index_path = plugin_root / GUIDED_37SIGNALS_SOURCE_INDEX
+    if not source_index_path.exists():
+        fail(f"missing 37signals source index: {source_index_path}")
+    source_index = load_json_manifest(source_index_path)
+    sources = source_index.get("sources", {})
+    if not isinstance(sources, dict) or not sources:
+        fail(f"37signals source index must define sources: {source_index_path}")
+    for source_id, source in sources.items():
+        if not isinstance(source, dict):
+            fail(f"37signals source entry must be an object: {source_id}")
+        for field in ("url", "scope", "allowed_claims", "caveat"):
+            if field not in source:
+                fail(f"37signals source '{source_id}' missing {field}: {source_index_path}")
+
+    expected_recipes = set(manifest.get("recipes", []))
+    recipes_root = plugin_root / "references" / "recipes"
+    if not recipes_root.exists():
+        fail(f"missing 37signals recipe directory: {recipes_root}")
+    actual_recipes = {path.stem for path in recipes_root.glob("*.md")}
+    if actual_recipes != expected_recipes:
+        fail(f"37signals recipes do not match manifest: {actual_recipes} != {expected_recipes}")
+
+    active_set = set(active_skills)
+    source_ids = set(sources)
+    for recipe_path in sorted(recipes_root.glob("*.md")):
+        data = parse_skill_frontmatter(recipe_path)
+        if data.get("type") != "recipe":
+            fail(f"37signals recipe must declare type: recipe: {recipe_path}")
+        owned_by = csv_values(data.get("owned_by", ""))
+        recipe_sources = csv_values(data.get("source_ids", ""))
+        claim_scope = data.get("claim_scope", "")
+        if not owned_by:
+            fail(f"37signals recipe missing owned_by: {recipe_path}")
+        if not set(owned_by).issubset(active_set):
+            fail(f"37signals recipe owner is not active in {recipe_path}: {owned_by}")
+        if not recipe_sources:
+            fail(f"37signals recipe missing source_ids: {recipe_path}")
+        if not set(recipe_sources).issubset(source_ids):
+            fail(f"37signals recipe source_ids are unknown in {recipe_path}: {recipe_sources}")
+        if not claim_scope:
+            fail(f"37signals recipe missing claim_scope: {recipe_path}")
+
+        text = recipe_path.read_text()
+        if "DHH says" in text and claim_scope != "dhh-rails":
+            fail(f"DHH-specific wording outside dhh-rails scope: {recipe_path}")
+
+    evals_root = plugin_root / GUIDED_37SIGNALS_EVALS
+    if not evals_root.exists():
+        fail(f"missing 37signals eval directory: {evals_root}")
+    eval_files = sorted(evals_root.glob("**/*.yml"))
+    if not eval_files:
+        fail(f"37signals eval directory must contain .yml cases: {evals_root}")
+
+    seen_case_ids: set[str] = set()
+    covered_skills: set[str] = set()
+    for eval_path in eval_files:
+        eval_data = load_json_manifest(eval_path)
+        cases = eval_data.get("cases")
+        if not isinstance(cases, list) or not cases:
+            fail(f"37signals eval file must contain non-empty cases list: {eval_path}")
+        for case in cases:
+            if not isinstance(case, dict):
+                fail(f"37signals eval case must be an object: {eval_path}")
+            case_id = case.get("id")
+            prompt = case.get("prompt")
+            if not isinstance(case_id, str) or not case_id:
+                fail(f"37signals eval case missing id: {eval_path}")
+            if case_id in seen_case_ids:
+                fail(f"duplicate 37signals eval case id: {case_id}")
+            seen_case_ids.add(case_id)
+            if not isinstance(prompt, str) or not prompt:
+                fail(f"37signals eval case missing prompt: {case_id}")
+
+            expect_skill = case.get("expect_skill")
+            if expect_skill is not None and expect_skill not in active_set:
+                fail(f"37signals eval expect_skill is not active in {case_id}: {expect_skill}")
+            if isinstance(expect_skill, str):
+                covered_skills.add(expect_skill)
+            reject_skills = case.get("reject_skills", [])
+            for rejected in require_string_list(reject_skills, "reject_skills", eval_path):
+                if rejected not in active_set:
+                    fail(f"37signals eval reject_skills is not active in {case_id}: {rejected}")
+            must_load_recipes = case.get("must_load_recipes", [])
+            for recipe in require_string_list(must_load_recipes, "must_load_recipes", eval_path):
+                if recipe not in expected_recipes:
+                    fail(f"37signals eval must_load_recipes is unknown in {case_id}: {recipe}")
+            may_reference_sources = case.get("may_reference_sources", [])
+            for source_id in require_string_list(may_reference_sources, "may_reference_sources", eval_path):
+                if source_id not in source_ids:
+                    fail(f"37signals eval may_reference_sources is unknown in {case_id}: {source_id}")
+            for text_list_field in ("must_mention", "must_not_say"):
+                require_string_list(case.get(text_list_field, []), text_list_field, eval_path)
+            reject_all = case.get("reject_all_37signals_static_skills")
+            if reject_all is not None and not isinstance(reject_all, bool):
+                fail(f"reject_all_37signals_static_skills must be a boolean in {case_id}")
+
+    missing_eval_coverage = active_set - covered_skills
+    if missing_eval_coverage:
+        fail(f"37signals evals must cover every active skill: {sorted(missing_eval_coverage)}")
+
 
 def main() -> int:
     catalog = load_json(CATALOG_PATH)
@@ -153,7 +340,11 @@ def main() -> int:
         if not skills_root.exists():
             fail(f"missing skills path for {plugin['name']}: {skills_root}")
 
-        for skill_dir in sorted(p for p in skills_root.iterdir() if p.is_dir()):
+        skill_dirs = sorted(p for p in skills_root.iterdir() if p.is_dir())
+        if plugin["name"] in GUIDED_37SIGNALS_PLUGINS:
+            validate_37signals_plugin(plugin_root, skill_dirs)
+
+        for skill_dir in skill_dirs:
             if skill_dir.name in seen_skills:
                 fail(f"duplicate skill name {skill_dir.name} in {plugin['name']} and {seen_skills[skill_dir.name]}")
             seen_skills[skill_dir.name] = plugin["name"]

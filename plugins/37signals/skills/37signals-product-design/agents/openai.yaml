@@ -1,4 +1,4 @@
 interface:
   display_name: "37signals Product Design"
   short_description: "Interface-first product design"
-  default_prompt: "Use $37signals-product-design to design or review this product UI through 37signals-inspired interface-first principles."
+  default_prompt: "Use $37signals-product-design to design or review this product UI through source-grounded interface-first 37signals principles."

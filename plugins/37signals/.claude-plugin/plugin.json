@@ -1,7 +1,7 @@
 {
   "name": "37signals",
   "version": "0.1.0",
-  "description": "37signals-inspired Rails, product design, shaping, work, and DHH judgment skills grounded in public sources.",
+  "description": "Compact 37signals-inspired Rails, Hotwire, product, shaping, communication, and DHH judgment skills with source-grounded recipes.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -17,7 +17,8 @@
     "hotwire",
     "kamal",
     "shape-up",
-    "rework",
+    "scope",
+    "communication",
     "product-design",
     "dhh"
   ]

@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Hotwire"
+  short_description: "Rails Hotwire UI judgment"
+  default_prompt: "Use $37signals-hotwire to design or review this Rails UI interaction with Hotwire and progressive enhancement."

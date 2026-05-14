@@ -1,0 +1,52 @@
+{
+  "sources": {
+    "37signals-books": {
+      "url": "https://37signals.com/books",
+      "scope": "37signals-synthesis",
+      "allowed_claims": ["public 37signals books", "practical company lessons"],
+      "caveat": "Use as public bibliography, not as proof of a specific practice."
+    },
+    "getting-real": {
+      "url": "https://books.37signals.com/8/getting-real",
+      "scope": "product-design",
+      "allowed_claims": ["interface-first", "epicenter design", "context over consistency", "one interface", "copy as interface", "regular blank error states"],
+      "caveat": "Product-design synthesis, not DHH-only guidance."
+    },
+    "shape-up": {
+      "url": "https://basecamp.com/shapeup",
+      "scope": "shaping",
+      "allowed_claims": ["appetite", "pitch", "rabbit holes", "no-gos", "circuit breaker", "betting"],
+      "caveat": "Use for shaping work before implementation, not as a backlog format."
+    },
+    "basecamp-guides": {
+      "url": "https://basecamp.com/guides",
+      "scope": "communication",
+      "allowed_claims": ["async writing", "decision ownership", "calm communication", "source of truth"],
+      "caveat": "Team constraints and explicit decision owners win."
+    },
+    "rails-doctrine": {
+      "url": "https://rubyonrails.org/doctrine",
+      "scope": "dhh-rails",
+      "allowed_claims": ["omakase", "convention over configuration", "integrated systems", "programmer happiness"],
+      "caveat": "Rails/DHH scope only; do not apply to general product strategy."
+    },
+    "dhh-rails": {
+      "url": "https://world.hey.com/dhh",
+      "scope": "dhh-rails",
+      "allowed_claims": ["one person framework", "monolith", "Hotwire", "no-build", "service skepticism"],
+      "caveat": "Use only for explicit DHH/Rails architecture judgment."
+    },
+    "dev-37signals": {
+      "url": "https://dev.37signals.com",
+      "scope": "rails-synthesis",
+      "allowed_claims": ["vanilla Rails", "good concerns", "multi-tenancy", "Solid Queue", "delegated type", "QA"],
+      "caveat": "Verify the exact article before treating an example as current practice."
+    },
+    "basecamp-repos": {
+      "url": "https://github.com/basecamp",
+      "scope": "local-repo",
+      "allowed_claims": ["public Basecamp-owned repo evidence", "CLI skill structure", "validation patterns"],
+      "caveat": "A repo pattern proves that repo, not universal 37signals doctrine."
+    }
+  }
+}

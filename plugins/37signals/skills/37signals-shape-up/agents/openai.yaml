@@ -1,4 +1,4 @@
 interface:
   display_name: "37signals Shape Up"
   short_description: "Shape ideas before building"
-  default_prompt: "Use $37signals-shape-up to turn this raw idea into a shaped pitch with appetite, boundaries, risks, and no-gos."
+  default_prompt: "Use $37signals-shape-up to turn this raw idea into a source-grounded shaped pitch with appetite, boundaries, risks, no-gos, and circuit breaker."
