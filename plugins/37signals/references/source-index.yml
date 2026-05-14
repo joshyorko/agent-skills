@@ -12,11 +12,41 @@
       "allowed_claims": ["interface-first", "epicenter design", "context over consistency", "one interface", "copy as interface", "regular blank error states"],
       "caveat": "Product-design synthesis, not DHH-only guidance."
     },
+    "getting-real-interface": {
+      "url": "https://basecamp.com/gettingreal/09.1-interface-first",
+      "scope": "product-design",
+      "allowed_claims": ["interface-first", "epicenter design", "blank slate", "three states", "context over consistency", "copywriting as interface"],
+      "caveat": "Use for product/interface judgment and refresh, not Rails architecture."
+    },
+    "getting-real-post-launch": {
+      "url": "https://basecamp.com/gettingreal",
+      "scope": "product-refresh",
+      "allowed_claims": ["one month tuneup", "better not beta", "beware the bloat monster", "ride out reaction storms", "go with the flow"],
+      "caveat": "Use as product-refresh/post-launch synthesis; verify chapter-level claims before quoting."
+    },
     "shape-up": {
       "url": "https://basecamp.com/shapeup",
       "scope": "shaping",
       "allowed_claims": ["appetite", "pitch", "rabbit holes", "no-gos", "circuit breaker", "betting"],
       "caveat": "Use for shaping work before implementation, not as a backlog format."
+    },
+    "shape-up-cycle": {
+      "url": "https://basecamp.com/shapeup/2.2-chapter-08",
+      "scope": "shaping",
+      "allowed_claims": ["six-week cycles", "cool-down", "betting table", "circuit breaker", "clean slate"],
+      "caveat": "Adjust cycle mechanics to team size; do not force formal Basecamp process onto tiny teams."
+    },
+    "shape-up-existing-products": {
+      "url": "https://basecamp.com/shapeup/2.3-chapter-09",
+      "scope": "shaping",
+      "allowed_claims": ["existing product bets", "cleanup mode", "production mode", "questions to ask", "post kickoff message"],
+      "caveat": "Existing-product work still needs a bounded bet or refresh appetite, not a grab-bag redesign."
+    },
+    "shape-up-scopes": {
+      "url": "https://basecamp.com/shapeup/3.3-chapter-12",
+      "scope": "shaping",
+      "allowed_claims": ["map scopes", "language of the project", "scope-level progress"],
+      "caveat": "Use after a bet starts; not a substitute for shaping the appetite and boundaries."
     },
     "basecamp-guides": {
       "url": "https://basecamp.com/guides",
@@ -41,6 +71,24 @@
       "scope": "rails-synthesis",
       "allowed_claims": ["vanilla Rails", "good concerns", "multi-tenancy", "Solid Queue", "delegated type", "QA"],
       "caveat": "Verify the exact article before treating an example as current practice."
+    },
+    "recordables-series": {
+      "url": "https://dev.37signals.com/series/recordables/",
+      "scope": "video-transcript",
+      "allowed_claims": ["public 37signals technical video series", "conversation-backed technical explanations", "video/transcript evidence"],
+      "caveat": "Use only episode-specific claims after opening the matching article/transcript."
+    },
+    "recordables-delegated-types": {
+      "url": "https://dev.37signals.com/the-rails-delegated-type-pattern/",
+      "scope": "rails-synthesis",
+      "allowed_claims": ["recordables", "delegated type hierarchy", "shared operations", "Basecamp and HEY example"],
+      "caveat": "A Basecamp/HEY architecture example, not a universal Rails schema recommendation."
+    },
+    "hotwire-project-stacks": {
+      "url": "https://dev.37signals.com/building-basecamp-project-stacks-with-hotwire/",
+      "scope": "rails-synthesis",
+      "allowed_claims": ["Basecamp project stacks", "Hotwire", "delegated type bucketables", "Rails UI behavior"],
+      "caveat": "Use as a public Basecamp implementation example, not a default for every product."
     },
     "basecamp-repos": {
       "url": "https://github.com/basecamp",

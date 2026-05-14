@@ -1,7 +1,7 @@
 {
   "name": "37signals",
   "version": "0.1.0",
-  "description": "Compact 37signals-inspired Rails, Hotwire, product, shaping, communication, and DHH judgment skills with source-grounded recipes.",
+  "description": "Compact 37signals-inspired Rails, Hotwire, product refresh, shaping, communication, and DHH judgment skills with source-grounded recipes.",
   "author": {
     "name": "Josh Yorko",
     "email": "joshua.yorko@gmail.com",
@@ -18,6 +18,7 @@
     "kamal",
     "shape-up",
     "scope",
+    "product-refresh",
     "communication",
     "product-design",
     "dhh"
@@ -25,8 +26,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "37signals",
-    "shortDescription": "Rails, product, shaping, and work judgment inspired by 37signals.",
-    "longDescription": "A compact 37signals-inspired skill plugin covering Rails implementation/review/refactoring, Hotwire, product/interface design, Shape Up style shaping, scope discipline, communication, and DHH Rails judgment. Lower-level topics such as auth, tenancy, migrations, jobs, caching, Turbo, Stimulus, Kamal, and tests live as source-grounded recipes. Community-maintained and not an official 37signals or Basecamp plugin.",
+    "shortDescription": "Rails, product refresh, shaping, and work judgment inspired by 37signals.",
+    "longDescription": "A compact 37signals-inspired skill plugin covering Rails implementation/review/refactoring, Hotwire, existing-product refresh, product/interface design, Shape Up style shaping, scope discipline, communication, and DHH Rails judgment. Lower-level topics such as auth, tenancy, migrations, jobs, caching, delegated types, Turbo, Stimulus, Kamal, and tests live as source-grounded recipes. Community-maintained and not an official 37signals or Basecamp plugin.",
     "developerName": "Josh Yorko",
     "category": "Developer Tools",
     "capabilities": [
@@ -38,7 +39,7 @@
     "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
     "defaultPrompt": [
       "Use $37signals-rails-implement to implement this Rails feature with source-grounded recipes.",
-      "Use $37signals-product-design to simplify this interface around the epicenter.",
+      "Use $37signals-product-refresh to refresh this existing product workflow without turning it into a rewrite.",
       "Use $37signals-shape-up and $37signals-scope-judgment to narrow this idea before implementation."
     ],
     "brandColor": "#9A3412"

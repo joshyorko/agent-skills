@@ -1,10 +1,11 @@
 {
-  "max_active": 9,
+  "max_active": 10,
   "skills": [
     "37signals-rails-implement",
     "37signals-rails-review",
     "37signals-rails-refactor",
     "37signals-hotwire",
+    "37signals-product-refresh",
     "37signals-product-design",
     "37signals-shape-up",
     "37signals-scope-judgment",
@@ -16,13 +17,16 @@
     "decision-memo",
     "hotwire-stimulus",
     "hotwire-turbo",
+    "basecamp-agent-skill-patterns",
     "product-copy",
     "product-empty-states",
+    "product-refresh",
     "rails-apis",
     "rails-auth",
     "rails-caching",
     "rails-concerns",
     "rails-crud",
+    "rails-delegated-types",
     "rails-events",
     "rails-jobs",
     "rails-kamal",
@@ -32,6 +36,8 @@
     "rails-state-records",
     "rails-tenancy",
     "rails-tests",
+    "shape-up-cycle",
+    "source-audit",
     "shape-up-pitch"
   ]
 }

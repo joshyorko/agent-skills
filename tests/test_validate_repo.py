@@ -131,7 +131,7 @@ class SkillFrontmatterTest(unittest.TestCase):
         active = ["37signals-rails-implement", "dhh-rails-judgment"]
         (root / "skills.active.yml").write_text(
             '{\n'
-            '  "max_active": 9,\n'
+            '  "max_active": 10,\n'
             '  "skills": ["37signals-rails-implement", "dhh-rails-judgment"],\n'
             '  "recipes": ["rails-models"]\n'
             '}\n',

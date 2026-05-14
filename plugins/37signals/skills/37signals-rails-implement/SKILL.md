@@ -29,8 +29,8 @@ load only the recipe cards needed for the implementation surface.
 
 ## Recipe Routing
 
-- Models, concerns, state records: `rails-models.md`, `rails-concerns.md`,
-  `rails-state-records.md`.
+- Models, concerns, state records, delegated types: `rails-models.md`,
+  `rails-concerns.md`, `rails-state-records.md`, `rails-delegated-types.md`.
 - Routes/controllers: `rails-crud.md`.
 - Schema: `rails-migrations.md`.
 - UI: `hotwire-turbo.md`, `hotwire-stimulus.md`.

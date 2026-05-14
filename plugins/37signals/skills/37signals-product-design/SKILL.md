@@ -39,7 +39,9 @@ navigation, settings, or explanation.
 
 Use `../../references/recipes/product-empty-states.md` and
 `../../references/recipes/product-copy.md` for state and language decisions.
-Use `$37signals-hotwire` when Rails interaction mechanics are the main question.
+Use `$37signals-product-refresh` when the user wants to improve an existing
+screen or workflow. Use `$37signals-hotwire` when Rails interaction mechanics are
+the main question.
 
 ## Review Lens
 
@@ -52,6 +54,7 @@ Use `$37signals-hotwire` when Rails interaction mechanics are the main question.
 ## Do Not Use For
 
 - Full Rails feature implementation: use `$37signals-rails-implement`.
+- Existing product refresh or modernization: use `$37signals-product-refresh`.
 - Shape Up pitch work: use `$37signals-shape-up`.
 - Generic scope cutting: use `$37signals-scope-judgment`.
 

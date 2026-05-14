@@ -31,7 +31,7 @@ preferences and name the smallest Rails-native alternative when pushing back.
 Load only the recipe cards that match touched code. Common cards:
 `rails-crud.md`, `rails-models.md`, `rails-migrations.md`, `rails-tests.md`,
 `hotwire-turbo.md`, `hotwire-stimulus.md`, `rails-tenancy.md`,
-`activerecord-tenanted.md`, and `rails-kamal.md`.
+`activerecord-tenanted.md`, `rails-delegated-types.md`, and `rails-kamal.md`.
 
 ## Do Not Use For
 

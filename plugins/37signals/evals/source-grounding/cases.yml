@@ -7,10 +7,23 @@
       "must_not_say": ["DHH says", "DHH would"]
     },
     {
+      "id": "dhh_refresh_overattribution_reject",
+      "prompt": "What would DHH say about modernizing this stale settings page?",
+      "expect_skill": "37signals-product-refresh",
+      "must_not_say": ["DHH says", "DHH would"]
+    },
+    {
       "id": "dhh_rails_allowed",
       "prompt": "What would DHH say about adding a React SPA to our Rails app?",
       "expect_skill": "dhh-rails-judgment",
       "may_reference_sources": ["rails-doctrine", "dhh-rails"]
+    },
+    {
+      "id": "recordables_scope_check",
+      "prompt": "Use the 37signals Recordables video to decide whether this Rails app needs delegated types.",
+      "expect_skill": "37signals-rails-review",
+      "may_reference_sources": ["recordables-series", "recordables-delegated-types"],
+      "must_not_say": ["universal 37signals doctrine"]
     }
   ]
 }

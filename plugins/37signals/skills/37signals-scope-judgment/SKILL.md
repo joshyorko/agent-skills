@@ -33,10 +33,13 @@ to remove overkill and expose the few decisions that matter.
   settings, and autonomous actions.
 - Use `../../references/recipes/decision-memo.md` when the simplification turns
   on a decision.
+- Use `$37signals-product-refresh` when the simplification target is an existing
+  product screen or workflow.
 
 ## Do Not Use For
 
 - Shaping a full project pitch: use `$37signals-shape-up`.
+- Refreshing an existing screen or workflow: use `$37signals-product-refresh`.
 - Rails architecture tradeoffs: use `$dhh-rails-judgment` or the Rails skills.
 - Generic encouragement or philosophy. Return concrete cuts and tradeoffs.
 

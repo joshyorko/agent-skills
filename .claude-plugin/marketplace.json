@@ -10,7 +10,7 @@
     {
       "name": "37signals",
       "source": "./plugins/37signals",
-      "description": "Compact 37signals-inspired Rails, Hotwire, product, shaping, communication, and DHH judgment skills with source-grounded recipes.",
+      "description": "Compact 37signals-inspired Rails, Hotwire, product refresh, shaping, communication, and DHH judgment skills with source-grounded recipes.",
       "category": "development",
       "tags": [
         "37signals",
@@ -20,6 +20,7 @@
         "kamal",
         "shape-up",
         "scope",
+        "product-refresh",
         "communication",
         "product-design",
         "dhh",

@@ -20,6 +20,20 @@
       "reject_skills": ["37signals-rails-implement", "37signals-shape-up"]
     },
     {
+      "id": "stale_settings_refresh",
+      "prompt": "Refresh this stale settings screen so it feels simpler and more modern without a rewrite.",
+      "expect_skill": "37signals-product-refresh",
+      "reject_skills": ["37signals-shape-up", "dhh-rails-judgment"],
+      "must_load_recipes": ["product-refresh", "product-copy", "product-empty-states"]
+    },
+    {
+      "id": "modernize_existing_onboarding",
+      "prompt": "Modernize this existing onboarding flow and cut the confusing parts.",
+      "expect_skill": "37signals-product-refresh",
+      "reject_skills": ["37signals-rails-implement", "dhh-rails-judgment"],
+      "must_load_recipes": ["product-refresh", "decision-memo"]
+    },
+    {
       "id": "legacy_auth_migration_topic",
       "prompt": "Add passwordless auth and the needed Rails migrations.",
       "expect_skill": "37signals-rails-implement",
@@ -30,7 +44,13 @@
       "id": "raw_product_bet",
       "prompt": "Shape this raw AI dashboard idea before we build anything.",
       "expect_skill": "37signals-shape-up",
-      "reject_skills": ["37signals-rails-implement"]
+      "reject_skills": ["37signals-product-refresh", "37signals-rails-implement"]
+    },
+    {
+      "id": "files_two_point_zero_grab_bag",
+      "prompt": "Redesign Files 2.0 with dashboards, automations, permissions, tags, and a new frontend.",
+      "expect_skill": "37signals-scope-judgment",
+      "reject_skills": ["37signals-rails-implement", "dhh-rails-judgment"]
     },
     {
       "id": "team_decision_note",

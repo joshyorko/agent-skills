@@ -15,15 +15,18 @@ class RuntimeViewsTest(unittest.TestCase):
         root = Path(tempfile.mkdtemp())
         skills_root = root / "plugins" / "37signals" / "skills"
         active = skills_root / "37signals-rails-implement"
+        refresh = skills_root / "37signals-product-refresh"
         stale = skills_root / "37signals-model"
         active.mkdir(parents=True)
+        refresh.mkdir()
         stale.mkdir()
         (active / "SKILL.md").write_text("# Active\n", encoding="utf-8")
+        (refresh / "SKILL.md").write_text("# Refresh\n", encoding="utf-8")
         (stale / "SKILL.md").write_text("# Stale\n", encoding="utf-8")
         (skills_root.parent / "skills.active.yml").write_text(
             '{\n'
-            '  "max_active": 9,\n'
-            '  "skills": ["37signals-rails-implement"],\n'
+            '  "max_active": 10,\n'
+            '  "skills": ["37signals-rails-implement", "37signals-product-refresh"],\n'
             '  "recipes": []\n'
             '}\n',
             encoding="utf-8",
@@ -37,8 +40,14 @@ class RuntimeViewsTest(unittest.TestCase):
         with mock.patch.object(build_runtime_views, "ROOT", root):
             canonical, standalone = build_runtime_views.collect_skills(catalog)
 
-        self.assertEqual(["37signals-rails-implement"], list(canonical))
-        self.assertEqual(["37signals-rails-implement"], list(standalone))
+        self.assertEqual(
+            ["37signals-rails-implement", "37signals-product-refresh"],
+            list(canonical),
+        )
+        self.assertEqual(
+            ["37signals-rails-implement", "37signals-product-refresh"],
+            list(standalone),
+        )
 
     def test_sync_dir_replaces_stale_symlink_with_active_symlink(self) -> None:
         root = self.make_temp_repo()

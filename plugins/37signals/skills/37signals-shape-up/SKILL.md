@@ -29,8 +29,10 @@ bet, appetite, boundaries, risks, and circuit breaker clear enough to decide.
 
 ## Pitch Shape
 
-Use `../../references/recipes/shape-up-pitch.md`. A good pitch has problem,
-appetite, solution, boundaries, rabbit holes, no-gos, and circuit breaker.
+Use `../../references/recipes/shape-up-pitch.md`. Use
+`../../references/recipes/shape-up-cycle.md` when cycle, cool-down, betting, or
+scope-progress language matters. A good pitch has problem, appetite, solution,
+boundaries, rabbit holes, no-gos, and circuit breaker.
 
 ## AI Feature Checks
 
@@ -43,6 +45,8 @@ appetite, solution, boundaries, rabbit holes, no-gos, and circuit breaker.
 
 - Rails implementation after the pitch is accepted: use
   `$37signals-rails-implement`.
+- Existing workflow refresh before it is a bet: use
+  `$37signals-product-refresh`.
 - Generic simplification without pitch structure: use
   `$37signals-scope-judgment`.
 

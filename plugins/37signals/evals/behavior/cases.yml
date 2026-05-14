@@ -7,6 +7,13 @@
       "must_mention": ["epicenter", "copy", "blank", "error"]
     },
     {
+      "id": "product_refresh_brief",
+      "prompt": "This existing project settings flow feels stale and bloated. Refresh it.",
+      "expect_skill": "37signals-product-refresh",
+      "must_mention": ["baseline", "epicenter", "appetite", "what stays", "cut", "states", "validation"],
+      "must_not_say": ["rewrite", "rebrand", "SPA by default"]
+    },
+    {
       "id": "hotwire_before_spa",
       "prompt": "Should this Rails workflow become a React SPA?",
       "expect_skill": "37signals-hotwire",

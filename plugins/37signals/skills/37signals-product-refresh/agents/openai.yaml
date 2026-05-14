@@ -1,0 +1,4 @@
+interface:
+  display_name: "37signals Product Refresh"
+  short_description: "Existing product refresh"
+  default_prompt: "Use $37signals-product-refresh to refresh this existing product workflow with source-grounded 37signals-inspired product judgment."
