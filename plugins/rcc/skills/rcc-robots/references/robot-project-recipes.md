@@ -139,6 +139,48 @@ rcc run -t Reporter -e devdata/env-sqlite-for-reporter.json
 
 Keep work item files and SQLite databases under `devdata/` or `output/`; commit only sample inputs that are intended fixtures.
 
+## DocDB-Backed Production Robot
+
+For a production RPA bot that uses DocumentDB as the durable queue and artifact boundary, keep the robot task surface explicit:
+
+```yaml
+tasks:
+  SeedDocDB:
+    shell: python scripts/seed_docdb.py
+  Producer:
+    shell: python -m robocorp.tasks run tasks.py -t producer
+  Consumer:
+    shell: python -m robocorp.tasks run tasks.py -t consumer
+  Reporter:
+    shell: python -m robocorp.tasks run tasks.py -t reporter
+  RunDocDBHelper:
+    shell: python scripts/run_docdb_helper.py
+  GenerateConsolidatedDashboard:
+    shell: python -m robocorp.tasks run scripts/generate_consolidated_dashboard.py -t generate_consolidated_dashboard
+```
+
+Keep `RunDocDBHelper` in `tasks` when CI needs it, not only in `devTasks`. It is the path for helper scripts that must run with the same pinned packages, truststore, and `PYTHONPATH` as the robot.
+
+Production CI should run:
+
+```bash
+rcc --silent task script -r robot.yaml -- python scripts/load_docdb_credentials.py
+rcc run -t SeedDocDB --silent
+rcc run -t Producer --silent
+rcc run -t Consumer --silent
+rcc run -t Reporter --silent
+```
+
+Local DocDB smoke runs may use role-specific env files:
+
+```bash
+rcc run -t Producer -e devdata/env-docdb-producer.json --silent
+rcc run -t Consumer -e devdata/env-docdb-consumer.json --silent
+rcc run -t Reporter -e devdata/env-docdb-reporter.json --silent
+```
+
+Do not copy local `-e devdata/env-docdb-*.json` usage into live workflows. Live workflows should set run-scoped queue names, DocDB database, adapter path, and credentials in job env. See `../../rcc-workitems/references/docdb-rpa-patterns.md` for the queue ladder and helper pattern.
+
 ## Diagnostic Dev Tasks
 
 Production automation projects should expose diagnostics as `devTasks`, not just business tasks. Useful patterns from `fizzy-symphony`, `fetch-repos-bot`, and maintenance automation:

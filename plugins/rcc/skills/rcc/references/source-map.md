@@ -152,6 +152,11 @@ Org-level `gh repo list` scans were also run for `Sema4AI`, `robocorp`, and `jos
 
 ## Local-Only Josh Repositories
 
+- `bps-rpa-cx-qa-bot-main`
+  - Local path inspected: `/var/home/kdlocpanda/Projects/agent-skills/bps-rpa-cx-qa-bot-main`
+  - Inspected date: 2026-05-14
+  - Supports production DocDB/MongoDB RPA patterns: run-scoped queue ladder, `robocorp_adapters_custom._docdb.DocumentDBAdapter`, `RunDocDBHelper`, `DOCDB_HELPER_ARGS_JSON`, per-job secret loading through RCC, dynamic worker matrix from DocDB counts, retry/outbox/replay, artifact and screenshot storage, failure categories, timing payloads, and workflow contract tests.
+
 - `git@github.com:yorko-io/control-room.git`
   - Local branch/commit inspected: `main` / `57c29f0`
   - Supports private Control Room parity notes, robot test structure, Helm holotree init context, and custom adapter env patterns.

@@ -4,6 +4,8 @@ Use this guide for producer/consumer queues, classic Robocorp work items, `actio
 
 For cross-source Python library evidence, work item example gaps, and refresh commands, see `../../rcc/references/python-library-audit.md`.
 
+For production DocumentDB/MongoDB queue ladders, retry/outbox design, CI helper boundaries, and observability payloads, see `docdb-rpa-patterns.md`.
+
 ## Classic robocorp.workitems
 
 ```python
@@ -140,18 +142,37 @@ Common Redis env file:
 }
 ```
 
-Common DocumentDB/MongoDB env file:
+Common DocumentDB/MongoDB local env file:
 
 ```json
 {
   "RC_WORKITEM_ADAPTER": "robocorp_adapters_custom._docdb.DocumentDBAdapter",
-  "DOCDB_HOSTNAME": "localhost",
-  "DOCDB_PORT": "27017",
-  "DOCDB_DATABASE": "workitems",
-  "DOCDB_USERNAME": "user",
-  "DOCDB_PASSWORD": "password"
+  "DOCDB_URI": "mongodb://qauser:qapassword@localhost:27017/rpa_qa_workitems?authSource=admin&retryWrites=false",
+  "DOCDB_DATABASE": "bps_rpa_workitems",
+  "RC_WORKITEM_QUEUE_NAME": "cx_qa_run_local",
+  "RC_WORKITEM_OUTPUT_QUEUE_NAME": "cx_qa_run_local_output",
+  "RC_WORKITEM_FILES_DIR": "devdata/work_item_files",
+  "RC_WORKITEM_ORPHAN_TIMEOUT_MINUTES": "30",
+  "RC_WORKITEM_FILE_SIZE_THRESHOLD": "1000000"
 }
 ```
+
+For production DocDB, prefer a run-scoped queue family:
+
+```text
+cx_qa_run_<run_id> -> cx_qa_run_<run_id>_output -> cx_qa_run_<run_id>_results
+```
+
+Each role should receive the exact queue and output queue in the job environment. Local `devdata/env-docdb-*.json` files are for local MongoDB smoke runs; do not pass them to live CI jobs because they can override live queue names, credentials, or database settings.
+
+When helpers such as `count_docdb_items.py`, `create_docdb_indexes.py`, `store_artifact_docdb.py`, `reset_failed_items.py`, or `publish_rpa_outbox.py` need the robot dependencies, expose an allowlisted RCC task and drive it through JSON args:
+
+```bash
+export DOCDB_HELPER_ARGS_JSON='["count_docdb_items.py","--queue-name","cx_qa_run_local_output","--max-workers","3"]'
+rcc run -t RunDocDBHelper --silent
+```
+
+Use `DOCDB_HELPER_OUTPUT_FILE` when a helper needs to return machine-readable data to GitHub Actions.
 
 ## Local Queue Semantics
 
@@ -159,6 +180,7 @@ Common DocumentDB/MongoDB env file:
 - File adapters are closest to Control Room JSON input/output fixtures and are best for tiny deterministic tests.
 - Redis and DocumentDB support distributed workers but add service availability and locking/failure modes.
 - Keep queue name and output queue name explicit in env files when multiple roles share one database.
+- For DocumentDB, create indexes for the whole queue family before seeding/running workers, including claim/status/run lookups, duplicate-check keys, retry markers, outbox identity, and artifact retrieval.
 - Older examples may use adapter paths such as `robocorp_adapters_custom.sqlite_adapter.SQLiteAdapter`; verify the installed package version. Current canonical paths use underscored modules such as `robocorp_adapters_custom._sqlite.SQLiteAdapter`.
 
 ## Modern Python Vs Legacy Robot Framework
