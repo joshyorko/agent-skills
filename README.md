@@ -142,6 +142,14 @@ The `plugins/rcc/` distribution is split into focused RCC-family skills.
 
 ## Quick Start
 
+### Standalone Skills
+
+Install the generated standalone skill view in compatible agents with:
+
+```bash
+npx skills add joshyorko/agent-skills
+```
+
 ### Codex Bootstrap
 
 Install this repo once per machine and expose its plugins/skills globally.
