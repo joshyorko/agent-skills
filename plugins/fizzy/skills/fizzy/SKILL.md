@@ -2,7 +2,7 @@
 name: fizzy
 description: |
   Interact with Fizzy via the Fizzy CLI or already-configured MCP tools. Manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Prefer available Fizzy MCP tools for supported board/card/account/comment reads and writes when they are already configured; use the CLI for setup, troubleshooting, and CLI-only coverage.
+  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Prefer available Fizzy MCP tools for supported board/card/account/comment reads and card/comment writes when they are already configured; use the CLI for setup, troubleshooting, and CLI-only coverage.
 triggers:
   # Direct invocations
   - fizzy
@@ -57,7 +57,7 @@ argument-hint: "[action] [args...]"
 
 # /fizzy - Fizzy Workflow Command
 
-Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration. MCP coverage is intentionally narrower for connector-native board/card search, fetch, and write tools.
+Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, users, notifications, pins, webhooks, account settings, search, and board migration. MCP coverage is intentionally narrower for connector-native board/card search and fetch plus card/comment write tools.
 
 ## Agent Invariants
 
@@ -77,7 +77,7 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 
 Fizzy has two supported agent surfaces:
 
-- **MCP first for supported work when already configured**: Use available `fizzy` MCP tools when the task is a supported board/card/account/comment read or write. This includes simple questions like listing board names.
+- **MCP first for supported work when already configured**: Use available `fizzy` MCP tools when the task is a supported board/card/account/comment read or supported card/comment write. This includes simple questions like listing board names.
 - **CLI for CLI-only work**: Use `fizzy` for local shell automation, setup/troubleshooting, attachments, migrations, board bootstrap, commands not exposed through MCP, or when the MCP tools are unavailable.
 
 Preflight before acting:
