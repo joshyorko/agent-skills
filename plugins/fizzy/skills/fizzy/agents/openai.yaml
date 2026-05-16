@@ -1,13 +1,6 @@
 interface:
   display_name: "Fizzy"
-  short_description: "Manage Fizzy with an MCP-first preflight for supported board/card/account/comment work, then CLI for setup, troubleshooting, and CLI-only coverage."
-  default_prompt: "Use $fizzy to manage Fizzy. Before the first action, choose the surface: if the `fizzy` MCP tool is available, use it first for supported board/card/account/comment reads and writes; use the CLI only for setup, troubleshooting, attachments, migrations, board bootstrap, CLI-only commands, or when MCP is unavailable. For self-hosted CLI work, use --api-url or FIZZY_API_URL; never fall back to curl, raw HTTP requests, endpoint probing, or HTML scraping."
-dependencies:
-  tools:
-    - type: "mcp"
-      value: "fizzy"
-      description: "Josh's Fizzy self-hosted MCP server for OAuth-backed board/card search, fetch, and write tools. This plugin is intended to use only this MCP endpoint."
-      transport: "streamable_http"
-      url: "https://fizzy.joshyorko.com/mcp/"
+  short_description: "Manage Fizzy boards, cards, comments, setup, troubleshooting, and self-hosted workflows."
+  default_prompt: "Use Fizzy when the user asks about Fizzy boards, cards, comments, or workflows. Prefer available Fizzy MCP tools when already configured. Use the CLI for setup, troubleshooting, attachments, migrations, board bootstrap, CLI-only commands, or when MCP is unavailable. For self-hosted CLI work, use --api-url or FIZZY_API_URL; never fall back to curl, raw HTTP requests, endpoint probing, or HTML scraping."
 policy:
   allow_implicit_invocation: true

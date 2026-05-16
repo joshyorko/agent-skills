@@ -1,6 +1,6 @@
 {
   "name": "fizzy",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Fizzy workflows for boards, cards, comments, account setup, self-hosted management, and connector-native MCP access.",
   "author": {
     "name": "Josh Yorko",
@@ -19,11 +19,10 @@
     "workflow"
   ],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Fizzy",
-    "shortDescription": "Manage Fizzy from the CLI or self-hosted MCP server.",
-    "longDescription": "Fizzy automation for boards, cards, comments, setup, self-hosted workflows, and connector-native MCP access. Prefer the CLI for local shell work and the MCP server for ChatGPT/Codex connector flows.",
+    "shortDescription": "Manage Fizzy boards, cards, comments, and workflows.",
+    "longDescription": "Fizzy automation for boards, cards, comments, setup, self-hosted workflows, and connector-native MCP access. Prefer available Fizzy MCP tools when already configured, and use the CLI for local shell work, setup, troubleshooting, attachments, migrations, board bootstrap, and CLI-only coverage.",
     "developerName": "Josh Yorko",
     "category": "Productivity",
     "capabilities": [
@@ -34,9 +33,8 @@
     "privacyPolicyURL": "https://github.com/joshyorko/agent-skills",
     "termsOfServiceURL": "https://github.com/joshyorko/agent-skills",
     "defaultPrompt": [
-      "Set up the Fizzy CLI or MCP server for the hosted instance.",
       "List boards and summarize active work in Fizzy.",
-      "Manage Fizzy cards and comments from the CLI or MCP."
+      "Manage Fizzy cards and comments from the CLI or available MCP tools."
     ],
     "brandColor": "#0F766E"
   }

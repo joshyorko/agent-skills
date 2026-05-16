@@ -1,8 +1,8 @@
 ---
 name: fizzy
 description: |
-  Interact with Fizzy via the Fizzy CLI or the self-hosted MCP server. Manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Always choose the surface first: prefer the Fizzy MCP tool for supported board/card/account/comment reads and writes when available; use the CLI for setup, troubleshooting, and CLI-only coverage.
+  Interact with Fizzy via the Fizzy CLI or already-configured MCP tools. Manage boards, cards, columns, comments,
+  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Prefer available Fizzy MCP tools for supported board/card/account/comment reads and writes when they are already configured; use the CLI for setup, troubleshooting, and CLI-only coverage.
 triggers:
   # Direct invocations
   - fizzy
@@ -63,7 +63,7 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 
 **MUST follow these rules:**
 
-1. **Choose the surface before the first Fizzy action** — if the `fizzy` MCP tool is available and the task fits its supported surface, use MCP first. If you use the CLI instead, state the reason before running it.
+1. **Choose the surface before the first Fizzy action** — if Fizzy MCP tools are already available and the task fits their supported surface, use MCP first. If you use the CLI instead, state the reason before running it.
 2. **Cards use NUMBER, not ID in the CLI** — `fizzy card show 42` uses the card number. Other CLI resources use their `id` field.
 3. **Use built-in `--jq` for CLI filtering** to reduce token output — `fizzy card list --jq '[.data[] | {number, title}]'`. Never pipe to external jq — use `--jq` instead. `--jq` implies `--json`, no need to pass both.
 4. **Check breadcrumbs** in CLI responses for available next actions with pre-filled values.
@@ -75,14 +75,14 @@ Full CLI coverage: boards, cards, columns, comments, steps, reactions, tags, use
 
 ## Interaction Surfaces
 
-Fizzy now has two supported agent surfaces:
+Fizzy has two supported agent surfaces:
 
-- **MCP first for supported work**: Use the installed `fizzy` MCP server when the task is a supported board/card/account/comment read or write and the MCP tools are available. This includes simple questions like listing board names.
+- **MCP first for supported work when already configured**: Use available `fizzy` MCP tools when the task is a supported board/card/account/comment read or write. This includes simple questions like listing board names.
 - **CLI for CLI-only work**: Use `fizzy` for local shell automation, setup/troubleshooting, attachments, migrations, board bootstrap, commands not exposed through MCP, or when the MCP tools are unavailable.
 
 Preflight before acting:
 
-1. Check whether `fizzy` MCP tools are available in the active tool list.
+1. Check whether Fizzy MCP tools are available in the active tool list.
 2. If available, use MCP for `account_list`, `board_list`, `board_show`, `column_list`, `card_list`, `card_show`, `search`, `fetch`, `comment_list`, `card_create`, `card_update`, and `comment_create`.
 3. If MCP is unavailable or the task is outside that list, use the CLI and say why.
 4. Do not run CLI setup/auth/config diagnostics before trying MCP for a supported MCP task.
@@ -95,7 +95,7 @@ Default self-hosted MCP endpoint:
 https://fizzy.joshyorko.com/mcp/
 ```
 
-The plugin declares this endpoint in `plugins/fizzy/.mcp.json`. This skill is intended to work with Josh's `https://fizzy.joshyorko.com/mcp/` endpoint only; do not retarget the MCP server to another Fizzy host unless the plugin itself is deliberately forked for that host.
+When MCP is configured separately, this skill is intended to work with Josh's `https://fizzy.joshyorko.com/mcp/` endpoint only; do not retarget the MCP server to another Fizzy host unless the plugin itself is deliberately forked for that host.
 
 MCP transport/auth shape:
 
