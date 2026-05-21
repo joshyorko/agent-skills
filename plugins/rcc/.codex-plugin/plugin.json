@@ -44,6 +44,8 @@
       "Validate an Action Server package.",
       "Set up RCC-powered CI maintenance safely."
     ],
-    "brandColor": "#1D4ED8"
+    "brandColor": "#1D4ED8",
+    "composerIcon": "./assets/rcc-logo.svg",
+    "logo": "./assets/rcc-logo.svg"
   }
 }
