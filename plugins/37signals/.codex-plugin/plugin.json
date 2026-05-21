@@ -42,6 +42,8 @@
       "Use $37signals-product-refresh to refresh this existing product workflow without turning it into a rewrite.",
       "Use $37signals-shape-up and $37signals-scope-judgment to narrow this idea before implementation."
     ],
-    "brandColor": "#9A3412"
+    "brandColor": "#9A3412",
+    "composerIcon": "./assets/37signals-logo.svg",
+    "logo": "./assets/37signals-logo.svg"
   }
 }
