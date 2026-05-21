@@ -36,6 +36,8 @@
       "List boards and summarize active work in Fizzy.",
       "Manage Fizzy cards and comments from the CLI or available MCP tools."
     ],
-    "brandColor": "#0F766E"
+    "brandColor": "#0F766E",
+    "composerIcon": "./assets/fizzy-logo.svg",
+    "logo": "./assets/fizzy-logo.svg"
   }
 }
