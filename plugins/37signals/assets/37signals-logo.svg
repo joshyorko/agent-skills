@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-labelledby="title desc">
+  <title id="title">37signals</title>
+  <desc id="desc">37signals-inspired plugin logo with a compact wordmark and signal bars.</desc>
+  <rect width="800" height="280" rx="28" fill="#2f1f18"/>
+  <rect x="42" y="42" width="716" height="196" rx="24" fill="#fffaf0"/>
+  <text x="92" y="160" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="76" font-weight="850" fill="#9a3412">37signals</text>
+  <g transform="translate(610 86)" fill="#9a3412">
+    <rect x="0" y="72" width="22" height="50" rx="6"/>
+    <rect x="40" y="48" width="22" height="74" rx="6"/>
+    <rect x="80" y="24" width="22" height="98" rx="6"/>
+  </g>
+  <path d="M606 176c32 28 88 28 120 0" fill="none" stroke="#d97706" stroke-width="14" stroke-linecap="round"/>
+</svg>
