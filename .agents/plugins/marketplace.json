@@ -39,7 +39,9 @@
           "Use $37signals-product-refresh to refresh this existing product workflow without turning it into a rewrite.",
           "Use $37signals-shape-up and $37signals-scope-judgment to narrow this idea before implementation."
         ],
-        "brandColor": "#9A3412"
+        "brandColor": "#9A3412",
+        "composerIcon": "./assets/37signals-logo.svg",
+        "logo": "./assets/37signals-logo.svg"
       },
       "source": {
         "source": "local",
@@ -79,7 +81,9 @@
           "List boards and summarize active work in Fizzy.",
           "Manage Fizzy cards and comments from the CLI or available MCP tools."
         ],
-        "brandColor": "#0F766E"
+        "brandColor": "#0F766E",
+        "composerIcon": "./assets/fizzy-logo.svg",
+        "logo": "./assets/fizzy-logo.svg"
       },
       "source": {
         "source": "local",
@@ -127,7 +131,9 @@
           "Validate an Action Server package.",
           "Set up RCC-powered CI maintenance safely."
         ],
-        "brandColor": "#1D4ED8"
+        "brandColor": "#1D4ED8",
+        "composerIcon": "./assets/rcc-logo.svg",
+        "logo": "./assets/rcc-logo.svg"
       },
       "source": {
         "source": "local",
