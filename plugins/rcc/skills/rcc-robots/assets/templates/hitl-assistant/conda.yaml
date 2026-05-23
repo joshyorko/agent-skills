@@ -7,7 +7,7 @@ dependencies:
   - python=3.12.11
   - uv=0.11.8
   - pip:
-      - robocorp
-      - rpaframework==31.2.0
-      - rpaframework-assistant==5.0.0
-      - robocorp-adapters-custom==0.1.5  # Verify PyPI before repinning
+      - robocorp==3.1.1
+      - rpaframework==32.0.0
+      - rpaframework-assistant==6.0.0
+      - robocorp-adapters-custom==0.1.6

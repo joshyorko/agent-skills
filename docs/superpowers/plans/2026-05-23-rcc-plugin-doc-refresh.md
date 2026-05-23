@@ -32,7 +32,7 @@
 - Modify: `plugins/rcc/skills/rcc/references/source-map.md`
 - Modify: `plugins/rcc/skills/rcc/references/python-library-audit.md`
 
-- [ ] **Step 1: Capture current stale evidence markers**
+- [x] **Step 1: Capture current stale evidence markers**
 
 Run:
 
@@ -42,7 +42,7 @@ rg -n '2026-05-01|7e63577|2e0e309|actions-work-items.: `0.2.1`|robocorp-adapters
 
 Expected: matches for stale May 1 source snapshot, Josh commit references, and old PyPI package versions.
 
-- [ ] **Step 2: Update `source-map.md` May 23 snapshot**
+- [x] **Step 2: Update `source-map.md` May 23 snapshot**
 
 Edit `plugins/rcc/skills/rcc/references/source-map.md` so the top-level current section records:
 
@@ -63,7 +63,7 @@ Include source bullets for these reviewed heads:
 - `https://github.com/joshyorko/robocorp_adapters_custom` at `c56c70102423`: production-style SQLite, Redis, DocumentDB/MongoDB, and Yorko Control Room adapters.
 ```
 
-- [ ] **Step 3: Add public Robocorp org runtime/process sources to `source-map.md`**
+- [x] **Step 3: Add public Robocorp org runtime/process sources to `source-map.md`**
 
 Add a subsection named `Public Robocorp Runtime And Process Examples` with these bullets:
 
@@ -81,7 +81,7 @@ Add this warning immediately after:
 Public Control Room-adjacent examples support client-contract inference, not unreleased backend implementation claims. Keep HMAC, runtime token, worker env var, process-step, and queue semantics labeled as public contract or inference from examples.
 ```
 
-- [ ] **Step 4: Update `source-map.md` PyPI metadata block**
+- [x] **Step 4: Update `source-map.md` PyPI metadata block**
 
 Replace stale package version bullets with:
 
@@ -102,7 +102,7 @@ Replace stale package version bullets with:
 - `robocorp-adapters-custom`: `0.1.6`
 ```
 
-- [ ] **Step 5: Update `python-library-audit.md` date and library map**
+- [x] **Step 5: Update `python-library-audit.md` date and library map**
 
 Change the opening paragraph to say it captures the `2026-05-23` audit. Update the library map rows so:
 
@@ -111,7 +111,7 @@ Change the opening paragraph to say it captures the `2026-05-23` audit. Update t
 | RPA Framework and HITL | `rpaframework`, `rpaframework-assistant`, Robot Framework libraries | Legacy `RPA.*` robots, Python-callable RPA utilities, Assistant desktop dialogs | Prefer modern `robocorp.*` libraries for new RCC Python robots. Use `RPA.Assistant` through `rpaframework-assistant` when a desktop/HITL dialog is intentionally part of the workflow. |
 ```
 
-- [ ] **Step 6: Add modern Robocorp example snippets to `python-library-audit.md`**
+- [x] **Step 6: Add modern Robocorp example snippets to `python-library-audit.md`**
 
 Ensure the file contains short examples for all of these APIs:
 
@@ -159,7 +159,7 @@ item.add_file("output/report.json", name="report.json")
 item.save()
 ```
 
-- [ ] **Step 7: Verify Task 1 edits**
+- [x] **Step 7: Verify Task 1 edits**
 
 Run:
 
@@ -177,7 +177,7 @@ Expected: matches for every current version, modern snippet, and runtime source.
 - Modify: `plugins/rcc/skills/rcc-robots/assets/templates/conda-browser.yaml`
 - Modify: `plugins/rcc/skills/rcc-robots/scripts/env_check.py`
 
-- [ ] **Step 1: Locate stale RPA Framework references**
+- [x] **Step 1: Locate stale RPA Framework references**
 
 Run:
 
@@ -187,7 +187,7 @@ rg -n "rpaframework==31|rpaframework-assistant==5|Python 3.8|RPA_SECRET|RPA_WORK
 
 Expected: current stale pins in robot recipes/templates and Python 3.8 guidance in `env_check.py`.
 
-- [ ] **Step 2: Update Assistant recipe in `robot-project-recipes.md`**
+- [x] **Step 2: Update Assistant recipe in `robot-project-recipes.md`**
 
 Change the Assistant/HITL package example to:
 
@@ -209,7 +209,7 @@ Add this paragraph under the example:
 `RPA.Assistant` is still useful for desktop/HITL Python workflows, but it comes from the separate `rpaframework-assistant` package. New headless RCC Python robots should prefer `robocorp.tasks`, `robocorp.browser`, `robocorp.workitems`, `robocorp.vault`, and `robocorp.storage` unless the workflow intentionally needs an Assistant dialog.
 ```
 
-- [ ] **Step 3: Add modern-vs-legacy env var note to `robot-project-recipes.md`**
+- [x] **Step 3: Add modern-vs-legacy env var note to `robot-project-recipes.md`**
 
 Add a short section named `Modern Robocorp Python Vs RPA Framework Libraries` with:
 
@@ -217,7 +217,7 @@ Add a short section named `Modern Robocorp Python Vs RPA Framework Libraries` wi
 Modern Python robots use `RC_WORKITEM_*` and `RC_VAULT_*` variables with `robocorp.workitems` and `robocorp.vault`. Legacy Robot Framework/RPA Framework flows use `RPA_WORKITEMS_*` and `RPA_SECRET_*` variables with `RPA.Robocorp.WorkItems` and `RPA.Robocorp.Vault`. Do not mix the two env families in one run unless bridging old code intentionally.
 ```
 
-- [ ] **Step 4: Update HITL Assistant template pins**
+- [x] **Step 4: Update HITL Assistant template pins**
 
 Edit `plugins/rcc/skills/rcc-robots/assets/templates/hitl-assistant/conda.yaml` to use:
 
@@ -227,7 +227,7 @@ Edit `plugins/rcc/skills/rcc-robots/assets/templates/hitl-assistant/conda.yaml` 
       - robocorp-adapters-custom==0.1.6
 ```
 
-- [ ] **Step 5: Fix browser template stale pin or label**
+- [x] **Step 5: Fix browser template stale pin or label**
 
 In `plugins/rcc/skills/rcc-robots/assets/templates/conda-browser.yaml`, replace `rpaframework==31.2.0` with `rpaframework==32.0.0` and add a nearby comment:
 
@@ -235,7 +235,7 @@ In `plugins/rcc/skills/rcc-robots/assets/templates/conda-browser.yaml`, replace 
       # Robot Framework browser template. For modern Python browser tasks prefer robocorp-browser.
 ```
 
-- [ ] **Step 6: Update Python version check**
+- [x] **Step 6: Update Python version check**
 
 Edit `plugins/rcc/skills/rcc-robots/scripts/env_check.py` so the message currently returning `Python 3.8+ recommended` becomes:
 
@@ -245,12 +245,12 @@ return False, f"Python 3.10+ recommended for current Robocorp/RPA Framework pack
 
 Keep the surrounding control flow unchanged unless the existing version tuple check must be aligned to `>= (3, 10)`.
 
-- [ ] **Step 7: Verify Task 2 edits**
+- [x] **Step 7: Verify Task 2 edits**
 
 Run:
 
 ```bash
-rg -n "rpaframework==32.0.0|rpaframework-assistant==6.0.0|robocorp-adapters-custom==0.1.6|Python 3.10\\+ recommended|Modern Robocorp Python Vs RPA Framework Libraries|Robot Framework browser template" plugins/rcc/skills/rcc-robots
+rg -n "rpaframework==32.0.0|rpaframework-assistant==6.0.0|robocorp-adapters-custom==0.1.6|Python 3.10-3.13 required|Modern Robocorp Python Vs RPA Framework Libraries|Robot Framework browser template" plugins/rcc/skills/rcc-robots
 ```
 
 Expected: matches in robot recipe docs, templates, and `env_check.py`.
@@ -262,7 +262,7 @@ Expected: matches in robot recipe docs, templates, and `env_check.py`.
 - Modify: `plugins/rcc/skills/action-server/references/action-server-recipes.md`
 - Modify: `plugins/rcc/skills/rcc-robots/assets/templates/package.yaml`
 
-- [ ] **Step 1: Locate stale work-item references**
+- [x] **Step 1: Locate stale work-item references**
 
 Run:
 
@@ -272,7 +272,7 @@ rg -n "actions-work-items=0.2.1|actions-work-items|actions_work_items|RC_REDIS_U
 
 Expected: stale `0.2.1` references and partial adapter coverage.
 
-- [ ] **Step 2: Add lineage section to `workitems-adapters.md`**
+- [x] **Step 2: Add lineage section to `workitems-adapters.md`**
 
 Near the top of `workitems-adapters.md`, add:
 
@@ -284,7 +284,7 @@ Near the top of `workitems-adapters.md`, add:
 `actions-work-items` is the later generalized package for Action Server and non-robot workflows. It offers Robocorp-style aliases and a similar API shape, but it has its own adapter contract and should not replace production `robocorp-adapters-custom` guidance.
 ```
 
-- [ ] **Step 3: Update `actions-work-items` section**
+- [x] **Step 3: Update `actions-work-items` section**
 
 Change its package guidance to version `0.2.4` and include:
 
@@ -321,7 +321,7 @@ Add extras text:
 Install Redis or DocumentDB support with `actions-work-items[redis]`, `actions-work-items[docdb]`, `actions-work-items[documentdb]`, or `actions-work-items[all]`.
 ```
 
-- [ ] **Step 4: Add process/reporter/retry patterns to `workitems-adapters.md`**
+- [x] **Step 4: Add process/reporter/retry patterns to `workitems-adapters.md`**
 
 Add a section named `Process And Reporter Patterns` with:
 
@@ -336,7 +336,7 @@ Add a section named `Process And Reporter Patterns` with:
 - Terminal marker payloads such as `_TERMINAL_=True` are process-control examples, not a general work-item requirement.
 ```
 
-- [ ] **Step 5: Update Action Server work-items recipe**
+- [x] **Step 5: Update Action Server work-items recipe**
 
 In `action-server-recipes.md`, replace `actions-work-items=0.2.1` with:
 
@@ -356,7 +356,7 @@ Add the Action Server datadir note:
 The community `workflow-producer-consumer` template stores its default SQLite queue under `ACTION_SERVER_DATADIR` or `SEMA4AI_ACTION_SERVER_DATADIR` by setting `RC_WORKITEM_DB_PATH`. Its `/api/work-items` UI/API path is SQLite/datadir-specific in the reviewed community branch; do not present it as a generic Redis/DocumentDB control plane.
 ```
 
-- [ ] **Step 6: Update template package comment**
+- [x] **Step 6: Update template package comment**
 
 In `plugins/rcc/skills/rcc-robots/assets/templates/package.yaml`, replace the commented example:
 
@@ -370,7 +370,7 @@ with:
     # - actions-work-items>=0.2.4
 ```
 
-- [ ] **Step 7: Verify Task 3 edits**
+- [x] **Step 7: Verify Task 3 edits**
 
 Run:
 
@@ -387,7 +387,7 @@ Expected: matches for updated package pin, aliases, env vars, lineage, process p
 - Modify: `plugins/rcc/skills/rcc-robots/references/rcc-command-recipes.md`
 - Modify: `plugins/rcc/skills/rcc/references/agent-prompt-examples.md`
 
-- [ ] **Step 1: Inspect current gateway docs**
+- [x] **Step 1: Inspect current gateway docs**
 
 Run:
 
@@ -397,7 +397,7 @@ rg -n "holotree|freeze|rccremote|runtime|Control Room|RC_WORKER|runtimeLinkToken
 
 Expected: existing RCC command/source references but missing public on-demand runtime contract details.
 
-- [ ] **Step 2: Add RCC gateway framing**
+- [x] **Step 2: Add RCC gateway framing**
 
 In `rcc-source-recipes.md`, add a section named `RCC As Gateway`:
 
@@ -405,7 +405,7 @@ In `rcc-source-recipes.md`, add a section named `RCC As Gateway`:
 RCC is the environment and execution gateway: it resolves `robot.yaml`, `conda.yaml`, holotree environments, dependency freeze/export, templates, bundles, profiles/endpoints, and command execution. Control Room-adjacent runtime provisioning is a separate lifecycle layer that can ask a worker to link back to Control Room, but RCC remains the local environment boundary inside that worker.
 ```
 
-- [ ] **Step 3: Add public on-demand runtime contract**
+- [x] **Step 3: Add public on-demand runtime contract**
 
 In the same file, add:
 
@@ -423,7 +423,7 @@ Add the caution:
 Do not copy public provisioner examples as production hardening guides. The reviewed Azure example logs request/secret material during validation, so production provisioners need stricter secret handling and logging policy.
 ```
 
-- [ ] **Step 4: Add runtime worker env vars**
+- [x] **Step 4: Add runtime worker env vars**
 
 In `rcc-command-recipes.md`, add:
 
@@ -442,7 +442,7 @@ RC_AGENT_TERMINATE_AFTER_RUN_MS
 These variables belong to worker lifecycle/linking context. Do not confuse them with RCC dependency resolution inputs such as `robot.yaml`, `conda.yaml`, and holotree cache state.
 ````
 
-- [ ] **Step 5: Update prompt routing examples**
+- [x] **Step 5: Update prompt routing examples**
 
 In `agent-prompt-examples.md`, add examples that route:
 
@@ -453,7 +453,7 @@ In `agent-prompt-examples.md`, add examples that route:
 - `package.yaml` v2, `sema4ai-actions`, `sema4ai-mcp`, `/mcp`, or Action Server work-items template questions to `$action-server`.
 ```
 
-- [ ] **Step 6: Verify Task 4 edits**
+- [x] **Step 6: Verify Task 4 edits**
 
 Run:
 
@@ -472,7 +472,7 @@ Expected: all gateway, runtime, env var, and routing phrases are present.
 - Generated: `.claude-plugin/marketplace.json`
 - Generated: `plugins/*/.claude-plugin/plugin.json`
 
-- [ ] **Step 1: Run source-level stale search before generated rebuild**
+- [x] **Step 1: Run source-level stale search before generated rebuild**
 
 Run:
 
@@ -482,7 +482,7 @@ rg -n "actions-work-items=0.2.1|rpaframework-assistant==5.0.0|rpaframework==31.2
 
 Expected: no matches in canonical RCC skill docs.
 
-- [ ] **Step 2: Rebuild marketplace metadata**
+- [x] **Step 2: Rebuild marketplace metadata**
 
 Run:
 
@@ -492,7 +492,7 @@ python3 scripts/build_marketplaces.py
 
 Expected: command exits `0` and regenerates marketplace outputs.
 
-- [ ] **Step 3: Rebuild runtime views**
+- [x] **Step 3: Rebuild runtime views**
 
 Run:
 
@@ -502,7 +502,7 @@ python3 scripts/build_runtime_views.py
 
 Expected: command exits `0` and generated skill views remain symlinks.
 
-- [ ] **Step 4: Run repository validation**
+- [x] **Step 4: Run repository validation**
 
 Run:
 
@@ -518,17 +518,17 @@ OK
 repo structure validated
 ```
 
-- [ ] **Step 5: Run final evidence search**
+- [x] **Step 5: Run final evidence search**
 
 Run:
 
 ```bash
-rg -n '2026-05-23|rpaframework==32.0.0|rpaframework-assistant==6.0.0|actions-work-items>=0.2.4|actions-work-items.: `0.2.4`|robocorp-adapters-custom.: `0.1.6`|Python 3.10\+ recommended|runtimeLinkToken|RC_WORKER_LINK_TOKEN|process_snapshot|Adapter Lineage|RCC As Gateway' plugins/rcc docs/superpowers
+rg -n '2026-05-23|rpaframework==32.0.0|rpaframework-assistant==6.0.0|actions-work-items>=0.2.4|actions-work-items.: `0.2.4`|robocorp-adapters-custom.: `0.1.6`|Python 3.10-3.13 required|runtimeLinkToken|RC_WORKER_LINK_TOKEN|process_snapshot|Adapter Lineage|RCC As Gateway' plugins/rcc docs/superpowers
 ```
 
 Expected: matches across the canonical RCC skill docs and plan/spec.
 
-- [ ] **Step 6: Inspect final git diff**
+- [x] **Step 6: Inspect final git diff**
 
 Run:
 
@@ -539,7 +539,7 @@ git status --short
 
 Expected: only planned canonical docs, planned template/script hygiene files, generated views, and Superpowers plan/spec files are changed.
 
-- [ ] **Step 7: Commit implementation**
+- [x] **Step 7: Commit implementation**
 
 Run:
 

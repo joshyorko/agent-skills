@@ -13,7 +13,8 @@ dependencies:
   - pip:
       - robotframework==7.1.1
       - robotframework-browser==18.9.1
-      - rpaframework==31.2.0
+      # Robot Framework browser template. For modern Python browser tasks prefer robocorp-browser.
+      - rpaframework==32.0.0
 
 # Initialize browser after environment creation
 rccPostInstall:

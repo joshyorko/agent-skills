@@ -1,7 +1,7 @@
 # Sema4AI Actions package.yaml (v2 spec)
 # Community fork compatible:
 # https://github.com/joshyorko/actions/tree/community
-# PyPI package metadata was fetched during the 2026-04-27 skill refresh;
+# PyPI package metadata was refreshed during the 2026-05-23 skill refresh;
 # recheck exact pins before repinning.
 
 spec-version: v2
@@ -19,8 +19,8 @@ dependencies:
     - sema4ai-mcp=0.0.3
     - requests=2.32.5
     - pydantic=2.11.7
-    # Optional community drop-in replacement for robocorp-workitems:
-    # - actions-work-items=0.2.1
+    # Optional community work-item package for Action Server/non-robot flows:
+    # - actions-work-items>=0.2.4
 
 pythonpath:
   - src

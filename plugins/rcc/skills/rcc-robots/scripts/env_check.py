@@ -195,10 +195,10 @@ def check_python_version() -> Tuple[bool, str]:
     version = sys.version_info
     version_str = f"{version.major}.{version.minor}.{version.micro}"
 
-    if version.major < 3:
-        return False, f"Python 2.x not supported: {version_str}"
-    if version.minor < 8:
-        return False, f"Python 3.8+ recommended: {version_str}"
+    if version.major != 3:
+        return False, f"Python 3.10-3.13 required for current Robocorp/RPA Framework packages: {version_str}"
+    if version.minor < 10 or version.minor >= 14:
+        return False, f"Python 3.10-3.13 required for current Robocorp/RPA Framework packages: {version_str}"
 
     return True, f"Python {version_str}"
 

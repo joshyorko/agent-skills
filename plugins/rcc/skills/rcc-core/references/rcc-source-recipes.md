@@ -2,6 +2,18 @@
 
 Use this guide when the work is about RCC itself: the CLI, source tree, holotree, cache behavior, templates, endpoint configuration, or Josh's fork.
 
+## RCC As Gateway
+
+RCC is the environment and execution gateway: it resolves `robot.yaml`, `conda.yaml`, holotree environments, dependency freeze/export, templates, bundles, profiles/endpoints, and command execution. Control Room-adjacent runtime provisioning is a separate lifecycle layer that can ask a worker to link back to Control Room, but RCC remains the local environment boundary inside that worker.
+
+## Public On-Demand Runtime Contract
+
+Public `robocorp/k8s-on-demand-runtimes` and `robocorp/azure-on-demand-runtimes` examples expose a provider-neutral webhook shape with `type` values `start`, `stop`, and `status`, plus `workspaceId`, `runtimeId`, `runtimeLinkToken`, and optional `maxLifetimeSeconds`. These examples support public contract guidance and architecture inference only; they are not a released Control Room backend implementation.
+
+One-time `runtimeLinkToken` values affect retry semantics. Retrying infrastructure after a token is consumed may require a fresh Control Room request rather than rerunning the same worker container.
+
+Do not copy public provisioner examples as production hardening guides. The reviewed Azure example logs request/secret material during validation, so production provisioners need stricter secret handling and logging policy.
+
 ## Command Map
 
 Start with read-only commands:
