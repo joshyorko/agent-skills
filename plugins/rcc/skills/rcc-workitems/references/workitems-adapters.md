@@ -6,6 +6,12 @@ For cross-source Python library evidence, work item example gaps, and refresh co
 
 For production DocumentDB/MongoDB queue ladders, retry/outbox design, CI helper boundaries, and observability payloads, see `docdb-rpa-patterns.md`.
 
+## Adapter Lineage
+
+`robocorp-adapters-custom` predates the generalized `actions-work-items` package. Treat it as the production-proven adapter layer for classic `robocorp.workitems` robot workflows, especially DocumentDB/MongoDB queue families, GridFS attachments, explicit output queues, orphan recovery, retry handling, and RCC producer/consumer/reporter runs.
+
+`actions-work-items` is the later generalized package for Action Server and non-robot workflows. It offers Robocorp-style aliases and a similar API shape, but it has its own adapter contract and should not replace production `robocorp-adapters-custom` guidance.
+
 ## Classic robocorp.workitems
 
 ```python
@@ -33,7 +39,9 @@ Use `with item:` so input items are released consistently. `outputs.create(...)`
 
 ## actions-work-items
 
-Josh's `actions` community branch includes `actions-work-items`, a drop-in style package for producer/consumer workflows outside classic robots.
+Josh's `actions` community branch includes `actions-work-items>=0.2.4`, the later generalized package for Action Server-centered packages and other non-robot producer/consumer workflows.
+
+Install Redis or DocumentDB support with `actions-work-items[redis]`, `actions-work-items[docdb]`, `actions-work-items[documentdb]`, or `actions-work-items[all]`.
 
 ```python
 from actions.work_items import BusinessException, inputs, outputs
@@ -43,6 +51,15 @@ for item in inputs:
         if "id" not in item.payload:
             raise BusinessException("Missing id")
         outputs.create({"id": item.payload["id"], "processed": True})
+```
+
+Supported import forms:
+
+```python
+from actions import workitems
+from actions_work_items import workitems
+import actions_work_items as workitems
+from actions.work_items import inputs, outputs
 ```
 
 Default local SQLite adapter:
@@ -58,19 +75,28 @@ adapter = SQLiteAdapter(
 init(adapter)
 ```
 
-Environment variables used by the SQLite/file local adapters:
+Environment variables used across local, Redis, and DocumentDB adapter paths:
 
 ```text
 RC_WORKITEM_ADAPTER
-RC_WORKITEM_DB_PATH
 RC_WORKITEM_QUEUE_NAME
 RC_WORKITEM_OUTPUT_QUEUE_NAME
 RC_WORKITEM_FILES_DIR
+RC_WORKITEM_DB_PATH
 RC_WORKITEM_INPUT_PATH
 RC_WORKITEM_OUTPUT_PATH
+RC_REDIS_URL
+DOCDB_URI
+DOCDB_HOSTNAME
+DOCDB_PORT
+DOCDB_USERNAME
+DOCDB_PASSWORD
+DOCDB_DATABASE
+RC_WORKITEM_AUTO_APPEND_OUTPUT_SUFFIX
+RC_WORKITEM_FILE_SIZE_THRESHOLD
 ```
 
-`RC_WORKITEM_FILES_DIR`, `RC_WORKITEM_DB_PATH`, and queue-name envs are custom/local adapter concerns. The built-in modern FileAdapter path is intentionally smaller: `RC_WORKITEM_ADAPTER`, `RC_WORKITEM_INPUT_PATH`, and `RC_WORKITEM_OUTPUT_PATH`.
+`RC_WORKITEM_FILES_DIR`, `RC_WORKITEM_DB_PATH`, and queue-name envs are custom/local adapter concerns. The built-in modern FileAdapter path is intentionally smaller: `RC_WORKITEM_ADAPTER`, `RC_WORKITEM_INPUT_PATH`, and `RC_WORKITEM_OUTPUT_PATH`. Redis adapters use `RC_REDIS_URL`. DocumentDB adapters can use a single `DOCDB_URI` or split `DOCDB_HOSTNAME`, `DOCDB_PORT`, `DOCDB_USERNAME`, `DOCDB_PASSWORD`, and `DOCDB_DATABASE` settings. `RC_WORKITEM_AUTO_APPEND_OUTPUT_SUFFIX` controls output queue naming in adapters that support automatic suffixing, and `RC_WORKITEM_FILE_SIZE_THRESHOLD` controls when larger files are stored through the backend file path such as GridFS.
 
 ## Custom Adapter Contract
 
@@ -173,6 +199,17 @@ rcc run -t RunDocDBHelper --silent
 ```
 
 Use `DOCDB_HELPER_OUTPUT_FILE` when a helper needs to return machine-readable data to GitHub Actions.
+
+## Process And Reporter Patterns
+
+- Producer tasks usually read one seed input and create child output items.
+- Consumer tasks loop the previous step's outputs and release each item as completed or failed.
+- Reporter tasks can consume consumer outputs, use a sentinel payload such as `{"TYPE": "Reporter"}`, or inspect prior step work items through a Process API pattern.
+- Retry automation should target application, orchestrator, or unspecified/system failures. Do not retry business/data failures by default.
+- Local file adapters simulate JSON queue handoff, but they do not reproduce all hosted scheduling semantics.
+- Local reporter smoke tests can use an explicit `COMPLETED_CONSUMER_WORKITEMS_JSON` fixture when the project does not have a hosted Process API run to inspect.
+- Email-triggered examples rely on parsed Control Room email payloads and files; raw email payload paths are historical/deprecated example material.
+- Terminal marker payloads such as `_TERMINAL_=True` are process-control examples, not a general work-item requirement.
 
 ## Local Queue Semantics
 

@@ -82,13 +82,20 @@ If browser install fails, treat it as environment/post-install first, not a sele
 Assistant UI automation projects use `rpaframework-assistant`, not the base `rpaframework` package. They are desktop/HITL flows and should not be treated as headless CI smoke tests.
 
 ```yaml
+channels:
+  - conda-forge
+
 dependencies:
   - python=3.12.11
   - uv=0.11.8
   - pip:
       - robocorp==3.1.1
-      - rpaframework-assistant==5.0.0
+      - rpaframework==32.0.0
+      - rpaframework-assistant==6.0.0
+      - robocorp-adapters-custom==0.1.6
 ```
+
+`RPA.Assistant` is still useful for desktop/HITL Python workflows, but it comes from the separate `rpaframework-assistant` package. New headless RCC Python robots should prefer `robocorp.tasks`, `robocorp.browser`, `robocorp.workitems`, `robocorp.vault`, and `robocorp.storage` unless the workflow intentionally needs an Assistant dialog.
 
 Typical tasks block on dialog interaction:
 
@@ -108,6 +115,10 @@ def ask_user() -> None:
 ```
 
 Keep producer/consumer/reporter task functions real `@task` entrypoints even when an Assistant task is present. Do not call `workitems.outputs.create(...)` from a HITL starter unless a seed/current input item is reserved.
+
+## Modern Robocorp Python Vs RPA Framework Libraries
+
+Modern Python robots use `RC_WORKITEM_*` and `RC_VAULT_*` variables with `robocorp.workitems` and `robocorp.vault`. Legacy Robot Framework/RPA Framework flows use `RPA_WORKITEMS_*` and `RPA_SECRET_*` variables with `RPA.Robocorp.WorkItems` and `RPA.Robocorp.Vault`. Do not mix the two env families in one run unless bridging old code intentionally.
 
 ## Work Item Automation Project
 

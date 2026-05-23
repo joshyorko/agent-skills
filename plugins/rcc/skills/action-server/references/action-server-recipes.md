@@ -45,9 +45,6 @@ dependencies:
     - requests=2.32.5
     - pydantic=2.11.7
 
-post-install:
-  - python -m robocorp.browser install chrome --isolated
-
 pythonpath:
   - src
   - tests
@@ -309,7 +306,7 @@ dependencies:
     - uv=0.11.8
   pypi:
     - sema4ai-actions=1.6.6
-    - actions-work-items=0.2.1
+    - actions-work-items>=0.2.4
 ```
 
 ```python
@@ -320,4 +317,6 @@ for item in inputs:
         outputs.create({"processed": True, "source": item.payload})
 ```
 
-Use `actions-work-items` for action-server-centered producer/consumer flows. Use `robocorp.workitems` for classic Robocorp robot flows.
+Use `actions-work-items` for Action Server-centered producer/consumer flows and non-robot workflows. Use `robocorp.workitems` for RCC robot processes. Use `robocorp-adapters-custom` when the production robot workflow depends on custom backend adapters such as DocumentDB.
+
+The community `workflow-producer-consumer` template stores its default SQLite queue under `ACTION_SERVER_DATADIR` or `SEMA4AI_ACTION_SERVER_DATADIR` by setting `RC_WORKITEM_DB_PATH`. Its `/api/work-items` UI/API path is SQLite/datadir-specific in the reviewed community branch; do not present it as a generic Redis/DocumentDB control plane.

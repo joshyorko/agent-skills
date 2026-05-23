@@ -6,6 +6,18 @@ For RCC source, endpoint, holotree internals, or cache behavior not tied to a sp
 
 For cross-source Python library evidence, current example gaps, and package/source refresh commands, see `../../rcc/references/python-library-audit.md`.
 
+## Runtime Worker Environment Variables
+
+Public on-demand runtime examples set worker/linking variables such as:
+
+```text
+RC_WORKER_NAME
+RC_WORKER_LINK_TOKEN
+RC_AGENT_TERMINATE_AFTER_RUN_MS
+```
+
+They may also set `ROBOCORP_HOME` to place RCC state inside the worker. Keep that distinction clear: `ROBOCORP_HOME` is still RCC's home/cache boundary, while the `RC_*` values belong to worker lifecycle/linking context. Do not confuse worker/linking variables with RCC dependency resolution inputs such as `robot.yaml`, `conda.yaml`, and holotree cache state.
+
 ## Create Or Locate A Robot
 
 ```bash
@@ -72,7 +84,7 @@ dependencies:
 #   - rfbrowser init
 ```
 
-RCC templates in this skill use `uv` for faster pip dependency installation. Package metadata was fetched from PyPI during the 2026-04-27 skill refresh; recheck exact pins before bumping.
+RCC templates in this skill use `uv` for faster pip dependency installation. Package metadata was refreshed from PyPI during the 2026-05-23 skill refresh; recheck exact pins before bumping.
 
 ## Prebuild And Inspect Holotree
 
