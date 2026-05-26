@@ -1,6 +1,6 @@
 ---
 name: rcc-ci-maintenance
-description: RCC CI and maintenance specialist. Use for RCC in GitHub Actions, ROBOCORP_HOME cache setup, pinned RCC installs, scheduled maintenance robots, allowlist-based dependency maintenance, bot PR workflows, maintenance artifacts, and safe cache/commit hygiene.
+description: Use for RCC in GitHub Actions, ROBOCORP_HOME cache, pinned installs, maintenance, bot PRs, and cache hygiene.
 ---
 
 # RCC CI Maintenance

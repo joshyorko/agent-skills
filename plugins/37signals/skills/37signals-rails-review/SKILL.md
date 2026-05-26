@@ -1,9 +1,6 @@
 ---
 name: 37signals-rails-review
-description: >-
-  Use when reviewing Rails code, pull requests, or architecture changes through
-  37signals-inspired Rails conventions, integrated-system bias, Hotwire defaults,
-  source-grounding, and concrete correctness risks.
+description: Use when reviewing Rails code, PRs, or architecture for conventions, Hotwire defaults, and correctness risks.
 ---
 ## Source Grounding
 

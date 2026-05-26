@@ -1,9 +1,6 @@
 ---
 name: 37signals-rails-implement
-description: >-
-  Use when implementing or extending a Rails feature with 37signals-inspired
-  defaults across data modeling, REST resources, Hotwire UI, jobs, mailers,
-  tenancy, deploy impact, and tests.
+description: Use when implementing or extending Rails features across models, REST, Hotwire, jobs, tenancy, and tests.
 ---
 ## Source Grounding
 

@@ -1,9 +1,6 @@
 ---
 name: 37signals-hotwire
-description: >-
-  Use when designing, implementing, or reviewing Rails UI behavior with Hotwire,
-  Turbo, Stimulus, no-build or low-build frontend defaults, progressive
-  enhancement, or server-rendered interaction tradeoffs.
+description: Use when designing, implementing, or reviewing Rails UI with Hotwire, Turbo, Stimulus, or server rendering.
 ---
 ## Source Grounding
 

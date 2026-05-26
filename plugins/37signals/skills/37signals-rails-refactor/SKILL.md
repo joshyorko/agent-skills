@@ -1,9 +1,6 @@
 ---
 name: 37signals-rails-refactor
-description: >-
-  Use when simplifying existing Rails code toward 37signals-inspired conventions
-  without changing behavior, especially reducing indirection, custom verbs,
-  frontend weight, service layers, or scattered domain logic.
+description: Use when simplifying Rails code without behavior change, especially indirection, verbs, or scattered domain logic.
 ---
 ## Source Grounding
 

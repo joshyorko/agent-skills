@@ -1,6 +1,6 @@
 ---
 name: rcc-workitems
-description: RCC work item specialist. Use for classic robocorp.workitems, actions-work-items, producer/consumer/reporter flows, queue env files, local SQLite/file queues, custom adapters, Redis, DocumentDB, and Yorko Control Room adapters.
+description: Use for RCC work item queues, robocorp.workitems, actions-work-items, producer/consumer flows, envs, and adapters.
 ---
 
 # RCC Work Items

@@ -1,6 +1,6 @@
 ---
 name: rcc
-description: Router for RCC-family work. Use when a task mentions RCC, RCC-backed automation projects, robot.yaml, conda.yaml, holotree, work items, Action Server packages, Josh's actions community branch, sema4ai-actions, sema4ai-mcp, RCC CI/cache, or maintenance automation and Codex needs to choose the focused RCC specialist skill.
+description: Route RCC-family work across core, robots, work items, Action Server, CI/cache, and maintenance automation.
 ---
 
 # RCC Router

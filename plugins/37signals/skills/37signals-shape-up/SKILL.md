@@ -1,9 +1,6 @@
 ---
 name: 37signals-shape-up
-description: >-
-  Use when shaping a raw product idea, feature request, spike, project, or bet
-  into a pitch with appetite, problem, solution sketch, rabbit holes, no-gos,
-  risks, and a clear build/no-build recommendation.
+description: Use when shaping a raw product idea, request, spike, project, or bet into a bounded Shape Up pitch.
 ---
 ## Source Grounding
 

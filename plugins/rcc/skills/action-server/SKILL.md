@@ -1,6 +1,6 @@
 ---
 name: action-server
-description: Action Server action-package specialist. Use for ordinary Action Server packages, Josh's actions community branch, package.yaml v2, sema4ai-actions, sema4ai-mcp, typed action responses, secrets, dev-tasks, tests, and local OpenAPI/MCP endpoint validation.
+description: Use for Action Server packages, package.yaml, sema4ai-actions, sema4ai-mcp, secrets, tests, and MCP validation.
 ---
 
 # Action Server

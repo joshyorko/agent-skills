@@ -1,6 +1,6 @@
 ---
 name: rcc-core
-description: "RCC CLI/source specialist. Use for RCC itself: command selection, installation, source tree orientation, holotree/cache internals, endpoint/profile configuration, templates, bundles, remote cache/client behavior, and diagnosing RCC before automation task code runs."
+description: "Use for RCC itself: commands, install, source tree, holotree/cache, endpoints, profiles, templates, and bundles."
 ---
 
 # RCC Core

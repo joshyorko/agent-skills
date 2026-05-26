@@ -1,8 +1,6 @@
 ---
 name: fizzy
-description: |
-  Interact with Fizzy via the Fizzy CLI or already-configured MCP tools. Manage boards, cards, columns, comments,
-  steps, reactions, tags, users, notifications, pins, webhooks, account settings, and ChatGPT/Codex connector flows. Use for ANY Fizzy question or action. Prefer available Fizzy MCP tools for supported board/card/account/comment reads and card/comment writes when they are already configured; use the CLI for setup, troubleshooting, and CLI-only coverage.
+description: Use for Fizzy boards, cards, comments, setup, self-hosting, CLI, MCP, connectors, and workflows.
 triggers:
   # Direct invocations
   - fizzy

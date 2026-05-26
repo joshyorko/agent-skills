@@ -1,10 +1,6 @@
 ---
 name: 37signals-product-refresh
-description: >-
-  Use when improving an existing product, screen, workflow, onboarding path,
-  settings area, or stale/bloated feature through 37signals-inspired product
-  refresh, modernization, simplification, interface-first design, and bounded
-  Rails/Hotwire-aware change.
+description: Use when improving an existing product, screen, workflow, onboarding, settings, or stale feature.
 ---
 ## Source Grounding
 

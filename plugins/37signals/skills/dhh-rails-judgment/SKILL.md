@@ -1,9 +1,6 @@
 ---
 name: dhh-rails-judgment
-description: >-
-  Use when explicitly evaluating Rails architecture through DHH or Rails Doctrine
-  judgment, including monoliths vs services, Hotwire, no-build defaults,
-  omakase, dependencies, or conceptual compression.
+description: Use when evaluating Rails architecture through DHH or Rails Doctrine judgment.
 ---
 ## Source Grounding
 

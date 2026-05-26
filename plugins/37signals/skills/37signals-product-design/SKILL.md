@@ -1,9 +1,6 @@
 ---
 name: 37signals-product-design
-description: >-
-  Use when designing or reviewing product UI, frontend flows, onboarding,
-  settings, empty states, product copy, or screen-level interaction through
-  37signals-inspired interface-first and epicenter design principles.
+description: Use when designing or reviewing product UI, flows, onboarding, settings, empty states, copy, or screens.
 ---
 ## Source Grounding
 

@@ -1,9 +1,6 @@
 ---
 name: 37signals-communication
-description: >-
-  Use when drafting or reviewing project updates, decision memos, async
-  communication, written tradeoffs, meeting replacements, Basecamp-style
-  announcements, or calm-work coordination artifacts.
+description: Use when drafting or reviewing async updates, decision memos, tradeoffs, or status.
 ---
 ## Source Grounding
 

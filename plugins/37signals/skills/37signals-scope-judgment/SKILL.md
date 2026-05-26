@@ -1,9 +1,6 @@
 ---
 name: 37signals-scope-judgment
-description: >-
-  Use when simplifying a product plan, roadmap, feature set, process, meeting
-  habit, AI workflow, or execution strategy through 37signals-inspired scope,
-  appetite, overkill, and calm-work judgment.
+description: Use when simplifying product plans, roadmaps, feature sets, process, meetings, AI workflows, or strategy.
 ---
 ## Source Grounding
 

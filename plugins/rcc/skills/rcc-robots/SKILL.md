@@ -1,6 +1,6 @@
 ---
 name: rcc-robots
-description: RCC automation-runtime specialist. Use for RCC CLI commands, RCC-backed automation projects, robot.yaml, conda.yaml, holotree, freeze files, bundles, templates, environment validation, and task debugging.
+description: Use for RCC automation projects, robot.yaml, conda.yaml, holotree, freezes, bundles, templates, envs, and tasks.
 ---
 
 # RCC Robots
