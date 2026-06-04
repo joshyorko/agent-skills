@@ -24,10 +24,12 @@ Treat RCC as the center of gravity for this stack. Frame the domain as RCC-manag
 - For DocDB-backed RPA systems that mix queue naming, helper scripts, retry, outbox, dashboards, or GitHub Actions matrix workers, start with `$rcc-workitems`; pull in `$rcc-robots` or `$rcc-ci-maintenance` only after the queue boundary is clear.
 - Keep canonical edits under `plugins/rcc/skills/<skill>/`. Treat top-level `skills/` and `.agents/skills/` as generated views.
 - Do not prototype marketplace servers, MCP servers, web services, daemons, or new runtime products from this plugin. `action-server` covers normal action-package work only.
+- When the user explicitly asks to expose Josh's RCC Dagger runner to agents, use `references/dagger-mcp.md` and `scripts/rcc-dagger-mcp`. Keep the local RCC checkout path explicit through `RCC_DAGGER_REPO`.
 
 ## Shared References
 
 - `references/python-library-audit.md`: cross-source Python library evidence, example gaps, and refresh commands for RCC-family recipes.
 - `references/source-map.md`: source evidence for RCC plugin refreshes.
 - `references/agent-prompt-examples.md`: short prompts that point future agents at the right specialist skill.
+- `references/dagger-mcp.md`: opt-in bridge for exposing a local RCC Dagger module through Dagger's MCP server.
 - `../rcc-workitems/references/docdb-rpa-patterns.md`: production DocDB/RPA queue, helper, retry, outbox, artifact, and CI patterns from the local BPS example.

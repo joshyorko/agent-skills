@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: rcc-dagger-mcp [dagger mcp options]
+
+Expose a local RCC Dagger module as a stdio MCP server.
+
+Set RCC_DAGGER_REPO to the absolute path of a local RCC checkout that contains
+dagger.json and .dagger/.
+
+Examples:
+  RCC_DAGGER_REPO=/path/to/rcc rcc-dagger-mcp
+  codex mcp add rcc-dagger --env RCC_DAGGER_REPO=/path/to/rcc -- /path/to/rcc-dagger-mcp
+
+If RCC_DAGGER_REPO is not set, the current working directory is used when it
+looks like an RCC Dagger module checkout.
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+if ! command -v dagger >/dev/null 2>&1; then
+  echo "dagger CLI is required to expose the RCC Dagger module as MCP." >&2
+  exit 127
+fi
+
+rcc_repo="${RCC_DAGGER_REPO:-${RCC_DAGGER_MODULE:-}}"
+if [[ -z "$rcc_repo" && -f dagger.json && -d .dagger ]]; then
+  rcc_repo="$PWD"
+fi
+
+if [[ -z "$rcc_repo" ]]; then
+  echo "Set RCC_DAGGER_REPO to a local RCC checkout containing dagger.json and .dagger/." >&2
+  exit 2
+fi
+
+rcc_repo="$(python3 - "$rcc_repo" <<'PY'
+import sys
+from pathlib import Path
+
+print(Path(sys.argv[1]).expanduser().resolve())
+PY
+)"
+
+if [[ ! -f "$rcc_repo/dagger.json" || ! -d "$rcc_repo/.dagger" ]]; then
+  echo "RCC_DAGGER_REPO must contain dagger.json and .dagger/: $rcc_repo" >&2
+  exit 2
+fi
+
+exec dagger --silent mcp --stdio --mod "$rcc_repo" "$@"

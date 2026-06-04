@@ -12,6 +12,10 @@ Use $rcc-core. Inspect RCC before debugging robot code: installed binary/version
 Use $rcc-core for RCC holotree, freeze/export, endpoint, prebuilt environment, rccremote, or public runtime webhook questions. Treat public on-demand runtime examples as public contract guidance and architecture inference, not unreleased Control Room backend fact.
 ```
 
+```text
+Use $rcc when exposing Josh's RCC Dagger runner to agents through MCP. Keep RCC_DAGGER_REPO explicit, verify dagger functions from the RCC checkout, and use the Dagger MCP ListMethods/SelectMethods/CallMethod flow.
+```
+
 ## Inspect A Robot
 
 ```text
