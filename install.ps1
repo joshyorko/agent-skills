@@ -163,7 +163,13 @@ function Install-FromGit {
     }
   }
   else {
-    Invoke-NativeCommand "git pull --ff-only" { & git -C $RepoPath pull --ff-only | Out-Null }
+    $branch = (& git -C $RepoPath symbolic-ref --short -q HEAD 2>$null)
+    if ($LASTEXITCODE -eq 0 -and $branch) {
+      Invoke-NativeCommand "git pull --ff-only" { & git -C $RepoPath pull --ff-only | Out-Null }
+    }
+    else {
+      Log "Existing checkout is detached; skipping git pull --ff-only"
+    }
   }
 
   $resolvedRef = $Ref
