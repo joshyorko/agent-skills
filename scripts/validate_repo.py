@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import ast
 import json
 import re
 import sys
@@ -138,6 +139,29 @@ def validate_skill_frontmatter(skill_dir: Path) -> None:
         fail(f"missing skill description in {path}")
     if len(description) > 1024:
         fail(f"skill description exceeds 1024 characters in {path}")
+
+
+def validate_hermes_plugin(plugin_root: Path, plugin: dict, codex_manifest: dict) -> None:
+    plugin_yaml = plugin_root / "plugin.yaml"
+    init_py = plugin_root / "__init__.py"
+    if not plugin_yaml.exists():
+        fail(f"missing Hermes plugin manifest: {plugin_yaml}")
+    if not init_py.exists():
+        fail(f"missing Hermes plugin loader: {init_py}")
+
+    hermes_manifest = load_json_manifest(plugin_yaml)
+
+    if hermes_manifest.get("name") != plugin["name"]:
+        fail(f"Hermes plugin manifest name mismatch for {plugin['name']}")
+    if hermes_manifest.get("version") != codex_manifest.get("version"):
+        fail(f"Hermes plugin manifest version mismatch for {plugin['name']}")
+    if hermes_manifest.get("kind") != "standalone":
+        fail(f"Hermes plugin kind must be standalone for {plugin['name']}")
+
+    try:
+        ast.parse(init_py.read_text(encoding="utf-8"), filename=str(init_py))
+    except SyntaxError as error:
+        fail(f"Hermes plugin loader does not compile: {init_py}: {error}")
 
 
 def validate_37signals_skill(skill_dir: Path) -> None:
@@ -335,6 +359,7 @@ def main() -> int:
         codex_manifest = load_json(codex_manifest_path)
         if codex_manifest["name"] != plugin["name"]:
             fail(f"plugin manifest name mismatch for {plugin['name']}")
+        validate_hermes_plugin(plugin_root, plugin, codex_manifest)
 
         skills_root = plugin_root / codex_manifest["skills"].removeprefix("./")
         if not skills_root.exists():

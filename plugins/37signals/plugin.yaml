@@ -1,0 +1,6 @@
+{
+  "name": "37signals",
+  "version": "0.1.0",
+  "description": "Compact 37signals-inspired Rails, Hotwire, product refresh, shaping, communication, and DHH judgment skills with source-grounded recipes.",
+  "kind": "standalone"
+}
