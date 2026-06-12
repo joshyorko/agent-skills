@@ -13,7 +13,7 @@ Use $rcc-core for RCC holotree, freeze/export, endpoint, prebuilt environment, r
 ```
 
 ```text
-Use $rcc when exposing Josh's RCC Dagger runner to agents through MCP. Keep RCC_DAGGER_REPO explicit, verify dagger functions from the RCC checkout, and use the Dagger MCP ListMethods/SelectMethods/CallMethod flow.
+Use $rcc when exposing a local Dagger module to agents through MCP. Do not pin RCC_DAGGER_REPO unless a fixed module is requested. If Docker or Dagger is unavailable, fall back to $rcc-core and use the regular rcc binary directly in the active project context.
 ```
 
 ## Inspect A Robot

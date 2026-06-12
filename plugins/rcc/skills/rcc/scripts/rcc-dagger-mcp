@@ -5,17 +5,20 @@ usage() {
   cat <<'EOF'
 Usage: rcc-dagger-mcp [dagger mcp options]
 
-Expose a local RCC Dagger module as a stdio MCP server.
+Expose a local Dagger module as a stdio MCP server.
 
-Set RCC_DAGGER_REPO to the absolute path of a local RCC checkout that contains
-dagger.json and .dagger/.
+By default, the current working directory is used when it contains dagger.json
+and .dagger/. If the current directory is not a Dagger module, the server starts
+without a module. Set RCC_DAGGER_REPO or RCC_DAGGER_MODULE only when you want to
+pin the server to a specific checkout regardless of current directory.
 
 Examples:
+  rcc-dagger-mcp
   RCC_DAGGER_REPO=/path/to/rcc rcc-dagger-mcp
-  codex mcp add rcc-dagger --env RCC_DAGGER_REPO=/path/to/rcc -- /path/to/rcc-dagger-mcp
+  codex mcp add rcc-dagger -- /path/to/rcc-dagger-mcp
 
-If RCC_DAGGER_REPO is not set, the current working directory is used when it
-looks like an RCC Dagger module checkout.
+Use the pinned env form only for a fixed module:
+  codex mcp add rcc-dagger --env RCC_DAGGER_REPO=/path/to/rcc -- /path/to/rcc-dagger-mcp
 EOF
 }
 
@@ -35,8 +38,7 @@ if [[ -z "$rcc_repo" && -f dagger.json && -d .dagger ]]; then
 fi
 
 if [[ -z "$rcc_repo" ]]; then
-  echo "Set RCC_DAGGER_REPO to a local RCC checkout containing dagger.json and .dagger/." >&2
-  exit 2
+  exec dagger --silent mcp --stdio --no-mod --env-privileged "$@"
 fi
 
 rcc_repo="$(python3 - "$rcc_repo" <<'PY'
@@ -48,7 +50,7 @@ PY
 )"
 
 if [[ ! -f "$rcc_repo/dagger.json" || ! -d "$rcc_repo/.dagger" ]]; then
-  echo "RCC_DAGGER_REPO must contain dagger.json and .dagger/: $rcc_repo" >&2
+  echo "Dagger module path must contain dagger.json and .dagger/: $rcc_repo" >&2
   exit 2
 fi
 
