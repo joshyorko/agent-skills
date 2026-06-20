@@ -27,10 +27,16 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
 if ! command -v dagger >/dev/null 2>&1; then
   echo "dagger CLI is required to expose the RCC Dagger module as MCP." >&2
   exit 127
 fi
+
+run_dagger_mcp() {
+  python3 "$script_dir/rcc-dagger-mcp-filter.py" "$@"
+}
 
 rcc_repo="${RCC_DAGGER_REPO:-${RCC_DAGGER_MODULE:-}}"
 if [[ -z "$rcc_repo" && -f dagger.json && -d .dagger ]]; then
@@ -38,7 +44,8 @@ if [[ -z "$rcc_repo" && -f dagger.json && -d .dagger ]]; then
 fi
 
 if [[ -z "$rcc_repo" ]]; then
-  exec dagger --silent mcp --stdio --no-mod --env-privileged "$@"
+  run_dagger_mcp --no-mod --env-privileged "$@"
+  exit $?
 fi
 
 rcc_repo="$(python3 - "$rcc_repo" <<'PY'
@@ -54,4 +61,4 @@ if [[ ! -f "$rcc_repo/dagger.json" || ! -d "$rcc_repo/.dagger" ]]; then
   exit 2
 fi
 
-exec dagger --silent mcp --stdio --mod "$rcc_repo" "$@"
+run_dagger_mcp --mod "$rcc_repo" "$@"
