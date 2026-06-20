@@ -23,6 +23,11 @@ Do not force a repo path unless the user asks for a fixed module. If the user wa
 
 No-module mode is privileged by Dagger design. Treat it as host/Docker-capable, not a harmless read-only helper.
 
+The launcher filters Dagger's stdio stream for strict MCP clients. Dagger `mcp`
+can emit engine progress lines on stdout before JSON-RPC responses even with
+`--silent`; those lines are forwarded to stderr, while JSON-RPC lines remain on
+stdout.
+
 ## Codex Registration
 
 On Josh's Bluefin host, prefer current-directory registration:
